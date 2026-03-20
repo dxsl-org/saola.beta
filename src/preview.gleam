@@ -6,8 +6,10 @@ import lustre/element.{type Element}
 import lustre/element/html as h
 import modem
 import preview/models.{
-  type Model, type Msg, Alerts, Forms, Home, Inputs, Model, OnRouteChange,
+  type Model, type Msg, Alerts, Buttons, Forms, Home, Inputs, Model, OnRouteChange,
 }
+import saola/buttons.{Primary, Secondary, WithIcon, Large, Small, button_full, button_primary, button_close}
+import gleam/option.{None}
 
 pub fn main() {
   let app = lustre.application(init, update, view)
@@ -23,6 +25,7 @@ fn init(_args) -> #(Model, Effect(Msg)) {
 fn on_url_change(uri: Uri) -> Msg {
   case uri.path {
     "/alerts" -> OnRouteChange(Alerts)
+    "/buttons" -> OnRouteChange(Buttons)
     "/inputs" -> OnRouteChange(Inputs)
     "/forms" -> OnRouteChange(Forms)
     _ -> OnRouteChange(Home)
@@ -46,6 +49,7 @@ fn sidebar(current_route: models.Route) -> Element(Msg) {
   h.div([a.class("sidebar")], [
     h.h2([a.class("sidebar-title")], [element.text("UI Showcase")]),
     nav_link("/alerts", "Alerts", current_route == Alerts),
+    nav_link("/buttons", "Buttons", current_route == Buttons),
     nav_link("/inputs", "Inputs", current_route == Inputs),
     nav_link("/forms", "Forms", current_route == Forms),
   ])
@@ -71,6 +75,7 @@ fn main_pane(route: models.Route) -> Element(Msg) {
     case route {
       Home -> h.div([], [element.text("Select a widget category to preview.")])
       Alerts -> view_alerts()
+      Buttons -> view_buttons()
       Inputs -> view_inputs()
       Forms -> view_forms()
     },
@@ -100,6 +105,23 @@ fn view_forms() -> Element(Msg) {
     h.h1([a.class("page-title")], [element.text("Forms")]),
     h.p([a.class("page-description")], [
       element.text("Showcase of complex form layouts."),
+    ]),
+  ])
+}
+
+fn view_buttons() -> Element(Msg) {
+  h.div([], [
+    h.h1([a.class("page-title")], [element.text("Buttons")]),
+    h.p([a.class("page-description")], [
+      element.text("Showcase of different button styles and sizes."),
+    ]),
+    h.div([a.class("button-grid")], [
+      // Primary buttons
+      button_primary("Primary Button", OnRouteChange(Home)),
+      button_full(Secondary, "Secondary Button", Large, None),
+      button_full(WithIcon("check"), "With Icon", Large, None),
+      button_full(Primary, "Small Primary", Small, None),
+      button_close(OnRouteChange(Home)),
     ]),
   ])
 }

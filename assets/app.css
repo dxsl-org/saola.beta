@@ -55,3 +55,12 @@
 .page-description {
   color: #6c757d;
 }
+
+/* Button Grid for showcase */
+.button-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  align-items: center;
+}

@@ -3,6 +3,7 @@ pub type Route {
   Alerts
   Inputs
   Forms
+  Buttons
 }
 
 pub type Model {
