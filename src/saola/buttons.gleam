@@ -5,6 +5,8 @@ import lustre/element.{type Element}
 import lustre/element/html as h
 import lustre/event as e
 
+import saola/icons
+
 pub type ButtonVariant {
   Primary
   Secondary
@@ -47,9 +49,7 @@ pub fn button_full(
   let event_handler =
     click_message |> option.map(e.on_click) |> option.unwrap(a.none())
   let icon = case variant {
-    // Assume that the icon is represented as HTML `<i class='icon-badge-check'></i>`.
-    // The implementation may be different, depending on which icon framework we choose.
-    WithIcon(icon_name) -> h.i([a.class("icon-" <> icon_name)], [])
+    WithIcon(icon_name) -> icons.get_icon(icon_name)
     _ -> element.none()
   }
   let label = case string.trim(label) {
@@ -77,5 +77,5 @@ pub fn button_primary(label: String, click_message: msg) -> Element(msg) {
 }
 
 pub fn button_close(click_message: msg) -> Element(msg) {
-  button_full(WithIcon("close"), "", Small, Some(click_message))
+  button_full(WithIcon("x"), "", Small, Some(click_message))
 }
