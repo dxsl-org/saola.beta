@@ -1,4 +1,3 @@
-import gleam/option.{None}
 import gleam/uri.{type Uri}
 import lustre
 import lustre/attribute as a
@@ -10,10 +9,7 @@ import preview/models.{
   type Model, type Msg, Alerts, Buttons, Forms, Home, Inputs, Model,
   OnRouteChange,
 }
-import saola/buttons.{
-  Large, Primary, Secondary, Small, WithIcon, button_close, button_full,
-  button_primary,
-}
+import preview/views
 
 pub fn main() {
   let app = lustre.application(init, update, view)
@@ -78,54 +74,10 @@ fn main_pane(route: models.Route) -> Element(Msg) {
   h.div([a.class("main-pane")], [
     case route {
       Home -> h.div([], [element.text("Select a widget category to preview.")])
-      Alerts -> view_alerts()
-      Buttons -> view_buttons()
-      Inputs -> view_inputs()
-      Forms -> view_forms()
+      Alerts -> views.view_alerts()
+      Buttons -> views.view_buttons()
+      Inputs -> views.view_inputs()
+      Forms -> views.view_forms()
     },
-  ])
-}
-
-fn view_alerts() -> Element(Msg) {
-  h.div([], [
-    h.h1([a.class("page-title")], [element.text("Alerts")]),
-    h.p([a.class("page-description")], [
-      element.text("Showcase of alert notifications."),
-    ]),
-  ])
-}
-
-fn view_inputs() -> Element(Msg) {
-  h.div([], [
-    h.h1([a.class("page-title")], [element.text("Inputs")]),
-    h.p([a.class("page-description")], [
-      element.text("Showcase of text inputs, checkboxes, etc."),
-    ]),
-  ])
-}
-
-fn view_forms() -> Element(Msg) {
-  h.div([], [
-    h.h1([a.class("page-title")], [element.text("Forms")]),
-    h.p([a.class("page-description")], [
-      element.text("Showcase of complex form layouts."),
-    ]),
-  ])
-}
-
-fn view_buttons() -> Element(Msg) {
-  h.div([], [
-    h.h1([a.class("page-title")], [element.text("Buttons")]),
-    h.p([a.class("page-description")], [
-      element.text("Showcase of different button styles and sizes."),
-    ]),
-    h.div([a.class("button-grid")], [
-      // Primary buttons
-      button_primary("Primary Button", OnRouteChange(Home)),
-      button_full(Secondary, "Secondary Button", Large, None),
-      button_full(WithIcon("check"), "With Icon", Large, None),
-      button_full(Primary, "Small Primary", Small, None),
-      button_close(OnRouteChange(Home)),
-    ]),
   ])
 }

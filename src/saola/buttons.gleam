@@ -1,4 +1,4 @@
-import gleam/option.{type Option, Some}
+import gleam/option.{type Option, None, Some}
 import gleam/string
 import lustre/attribute as a
 import lustre/element.{type Element}
@@ -19,6 +19,28 @@ pub type ButtonSize {
   Small
 }
 
+pub type ButtonAria {
+  ButtonAria(label: String, expanded: Option(Bool))
+}
+
+pub type ButtonRoleType {
+  /// Render as type='button'
+  Regular
+  /// Render as type='submit'
+  Submit
+  /// Render as type='reset'
+  Reset
+}
+
+/// Extra attributes for button
+pub type ButtonExtraAttrs {
+  ButtonExtraAttrs(
+    disabled: Bool,
+    type_: Option(ButtonRoleType),
+    aria: ButtonAria,
+  )
+}
+
 /// Fully customizable button
 ///
 /// Example:
@@ -36,6 +58,7 @@ pub fn button_full(
   size: ButtonSize,
   // Note: `msg` is lowercase, it is a generic (type parameter)
   click_message: Option(msg),
+  extra_attrs: ButtonExtraAttrs,
 ) -> Element(msg) {
   // We are following the CSS class here: https://basecoatui.com/kitchen-sink/#button
   let css_name = case size, variant {
@@ -57,7 +80,42 @@ pub fn button_full(
     "" -> element.none()
     text -> h.text(text)
   }
-  h.button([css_class, event_handler], [icon, label])
+  let disabled_attr = case extra_attrs.disabled {
+    True -> a.disabled(True)
+    False -> a.none()
+  }
+  let type_attr = case extra_attrs.type_ {
+    None -> a.none()
+    Some(Regular) -> a.type_("button")
+    Some(Submit) -> a.type_("submit")
+    Some(Reset) -> a.type_("reset")
+  }
+  let aria_label_attr = a.aria_label(extra_attrs.aria.label)
+  let aria_expanded_attr = case extra_attrs.aria.expanded {
+    None -> a.none()
+    Some(expanded) -> a.aria_expanded(expanded)
+  }
+  h.button(
+    [
+      css_class,
+      event_handler,
+      disabled_attr,
+      type_attr,
+      aria_label_attr,
+      aria_expanded_attr,
+    ],
+    [icon, label],
+  )
+}
+
+// -- Function to produce default values --
+
+pub fn default_extra_attrs() {
+  ButtonExtraAttrs(False, None, default_aria())
+}
+
+pub fn default_aria() {
+  ButtonAria("", None)
 }
 
 // -- Some common used buttons --
@@ -74,9 +132,15 @@ pub fn button_full(
 /// ```
 /// 
 pub fn button_primary(label: String, click_message: msg) -> Element(msg) {
-  button_full(Primary, label, Large, Some(click_message))
+  button_full(Primary, label, Large, Some(click_message), default_extra_attrs())
 }
 
 pub fn button_close(click_message: msg) -> Element(msg) {
-  button_full(WithIcon("x"), "", Small, Some(click_message))
+  button_full(
+    WithIcon("x"),
+    "",
+    Small,
+    Some(click_message),
+    default_extra_attrs(),
+  )
 }
