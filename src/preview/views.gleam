@@ -27,7 +27,7 @@ pub fn view_inputs() -> Element(Msg) {
       checkboxes.checkbox_full(
         "Checkbox with help text",
         checkboxes.default_check_status,
-        checkboxes.default_form_attr,
+        checkboxes.default_extra_attrs,
         "This is a help text for the checkbox.",
       ),
     ]),
