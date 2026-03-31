@@ -63,6 +63,7 @@ TODO: How to tree-shake?
 
 - [Gleam][Gleam], of course.
 - [Just][just]
+- [Bun][bun]
 - Recommend to use Fish shell, so that it can autocomplete the commands listed in _justfile_.
 - [Nushell][Nushell]: For writing script to process data.
 
@@ -75,4 +76,5 @@ TODO: How to tree-shake?
 [lucide_lustre]: https://hexdocs.pm/lucide_lustre/
 [Gleam]: https://gleam.run/
 [just]: https://just.systems/
+[bun]: https://bun.sh/
 [nushell]: https://www.nushell.sh/
