@@ -1,10 +1,11 @@
 import lustre/attribute as a
 import lustre/element.{type Element, text}
 import lustre/element/html as h
-import preview/buttons
-import preview/dropdown_menus
-import preview/inputs
-import preview/models.{type Msg}
+
+import saola/preview/buttons
+import saola/preview/dropdown_menus
+import saola/preview/inputs
+import saola/preview/models.{type Msg}
 
 pub fn view_alerts() -> Element(Msg) {
   h.div([], [

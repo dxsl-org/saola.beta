@@ -3,7 +3,7 @@ import gleam/option.{Some}
 import lustre/attribute as a
 import lustre/element.{type Element, text}
 import lustre/element/html as h
-import preview/models.{type Msg}
+import saola/preview/models.{type Msg}
 import saola/dropdown_menus as dropdown
 
 pub fn view_dropdown_menus() -> Element(Msg) {

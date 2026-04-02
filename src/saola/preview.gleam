@@ -5,11 +5,12 @@ import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html as h
 import modem
-import preview/models.{
+
+import saola/preview/models.{
   type Model, type Msg, Alerts, Buttons, Forms, Home, Inputs, Model,
   OnRouteChange,
 }
-import preview/views
+import saola/preview/views
 
 pub fn main() {
   let app = lustre.application(init, update, view)

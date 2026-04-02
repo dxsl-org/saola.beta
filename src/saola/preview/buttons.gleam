@@ -2,8 +2,9 @@ import gleam/option.{None, Some}
 import lustre/attribute as a
 import lustre/element.{type Element, text}
 import lustre/element/html as h
-import preview/models.{type Msg, Home, OnRouteChange}
+
 import saola/buttons
+import saola/preview/models.{type Msg, Home, OnRouteChange}
 
 pub fn view_buttons() -> Element(Msg) {
   let attrs_disabled =
