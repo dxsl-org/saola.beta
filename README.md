@@ -11,26 +11,21 @@ coming with its own Lustre runtime instance.
 
 ```
 .
-├── src/
-│   ├── saola/
-│   │   ├── buttons.gleam
-│   │   ├── checkboxes.gleam
-│   │   ├── dropdown_menus.gleam
-│   │   ├── icons.gleam
-│   │   ├── internal/
-│   │   ├── preview/
-│   │   └── preview.gleam
-│   └── saola.gleam
 ├── gleam.toml
+├── src
+│   ├── saola/
+│   └── saola.gleam
 ├── assets/
 ├── dev/
 │   ├── basecoat/
-│   ├── convert-html-to-lustre.nu
-│   ├── generate-lucide-icon-map.nu
+│   ├── saola/
+│   │   ├── preview/
+│   │   └── preview.gleam
 │   └── split-lucide-icons.nu
 ├── justfile
 ├── README.md
-└── test/
+└── test
+    └── saola_test.gleam
 ```
 
 The project is in form of a library, where the to-be-distributed code is in _src_ folder.
