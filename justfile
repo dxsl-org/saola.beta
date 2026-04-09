@@ -6,3 +6,8 @@ preview $ERL_FLAGS="+B":
 build:
 	@echo "Build to JS"
 	gleam run -m lustre/dev build
+
+
+build-preview:
+	@echo "Build the preview app"
+	gleam run -m lustre/dev build saola/preview
