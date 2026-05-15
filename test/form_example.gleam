@@ -110,6 +110,7 @@ pub fn view(model: Model) -> Element(Msg) {
           "Send",
           button.Large,
           None,
+          None,
           button.ButtonExtraAttrs(
             disabled: False,
             type_: Some(button.Submit),

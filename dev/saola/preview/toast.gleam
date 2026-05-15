@@ -21,6 +21,7 @@ pub fn view_toasts(model: Model) -> Element(Msg) {
         button.Secondary,
         "Add Destructive Toast",
         button.Large,
+        option.None,
         option.Some(
           AddToast(toast.new_toast("Error", "Could not save changes.", toast.Destructive)),
         ),

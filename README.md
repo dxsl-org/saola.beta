@@ -1,87 +1,94 @@
 # Saola
 
-UI widgets for [Lustre]-based frontent projects.
+Typed, stateless UI widgets for [Lustre](https://hexdocs.pm/lustre) applications.
+Built on top of [Basecoat CSS](https://basecoatui.com/) (a pure-HTML port of shadcn/ui).
 
-Inspired from Shadcn, based on the [Basecoat] port.
+> **Widget vs Component** — Lustre uses the word "component" for elements with their own runtime instance.
+> Saola elements are called *widgets* to avoid confusion: they are plain view functions, no runtime state.
 
-While many other UI kits call "components", we call "widgets" because the "[component]" in Lustre is something bigger,
-coming with its own Lustre runtime instance.
+## Getting started
 
-## Folder structure
+Add the package:
 
-```
-.
-├── gleam.toml
-├── src
-│   ├── saola/
-│   └── saola.gleam
-├── assets/
-├── dev/
-│   ├── basecoat/
-│   ├── saola/
-│   │   ├── preview/
-│   │   └── preview.gleam
-│   └── split-lucide-icons.nu
-├── justfile
-├── README.md
-└── test
-    └── saola_test.gleam
+```sh
+gleam add saola
 ```
 
-The project is in form of a library, where the to-be-distributed code is in _src_ folder.
-We have a small "Gallery" app to see how the widgets are rendered, which is the _preview.gleam_ code.
-To run the preview server, run `just preview` (detailed command in _justfile_.)
-This preview app code should not be packaged.
+Import the CSS (add to your HTML shell):
 
-Some code are tools for development, placed in _dev_ folder.
-The _dev/basecoat_ is a Git submodule of the [Basecoat] source.
-It is chosen because it already ported the React-based Shadcn code to pure HTML.
-
-## How to develop
-
-The development will involve two steps:
-
-1. Use [`html_lustre_converter`][html_lustre_converter] to convert the HTML from Basecoat to view functions in Gleam code.
-
-1. Redesign the API for our widgets, so that user won't be confused which values that the widget accepts,
-   how to not pass useless data.
-
-To think: Where the generated code in step 1 is placed to? Could be _src/saola/raw/_.
-
-## Icons
-
-We use icons from [Lucide]. Because the number of icons is big, we split them to modules whose names match the starting letter of the icon name.
-
-```
-src/saola/icon/
-├── la.gleam
-├── lb.gleam
-├── lz.gleam
+```html
+<link rel="stylesheet" href="https://unpkg.com/basecoat-css@latest/dist/basecoat.css" />
 ```
 
-We need to use "code generation" technique to maintain them.
+Use a widget inside any Lustre `view` function:
 
-- We use tool from [lucide_lustre] to generate a big *lucide.gleam* file. The import line is changed to using alias to make code shorter, then we move it
-  to *src/saola/icon/lucide.gleam*.
-- We the use *dev/split-lucide-icons.nu* script to split that *lucide.gleam* file to smaller *l\_\*.gleam* files.
+```gleam
+import saola/button
+import saola/badge
 
-TODO: How to tree-shake?
+fn view(model: Model) -> Element(Msg) {
+  h.div([], [
+    badge.badge_secondary("New"),
+    button.button_primary("Get started", UserClickedStart),
+  ])
+}
+```
 
-## Developer tools
+## Widgets
 
-- [Gleam], of course.
-- [Just]
-- [Bun]
-- Recommend to use Fish shell, so that it can autocomplete the commands listed in _justfile_.
-- [Nushell]: For writing script to process data.
+| Module | Shortcuts | Full API |
+|--------|-----------|----------|
+| `saola/alert` | `alert_default`, `alert_destructive` | `alert_full` |
+| `saola/badge` | `badge_default`, `badge_secondary`, `badge_outline`, `badge_destructive` | — |
+| `saola/button` | `button_primary`, `button_secondary`, `button_outline`, `button_ghost`, `button_destructive`, `button_submit` | `button_full` |
+| `saola/card` | `card_simple` | `card` |
+| `saola/checkbox` | `checkbox_simple` | `checkbox_full` |
+| `saola/dialog` | — | `dialog_full` |
+| `saola/field` | `field_simple` | `field` |
+| `saola/input` | — | `input_full` |
+| `saola/label` | `label_for` | — |
+| `saola/select` | `select_simple` | `select_full` |
+| `saola/separator` | `separator`, `separator_vertical` | — |
+| `saola/slider` | `slider_simple` | `slider_full` |
+| `saola/switch` | `switch_simple` | `switch_full` |
+| `saola/table` | `table_simple` | — |
+| `saola/tabs` | `tabs_simple` | — |
+| `saola/textarea` | — | `textarea_full` |
+| `saola/toast` | `new_toast` (factory) | `toaster` (container) |
+| `saola/tooltip` | `tooltip`, `tooltip_side` | `attr`, `side_attr` |
 
-[basecoat]: https://basecoatui.com/
-[bun]: https://bun.sh/
-[component]: https://hexdocs.pm/lustre/lustre.html#component
-[gleam]: https://gleam.run/
-[html_lustre_converter]: https://hexdocs.pm/html_lustre_converter/
-[just]: https://just.systems/
-[lucide]: https://lucide.dev/
-[lucide_lustre]: https://hexdocs.pm/lucide_lustre/
-[lustre]: https://hexdocs.pm/lustre
-[nushell]: https://www.nushell.sh/
+### Third-party widget wrappers
+
+These wrappers ship as custom elements (`<script>` required separately):
+
+| Module | Custom element | Dependency |
+|--------|---------------|------------|
+| `saola/codemirror_editor` | `<saola-codemirror-editor>` | CodeMirror 6 |
+| `saola/monaco_editor` | `<saola-monaco-editor>` | Monaco / VS Code |
+| `saola/d3_bar_chart` | `<saola-d3-bar-chart>` | D3.js v7 |
+
+## Design principles
+
+- **Stateless** — every widget is a pure `fn ... -> Element(msg)`. The consumer's `Model` owns all state.
+- **External-state duality** — form widgets accept `InitValue(v)` (seed once) or `SyncValue(v)` (keep in sync with model).
+- **Two-tier API** — each widget exposes a `_simple` shortcut for the common case and a `_full` function for complete control.
+- **Typed, not stringly typed** — variants (`ButtonVariant`, `BadgeVariant`, …) are Gleam custom types, not magic strings.
+
+## Running the preview app
+
+```sh
+just preview
+```
+
+Requires [Just](https://just.systems/) and [Bun](https://bun.sh/).
+
+## Contributing
+
+1. Clone the repo (includes `dev/basecoat` submodule — run `git submodule update --init`).
+2. Run `gleam test` to verify all tests pass.
+3. The live preview app lives in `dev/saola/preview/`; add a showcase page for any new widget.
+4. Follow the rules in `CLAUDE.md` for widget API conventions.
+
+## Licence
+
+Apache-2.0

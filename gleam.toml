@@ -2,28 +2,22 @@ name = "saola"
 version = "1.0.0"
 target = 'javascript'
 
-# Fill out these fields if you intend to generate HTML documentation or publish
-# your project to the Hex package manager.
-#
-# description = ""
-# licences = ["Apache-2.0"]
-# repository = { type = "github", user = "", repo = "" }
-# links = [{ title = "Website", href = "" }]
-#
-# For a full reference of all the available options, you can have a look at
-# https://gleam.run/writing-gleam/gleam-toml/.
+description = "A Lustre UI component library — typed, stateless widgets built on Basecoat CSS."
+licences = ["Apache-2.0"]
+repository = { type = "github", user = "tindn", repo = "saola" }
+links = [{ title = "Changelog", href = "https://github.com/tindn/saola/blob/main/CHANGELOG.md" }]
 
 [dependencies]
 gleam_stdlib = ">= 0.44.0 and < 2.0.0"
 gleam_json = ">= 3.1.0 and < 4.0.0"
 lustre = ">= 5.6.0 and < 6.0.0"
-modem = ">= 2.1.2 and < 3.0.0"
 typeid_gleam = ">= 1.1.0 and < 2.0.0"
 
 [dev_dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"
 lustre_dev_tools = ">= 2.3.6 and < 3.0.0"
 lucide_lustre = ">= 2.0.3 and < 3.0.0"
+modem = ">= 2.1.2 and < 3.0.0"
 
 [tool.lustre.bin]
 bun = "system"

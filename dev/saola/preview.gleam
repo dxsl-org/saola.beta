@@ -188,7 +188,7 @@ fn sidebar(current_route: model.Route) -> Element(Msg) {
     nav_link("/tables", "Tables", current_route == Tables),
     nav_link("/toasts", "Toasts", current_route == Toasts),
     nav_link("/d3-charts", "D3 Charts", current_route == D3Charts),
-    nav_link("/monaco-editor", "Monaco Editor", current_route == MonacoEditor),
+    nav_link("/monaco-editor", "Code Editor", current_route == MonacoEditor),
     nav_link("/example-form", "Example Form", current_route == ExampleForm),
     nav_link("/example-site", "Example Site", current_route == ExampleSite),
   ])

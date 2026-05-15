@@ -68,6 +68,7 @@ fn hero() -> Element(Msg) {
         "Read docs",
         button.Large,
         None,
+        None,
         button.default_extra_attrs,
       ),
     ]),

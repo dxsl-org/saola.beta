@@ -81,6 +81,7 @@ pub fn view_form_example(model: Model) -> Element(Msg) {
           "Send",
           button.Large,
           None,
+          None,
           button.ButtonExtraAttrs(
             False,
             Some(button.Submit),
