@@ -11,14 +11,19 @@ import lustre/element/html as h
 import modem
 
 import saola/preview/model.{
-  type Model, type Msg, AccordionToggled, Accordions, AddToast, Alerts, Avatars,
-  Badges, Buttons, Cards, CloseDialog, D3Charts, Dialogs, DismissToast,
-  DropdownMenus, ExampleForm, ExampleSite, Fields, FormEmailChanged,
-  FormMessageChanged, FormNameChanged, FormSubmitted, Forms, Home, Inputs,
-  Model, MonacoEditor, OnRouteChange, OpenDialog, Progresses, SelectChanged,
-  Selects, Separators, Skeletons, SliderChanged, Sliders, StartedTrial,
-  Switches, SwitchToggled, TabChanged, Tables, Tabs, Toasts, Tooltips,
-  ToggleDropdown,
+  type Model, type Msg, AccordionToggled, Accordions, AddToast, AlertDialogCancelled,
+  AlertDialogConfirmed, AlertDialogOpened, AlertDialogs, Alerts, AspectRatios, Avatars,
+  Badges, Breadcrumbs, Buttons, Cards, CloseDialog, CollapsibleToggled,
+  Collapsibles, D3Charts, Dialogs, DismissToast, DropdownMenus, ExampleForm,
+  ExampleSite, Fields, FormEmailChanged, FormMessageChanged, FormNameChanged,
+  FormSubmitted, Forms, Home, HoverCardClosed, HoverCardOpened, HoverCards,
+  InputOtpChanged, InputOtps, Inputs, MenubarClosed, MenubarOpened, Menubars,
+  Model, MonacoEditor, OnRouteChange, OpenDialog, Paginations, PaginationChanged,
+  PopoverClosed, Popovers, Progresses, RadioGroups, ScrollAreas, SelectChanged,
+  Selects, Separators, SheetClosed, SheetOpened, Sheets, Skeletons, SliderChanged,
+  Sliders, StartedTrial, Switches, SwitchToggled, TabChanged, Tables, Tabs,
+  Toasts, ToggleBoldChanged, ToggleGroupChanged, ToggleGroups, ToggleItalicChanged,
+  Toggles, Tooltips, ToggleDropdown,
 }
 import saola/preview/view as views
 
@@ -55,6 +60,17 @@ fn init(_args) -> #(Model, Effect(Msg)) {
       select_fruit: "apple",
       select_timezone: "asia/ho_chi_minh",
       accordion_open: [],
+      toggle_group_selected: [],
+      pagination_page: 1,
+      collapsible_open: False,
+      popover_open: False,
+      alert_dialog_open: False,
+      hover_card_open: False,
+      input_otp_value: "",
+      sheet_open: False,
+      menubar_open: "",
+      toggle_bold: False,
+      toggle_italic: False,
     ),
     effect.batch([modem.init(on_url_change), whatnext]),
   )
@@ -87,6 +103,20 @@ fn on_url_change(uri: Uri) -> Msg {
     "/progress" -> Progresses
     "/skeletons" -> Skeletons
     "/avatars" -> Avatars
+    "/radio-groups" -> RadioGroups
+    "/toggles" -> Toggles
+    "/toggle-groups" -> ToggleGroups
+    "/breadcrumbs" -> Breadcrumbs
+    "/paginations" -> Paginations
+    "/scroll-areas" -> ScrollAreas
+    "/aspect-ratios" -> AspectRatios
+    "/collapsibles" -> Collapsibles
+    "/popovers" -> Popovers
+    "/alert-dialogs" -> AlertDialogs
+    "/hover-cards" -> HoverCards
+    "/input-otps" -> InputOtps
+    "/sheets" -> Sheets
+    "/menubars" -> Menubars
     _ -> Home
   }
   OnRouteChange(route)
@@ -163,6 +193,52 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       }
       #(Model(..model, accordion_open: open), effect.none())
     }
+    ToggleGroupChanged(selected) -> #(
+      Model(..model, toggle_group_selected: selected),
+      effect.none(),
+    )
+    PaginationChanged(page) -> #(
+      Model(..model, pagination_page: page),
+      effect.none(),
+    )
+    CollapsibleToggled -> #(
+      Model(..model, collapsible_open: !model.collapsible_open),
+      effect.none(),
+    )
+    PopoverClosed -> #(Model(..model, popover_open: False), effect.none())
+    AlertDialogOpened -> #(
+      Model(..model, alert_dialog_open: True),
+      effect.none(),
+    )
+    AlertDialogConfirmed -> #(
+      Model(..model, alert_dialog_open: False),
+      effect.none(),
+    )
+    AlertDialogCancelled -> #(
+      Model(..model, alert_dialog_open: False),
+      effect.none(),
+    )
+    HoverCardOpened -> #(Model(..model, hover_card_open: True), effect.none())
+    HoverCardClosed -> #(Model(..model, hover_card_open: False), effect.none())
+    InputOtpChanged(val) -> #(
+      Model(..model, input_otp_value: val),
+      effect.none(),
+    )
+    SheetOpened -> #(Model(..model, sheet_open: True), effect.none())
+    SheetClosed -> #(Model(..model, sheet_open: False), effect.none())
+    MenubarOpened(menu) -> #(
+      Model(..model, menubar_open: menu),
+      effect.none(),
+    )
+    MenubarClosed -> #(Model(..model, menubar_open: ""), effect.none())
+    ToggleBoldChanged(val) -> #(
+      Model(..model, toggle_bold: val),
+      effect.none(),
+    )
+    ToggleItalicChanged(val) -> #(
+      Model(..model, toggle_italic: val),
+      effect.none(),
+    )
   }
 }
 
@@ -199,6 +275,20 @@ fn sidebar(current_route: model.Route) -> Element(Msg) {
     nav_link("/progress", "Progress", current_route == Progresses),
     nav_link("/skeletons", "Skeleton", current_route == Skeletons),
     nav_link("/avatars", "Avatar", current_route == Avatars),
+    nav_link("/radio-groups", "Radio Group", current_route == RadioGroups),
+    nav_link("/toggles", "Toggle", current_route == Toggles),
+    nav_link("/toggle-groups", "Toggle Group", current_route == ToggleGroups),
+    nav_link("/breadcrumbs", "Breadcrumb", current_route == Breadcrumbs),
+    nav_link("/paginations", "Pagination", current_route == Paginations),
+    nav_link("/scroll-areas", "Scroll Area", current_route == ScrollAreas),
+    nav_link("/aspect-ratios", "Aspect Ratio", current_route == AspectRatios),
+    nav_link("/collapsibles", "Collapsible", current_route == Collapsibles),
+    nav_link("/popovers", "Popover", current_route == Popovers),
+    nav_link("/alert-dialogs", "Alert Dialog", current_route == AlertDialogs),
+    nav_link("/hover-cards", "Hover Card", current_route == HoverCards),
+    nav_link("/input-otps", "Input OTP", current_route == InputOtps),
+    nav_link("/sheets", "Sheet", current_route == Sheets),
+    nav_link("/menubars", "Menubar", current_route == Menubars),
     nav_link("/dropdown-menus", "Dropdown Menus", current_route == DropdownMenus),
     nav_link("/tabs", "Tabs", current_route == Tabs),
     nav_link("/dialogs", "Dialogs", current_route == Dialogs),
@@ -247,6 +337,20 @@ fn main_pane(model: Model) -> Element(Msg) {
       Progresses -> views.view_progresses()
       Skeletons -> views.view_skeletons()
       Avatars -> views.view_avatars()
+      RadioGroups -> views.view_radio_groups(model)
+      Toggles -> views.view_toggles(model)
+      ToggleGroups -> views.view_toggle_groups(model)
+      Breadcrumbs -> views.view_breadcrumbs()
+      Paginations -> views.view_paginations(model)
+      ScrollAreas -> views.view_scroll_areas()
+      AspectRatios -> views.view_aspect_ratios()
+      Collapsibles -> views.view_collapsibles(model)
+      Popovers -> views.view_popovers(model)
+      AlertDialogs -> views.view_alert_dialogs(model)
+      HoverCards -> views.view_hover_cards(model)
+      InputOtps -> views.view_input_otps(model)
+      Sheets -> views.view_sheets(model)
+      Menubars -> views.view_menubars(model)
       D3Charts -> views.view_d3_charts()
       MonacoEditor -> views.view_monaco_editor()
       ExampleForm -> views.view_form_example(model)

@@ -4,20 +4,32 @@ import lustre/element/html as h
 
 import saola/preview/accordion as accordion_preview
 import saola/preview/alert
+import saola/preview/alert_dialog_preview
+import saola/preview/aspect_ratio_preview
 import saola/preview/avatar as avatar_preview
 import saola/preview/badge
+import saola/preview/breadcrumb_preview
 import saola/preview/button
 import saola/preview/card
 import saola/preview/chart_examples
+import saola/preview/collapsible_preview
 import saola/preview/dialog
 import saola/preview/dropdown_menu
 import saola/preview/field as field_preview
 import saola/preview/form_example
+import saola/preview/hover_card_preview
 import saola/preview/input
+import saola/preview/input_otp_preview
+import saola/preview/menubar_preview
 import saola/preview/model.{type Model, type Msg}
+import saola/preview/pagination_preview
+import saola/preview/popover_preview
 import saola/preview/progress as progress_preview
+import saola/preview/radio_group_preview
+import saola/preview/scroll_area_preview
 import saola/preview/select as select_preview
 import saola/preview/separator as separator_preview
+import saola/preview/sheet_preview
 import saola/preview/site_example
 import saola/preview/skeleton as skeleton_preview
 import saola/preview/slider as slider_preview
@@ -25,6 +37,8 @@ import saola/preview/switch as switch_preview
 import saola/preview/table
 import saola/preview/tabs
 import saola/preview/toast
+import saola/preview/toggle_group_preview
+import saola/preview/toggle_preview
 import saola/preview/tooltip as tooltip_preview
 
 pub fn view_alerts() -> Element(Msg) {
@@ -121,6 +135,62 @@ pub fn view_skeletons() -> Element(Msg) {
 
 pub fn view_avatars() -> Element(Msg) {
   avatar_preview.view_avatars()
+}
+
+pub fn view_radio_groups(model: Model) -> Element(Msg) {
+  radio_group_preview.view_radio_groups(model)
+}
+
+pub fn view_toggles(model: Model) -> Element(Msg) {
+  toggle_preview.view_toggles(model)
+}
+
+pub fn view_toggle_groups(model: Model) -> Element(Msg) {
+  toggle_group_preview.view_toggle_groups(model)
+}
+
+pub fn view_breadcrumbs() -> Element(Msg) {
+  breadcrumb_preview.view_breadcrumbs()
+}
+
+pub fn view_paginations(model: Model) -> Element(Msg) {
+  pagination_preview.view_paginations(model)
+}
+
+pub fn view_scroll_areas() -> Element(Msg) {
+  scroll_area_preview.view_scroll_areas()
+}
+
+pub fn view_aspect_ratios() -> Element(Msg) {
+  aspect_ratio_preview.view_aspect_ratios()
+}
+
+pub fn view_collapsibles(model: Model) -> Element(Msg) {
+  collapsible_preview.view_collapsibles(model)
+}
+
+pub fn view_popovers(model: Model) -> Element(Msg) {
+  popover_preview.view_popovers(model)
+}
+
+pub fn view_alert_dialogs(model: Model) -> Element(Msg) {
+  alert_dialog_preview.view_alert_dialogs(model)
+}
+
+pub fn view_hover_cards(model: Model) -> Element(Msg) {
+  hover_card_preview.view_hover_cards(model)
+}
+
+pub fn view_input_otps(model: Model) -> Element(Msg) {
+  input_otp_preview.view_input_otps(model)
+}
+
+pub fn view_sheets(model: Model) -> Element(Msg) {
+  sheet_preview.view_sheets(model)
+}
+
+pub fn view_menubars(model: Model) -> Element(Msg) {
+  menubar_preview.view_menubars(model)
 }
 
 pub fn view_forms() -> Element(Msg) {

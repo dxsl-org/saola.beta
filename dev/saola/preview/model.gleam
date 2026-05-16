@@ -30,6 +30,20 @@ pub type Route {
   Progresses
   Skeletons
   Avatars
+  RadioGroups
+  Toggles
+  ToggleGroups
+  Breadcrumbs
+  Paginations
+  ScrollAreas
+  AspectRatios
+  Collapsibles
+  Popovers
+  AlertDialogs
+  HoverCards
+  InputOtps
+  Sheets
+  Menubars
 }
 
 pub type Model {
@@ -59,6 +73,27 @@ pub type Model {
     select_timezone: String,
     // Accordion preview state
     accordion_open: List(String),
+    // Toggle group preview state
+    toggle_group_selected: List(String),
+    // Pagination preview state
+    pagination_page: Int,
+    // Collapsible preview state
+    collapsible_open: Bool,
+    // Popover preview state
+    popover_open: Bool,
+    // Alert dialog preview state
+    alert_dialog_open: Bool,
+    // Hover card preview state
+    hover_card_open: Bool,
+    // Input OTP preview state
+    input_otp_value: String,
+    // Sheet preview state
+    sheet_open: Bool,
+    // Menubar preview state
+    menubar_open: String,
+    // Toggle pressed states
+    toggle_bold: Bool,
+    toggle_italic: Bool,
   )
 }
 
@@ -79,4 +114,20 @@ pub type Msg {
   SliderChanged(id: String, value: String)
   SelectChanged(id: String, value: String)
   AccordionToggled(String)
+  ToggleGroupChanged(List(String))
+  PaginationChanged(Int)
+  CollapsibleToggled
+  PopoverClosed
+  AlertDialogOpened
+  AlertDialogConfirmed
+  AlertDialogCancelled
+  HoverCardOpened
+  HoverCardClosed
+  InputOtpChanged(String)
+  SheetOpened
+  SheetClosed
+  MenubarOpened(String)
+  MenubarClosed
+  ToggleBoldChanged(Bool)
+  ToggleItalicChanged(Bool)
 }
