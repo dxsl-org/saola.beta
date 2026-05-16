@@ -38,23 +38,41 @@ fn view(model: Model) -> Element(Msg) {
 
 | Module | Shortcuts | Full API |
 |--------|-----------|----------|
+| `saola/accordion` | `accordion_simple` | `accordion_full` |
 | `saola/alert` | `alert_default`, `alert_destructive` | `alert_full` |
+| `saola/alert_dialog` | `alert_dialog_simple` | `alert_dialog_full` |
+| `saola/aspect_ratio` | `aspect_ratio` | — |
+| `saola/avatar` | `avatar_initials`, `avatar_image` | `avatar_full` |
 | `saola/badge` | `badge_default`, `badge_secondary`, `badge_outline`, `badge_destructive` | — |
+| `saola/breadcrumb` | `breadcrumb_simple` | `breadcrumb_full` |
 | `saola/button` | `button_primary`, `button_secondary`, `button_outline`, `button_ghost`, `button_destructive`, `button_submit` | `button_full` |
 | `saola/card` | `card_simple` | `card` |
 | `saola/checkbox` | `checkbox_simple` | `checkbox_full` |
+| `saola/collapsible` | `collapsible_simple` | `collapsible_full` |
 | `saola/dialog` | — | `dialog_full` |
 | `saola/field` | `field_simple` | `field` |
+| `saola/hover_card` | `hover_card_simple` | `hover_card_full` |
 | `saola/input` | — | `input_full` |
+| `saola/input_otp` | `input_otp_simple` | `input_otp_full` |
 | `saola/label` | `label_for` | — |
+| `saola/menubar` | `menubar_simple` | `menubar_full` |
+| `saola/pagination` | `pagination_simple` | `pagination_full` |
+| `saola/popover` | `popover_simple` | `popover_full` |
+| `saola/progress` | `progress_simple` | `progress_full` |
+| `saola/radio_group` | `radio_group_simple` | `radio_group_full` |
+| `saola/scroll_area` | `scroll_area_simple` | `scroll_area_full` |
 | `saola/select` | `select_simple` | `select_full` |
 | `saola/separator` | `separator`, `separator_vertical` | — |
+| `saola/sheet` | `sheet_simple` | `sheet_full` |
+| `saola/skeleton` | `skeleton_text`, `skeleton_circle` | `skeleton` |
 | `saola/slider` | `slider_simple` | `slider_full` |
 | `saola/switch` | `switch_simple` | `switch_full` |
 | `saola/table` | `table_simple` | — |
 | `saola/tabs` | `tabs_simple` | — |
 | `saola/textarea` | — | `textarea_full` |
 | `saola/toast` | `new_toast` (factory) | `toaster` (container) |
+| `saola/toggle` | `toggle_simple` | `toggle_full` |
+| `saola/toggle_group` | `toggle_group_simple` | `toggle_group_full` |
 | `saola/tooltip` | `tooltip`, `tooltip_side` | `attr`, `side_attr` |
 
 ### Third-party widget wrappers
