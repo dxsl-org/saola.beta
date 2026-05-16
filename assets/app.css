@@ -207,3 +207,136 @@ h2 {
   width: 100%;
   min-height: 180px;
 }
+
+/* ── Accordion ─────────────────────────────────────────── */
+.accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.accordion-item {
+  border: 1px solid var(--color-border, #dee2e6);
+  border-radius: var(--radius-md, 0.375rem);
+  overflow: hidden;
+}
+
+.accordion-trigger {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: inherit;
+  font-weight: 500;
+  text-align: left;
+  color: inherit;
+}
+
+.accordion-trigger:hover {
+  background-color: var(--color-accent, #f8f9fa);
+}
+
+.accordion-trigger[aria-expanded="true"]::after {
+  content: "▲";
+  font-size: 0.7em;
+  opacity: 0.6;
+}
+
+.accordion-trigger[aria-expanded="false"]::after {
+  content: "▼";
+  font-size: 0.7em;
+  opacity: 0.6;
+}
+
+.accordion-panel {
+  padding: 0 1rem 1rem;
+}
+
+.accordion-panel[aria-hidden="true"] {
+  display: none;
+}
+
+/* ── Progress ──────────────────────────────────────────── */
+.progress {
+  position: relative;
+  height: 0.5rem;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 9999px;
+  background-color: var(--color-muted, #e9ecef);
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: inherit;
+  background-color: var(--color-primary, #0d6efd);
+  transition: width 300ms ease;
+}
+
+.progress-bar-success {
+  background-color: var(--color-success, #198754);
+}
+
+.progress-bar-destructive {
+  background-color: var(--color-destructive, #dc3545);
+}
+
+/* ── Skeleton ──────────────────────────────────────────── */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.skeleton {
+  display: block;
+  background-color: var(--color-muted, #e9ecef);
+  border-radius: var(--radius-md, 0.375rem);
+  animation: skeleton-pulse 2s ease-in-out infinite;
+}
+
+.skeleton-text {
+  height: 1rem;
+  width: 100%;
+  border-radius: 0.25rem;
+}
+
+.skeleton-circle {
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: 9999px;
+}
+
+/* ── Avatar ────────────────────────────────────────────── */
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 9999px;
+  background-color: var(--color-muted, #e9ecef);
+  color: var(--color-muted-foreground, #6c757d);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.avatar-sm { width: 2rem; height: 2rem; font-size: 0.75rem; }
+.avatar-md { width: 2.5rem; height: 2.5rem; font-size: 0.875rem; }
+.avatar-lg { width: 3.5rem; height: 3.5rem; font-size: 1.125rem; }
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}

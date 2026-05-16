@@ -2,7 +2,9 @@ import lustre/attribute as a
 import lustre/element.{type Element, text}
 import lustre/element/html as h
 
+import saola/preview/accordion as accordion_preview
 import saola/preview/alert
+import saola/preview/avatar as avatar_preview
 import saola/preview/badge
 import saola/preview/button
 import saola/preview/card
@@ -13,9 +15,11 @@ import saola/preview/field as field_preview
 import saola/preview/form_example
 import saola/preview/input
 import saola/preview/model.{type Model, type Msg}
+import saola/preview/progress as progress_preview
 import saola/preview/select as select_preview
 import saola/preview/separator as separator_preview
 import saola/preview/site_example
+import saola/preview/skeleton as skeleton_preview
 import saola/preview/slider as slider_preview
 import saola/preview/switch as switch_preview
 import saola/preview/table
@@ -101,6 +105,22 @@ pub fn view_selects(model: Model) -> Element(Msg) {
 
 pub fn view_fields(model: Model) -> Element(Msg) {
   field_preview.view_fields(model.form_name, model.form_email)
+}
+
+pub fn view_accordions(model: Model) -> Element(Msg) {
+  accordion_preview.view_accordions(model)
+}
+
+pub fn view_progresses() -> Element(Msg) {
+  progress_preview.view_progresses()
+}
+
+pub fn view_skeletons() -> Element(Msg) {
+  skeleton_preview.view_skeletons()
+}
+
+pub fn view_avatars() -> Element(Msg) {
+  avatar_preview.view_avatars()
 }
 
 pub fn view_forms() -> Element(Msg) {

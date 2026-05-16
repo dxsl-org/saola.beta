@@ -26,6 +26,10 @@ pub type Route {
   Sliders
   Selects
   Fields
+  Accordions
+  Progresses
+  Skeletons
+  Avatars
 }
 
 pub type Model {
@@ -53,6 +57,8 @@ pub type Model {
     // Select preview state
     select_fruit: String,
     select_timezone: String,
+    // Accordion preview state
+    accordion_open: List(String),
   )
 }
 
@@ -72,4 +78,5 @@ pub type Msg {
   SwitchToggled(id: String, value: Bool)
   SliderChanged(id: String, value: String)
   SelectChanged(id: String, value: String)
+  AccordionToggled(String)
 }

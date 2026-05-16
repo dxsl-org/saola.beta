@@ -11,13 +11,14 @@ import lustre/element/html as h
 import modem
 
 import saola/preview/model.{
-  type Model, type Msg, Alerts, Badges, Buttons, Cards, CloseDialog, D3Charts,
-  Dialogs, DropdownMenus, ExampleForm, ExampleSite, Fields, Forms,
-  FormEmailChanged, FormMessageChanged, FormNameChanged, FormSubmitted, Home,
-  Inputs, Model, MonacoEditor, OnRouteChange, OpenDialog, SelectChanged,
-  Selects, Separators, SliderChanged, Sliders, StartedTrial, Switches,
-  SwitchToggled, Tables, Tabs, Toasts, Tooltips, ToggleDropdown, TabChanged,
-  AddToast, DismissToast,
+  type Model, type Msg, AccordionToggled, Accordions, AddToast, Alerts, Avatars,
+  Badges, Buttons, Cards, CloseDialog, D3Charts, Dialogs, DismissToast,
+  DropdownMenus, ExampleForm, ExampleSite, Fields, FormEmailChanged,
+  FormMessageChanged, FormNameChanged, FormSubmitted, Forms, Home, Inputs,
+  Model, MonacoEditor, OnRouteChange, OpenDialog, Progresses, SelectChanged,
+  Selects, Separators, Skeletons, SliderChanged, Sliders, StartedTrial,
+  Switches, SwitchToggled, TabChanged, Tables, Tabs, Toasts, Tooltips,
+  ToggleDropdown,
 }
 import saola/preview/view as views
 
@@ -53,6 +54,7 @@ fn init(_args) -> #(Model, Effect(Msg)) {
       slider_brightness: 80,
       select_fruit: "apple",
       select_timezone: "asia/ho_chi_minh",
+      accordion_open: [],
     ),
     effect.batch([modem.init(on_url_change), whatnext]),
   )
@@ -81,6 +83,10 @@ fn on_url_change(uri: Uri) -> Msg {
     "/sliders" -> Sliders
     "/selects" -> Selects
     "/fields" -> Fields
+    "/accordions" -> Accordions
+    "/progress" -> Progresses
+    "/skeletons" -> Skeletons
+    "/avatars" -> Avatars
     _ -> Home
   }
   OnRouteChange(route)
@@ -150,6 +156,13 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
         "timezone" -> #(Model(..model, select_timezone: value), effect.none())
         _ -> #(model, effect.none())
       }
+    AccordionToggled(id) -> {
+      let open = case list.contains(model.accordion_open, id) {
+        True -> list.filter(model.accordion_open, fn(x) { x != id })
+        False -> [id, ..model.accordion_open]
+      }
+      #(Model(..model, accordion_open: open), effect.none())
+    }
   }
 }
 
@@ -182,6 +195,10 @@ fn sidebar(current_route: model.Route) -> Element(Msg) {
     nav_link("/sliders", "Slider", current_route == Sliders),
     nav_link("/selects", "Select", current_route == Selects),
     nav_link("/fields", "Field", current_route == Fields),
+    nav_link("/accordions", "Accordion", current_route == Accordions),
+    nav_link("/progress", "Progress", current_route == Progresses),
+    nav_link("/skeletons", "Skeleton", current_route == Skeletons),
+    nav_link("/avatars", "Avatar", current_route == Avatars),
     nav_link("/dropdown-menus", "Dropdown Menus", current_route == DropdownMenus),
     nav_link("/tabs", "Tabs", current_route == Tabs),
     nav_link("/dialogs", "Dialogs", current_route == Dialogs),
@@ -226,6 +243,10 @@ fn main_pane(model: Model) -> Element(Msg) {
       Dialogs -> views.view_dialogs(model)
       Tables -> views.view_tables()
       Toasts -> views.view_toasts(model)
+      Accordions -> views.view_accordions(model)
+      Progresses -> views.view_progresses()
+      Skeletons -> views.view_skeletons()
+      Avatars -> views.view_avatars()
       D3Charts -> views.view_d3_charts()
       MonacoEditor -> views.view_monaco_editor()
       ExampleForm -> views.view_form_example(model)
