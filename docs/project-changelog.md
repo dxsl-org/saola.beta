@@ -2,6 +2,69 @@
 
 All notable changes to the Saola UI Kit are documented here.
 
+## [2026-05-17] — Batch 9: Empty, Item Widgets
+
+### Added
+
+**New Widgets**
+- **Empty** (`src/saola/empty.gleam`) — Empty-state panel for "no results", onboarding, error placeholders
+  - Two media variants: Default, Icon (with rounded bg-muted wrapper)
+  - Flat API: `empty_full(media, media_variant, title, description, content, attrs)`, `empty_simple(icon, title, description_text, action)`
+  - Renders centered dashed-border container with optional header (media + title + description) and content area
+  - Omits header/content sections when all sub-fields are empty
+  - Pure-Gleam, no JS, stateless
+
+- **Item** (`src/saola/item.gleam`) — Row-layout primitive for lists (settings rows, navigation, gallery)
+  - 3 variants: Default, Outline, Muted; 2 sizes: Large (lg), Small (sm)
+  - 3 media variants: Default, Icon (with border bg-muted), Image (with object-fit cover)
+  - Flat API: `item_full(variant, size, media, media_variant, title, description, actions, attrs)`
+  - Shortcut functions: `item_simple(title, description, action)`, `item_link(href, title, description, action, attrs)` (emits `<a>` root)
+  - Group support: `item_group(children)` with `role="list"`, `item_separator()` with `role="separator"`
+  - Pure-Gleam, no JS, stateless
+  - Flexbox layout: media + content (title + description) + actions
+
+### Modified
+
+- `dev/saola/preview/model.gleam` — Added `Empties`, `Items` routes to Route ADT
+- `dev/saola/preview.gleam` — Wired `/empties` and `/items` URL routes, sidebar nav links, main_pane dispatcher cases
+- `dev/saola/preview/view.gleam` — Added 2 dispatch functions: `view_empties()`, `view_items()`
+
+### Preview
+
+- Created `dev/saola/preview/empty_preview.gleam` — 3 empty-state demos: bare, with icon, with action
+- Created `dev/saola/preview/item_preview.gleam` — 5 demos: variants, sizes, media variants, grouped with separators, link-item
+
+### Tests
+
+- `test/new_widget_tests6.gleam` — New comprehensive test suite
+  - 19 new tests covering Empty and Item widgets
+  - Total suite now at **272 tests passing**
+  - Coverage includes: variants, sizes, media variants, shortcut functions, role attributes, CSS classes, omission of empty sections
+
+### CSS Changes
+
+- Added ~90 lines of CSS (empty + item styles)
+- **Empty** (`.empty-*` classes):
+  - Root: dashed border, flex center, gap/padding rules
+  - Header: centered max-width 24rem, sub-elements: media, title (h2), description (p)
+  - Media: default transparent, icon variant with 2.5rem box + rounded corners + bg-muted
+  - Description: text color muted-foreground, nested `<a>` with underline
+  - Content: flex column, centered, 24rem max-width
+- **Item** (`.item-*` classes):
+  - Root: flex wrap, gap 1rem, border/border-radius, transition on hover
+  - Variants: default (transparent), outline (border), muted (bg-muted)
+  - Sizes: lg (1rem gap/padding), sm (0.625rem gap, 0.75rem/1rem padding)
+  - Media: flex, shrink-0; icon variant (2rem box + border), image variant (2.5rem + object-fit)
+  - Content: flex-1, flex-column, title + description (2-line clamp)
+  - Actions: flex, gap 0.5rem
+  - Group & Separator: flex-column layout, hr border-top only
+- All styles use Basecoat design tokens (--color-muted, --color-border, --color-foreground, --color-muted-foreground, --radius-md, --radius-lg)
+
+### Documentation
+
+- Updated `docs/development-roadmap.md` — Marked Empty, Item as Complete; updated metrics (47 widgets, +2)
+- Updated project metrics: Batch 9 in key milestones
+
 ## [2026-05-17] — Batch 8: Carousel, Combobox, Navigation Menu, Toast Enhancement
 
 ### Added
@@ -227,8 +290,9 @@ Core widgets through form controls, including:
 
 | Metric | Value |
 |--------|-------|
-| Total widgets shipped | 45 |
-| Test suite coverage | 253 tests passing |
+| Total widgets shipped | 47 |
+| Test suite coverage | 272 tests passing |
+| New tests (Batch 9) | 19 |
 | New tests (Batch 8) | 27 |
 | New tests (Batch 7) | 37 |
 | Total phases | 6 |
