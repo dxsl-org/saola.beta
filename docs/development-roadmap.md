@@ -1,6 +1,6 @@
 # Saola Development Roadmap
 
-**Last updated:** 2026-05-17 (Batch 7: Command, Resizable, Sidebar, Data Table)
+**Last updated:** 2026-05-17 (Batch 8: Carousel, Combobox, Navigation Menu, Toast Enhancement)
 
 ## Phase 1: Core Widgets (In Progress)
 
@@ -97,13 +97,14 @@ Complex data widgets.
 
 ## Project Metrics
 
-- **Total Widgets:** 47+
-- **Completed:** 41
+- **Total Widgets:** 50+
+- **Completed:** 45
 - **In Progress:** 3
 - **Planned:** 5+
 
 ## Key Milestones
 
+- 2026-05-17: Batch 8 complete (carousel, combobox, navigation_menu, toast enhancement)
 - 2026-05-17: Batch 7 complete (command, sidebar, resizable, data_table)
 - 2026-05-17: Batch 6 complete (spinner, native_select, button_group, input_group, context_menu, drawer)
 - 2026-05-16: Batch 5 complete (calendar, date_picker)

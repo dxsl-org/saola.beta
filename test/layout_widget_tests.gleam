@@ -150,7 +150,7 @@ pub fn dialog_with_close_button_renders_test() {
 // --- toast ---
 
 pub fn toast_new_creates_struct_test() {
-  let t = toast.new_toast("Saved!", "Your file was saved.", toast.Default)
+  let t = toast.new_toast_simple("Saved!", "Your file was saved.", toast.Default)
   assert t.title == "Saved!"
   assert t.description == "Your file was saved."
   assert t.variant == toast.Default
@@ -158,7 +158,7 @@ pub fn toast_new_creates_struct_test() {
 }
 
 pub fn toaster_renders_container_test() {
-  let t = toast.new_toast("Done", "Task complete.", toast.Default)
+  let t = toast.new_toast_simple("Done", "Task complete.", toast.Default)
   let html = toast.toaster([t], fn(id) { id }) |> element.to_string
   assert string.contains(html, "class=\"toaster\"")
   assert string.contains(html, "aria-live=\"polite\"")
@@ -173,7 +173,7 @@ pub fn toaster_empty_renders_container_test() {
 }
 
 pub fn toaster_destructive_renders_test() {
-  let t = toast.new_toast("Error", "Failed.", toast.Destructive)
+  let t = toast.new_toast_simple("Error", "Failed.", toast.Destructive)
   let html = toast.toaster([t], fn(id) { id }) |> element.to_string
   assert string.contains(html, "toast-destructive")
 }

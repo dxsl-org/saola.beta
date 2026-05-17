@@ -58,6 +58,9 @@ pub type Route {
   Commands
   Resizables
   DataTables
+  Carousels
+  Comboboxes
+  NavigationMenus
 }
 
 pub type Model {
@@ -71,7 +74,7 @@ pub type Model {
     // Whether the demo dialog is open
     is_dialog_open: Bool,
     // List of active toasts
-    toasts: List(saola_toast.Toast),
+    toasts: List(saola_toast.Toast(Msg)),
     form_name: String,
     form_email: String,
     form_message: String,
@@ -134,6 +137,16 @@ pub type Model {
     resizable_sizes: List(Float),
     // Data table preview state
     data_table_state: data_table.DataTableState,
+    // Carousel preview state
+    carousel_index: Int,
+    carousel_can_prev: Bool,
+    carousel_can_next: Bool,
+    // Combobox preview state
+    combobox_value: Option(String),
+    combobox_query: String,
+    combobox_open: Bool,
+    // Navigation menu preview state
+    nav_menu_open: Option(String),
   )
 }
 
@@ -143,7 +156,7 @@ pub type Msg {
   TabChanged(String)
   OpenDialog
   CloseDialog
-  AddToast(saola_toast.Toast)
+  AddToast(saola_toast.Toast(Msg))
   DismissToast(String)
   FormNameChanged(String)
   FormEmailChanged(String)
@@ -191,4 +204,9 @@ pub type Msg {
   DataTableFilterChanged(String)
   DataTablePageChanged(Int)
   DataTableSelectChanged(List(String))
+  CarouselChanged(Int, Bool, Bool)
+  ComboboxOpenChanged(Bool)
+  ComboboxQueryChanged(String)
+  ComboboxSelected(String)
+  NavMenuOpenChanged(Option(String))
 }

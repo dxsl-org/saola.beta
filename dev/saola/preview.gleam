@@ -16,7 +16,8 @@ import saola/preview/model.{
   type Model, type Msg, AccordionToggled, Accordions, AddToast, AlertDialogCancelled,
   AlertDialogConfirmed, AlertDialogOpened, AlertDialogs, Alerts, AspectRatios, Avatars,
   Badges, Breadcrumbs, ButtonGroups, Buttons, CalendarDateSelected, CalendarMonthChanged,
-  Calendars, Cards, CloseDialog, CollapsibleToggled, Collapsibles, CommandNavDown,
+  Calendars, Cards, CarouselChanged, Carousels, CloseDialog, CollapsibleToggled, Collapsibles,
+  ComboboxOpenChanged, ComboboxQueryChanged, ComboboxSelected, Comboboxes, CommandNavDown,
   CommandNavUp, CommandQueryChanged, CommandSelected, Commands, ContextMenuClosed,
   ContextMenuOpened, ContextMenus, D3Charts, DataTableFilterChanged, DataTablePageChanged,
   DataTableSelectChanged, DataTableSortChanged, DataTables, DatePickerDateSelected,
@@ -24,13 +25,14 @@ import saola/preview/model.{
   DrawerClosed, DrawerOpened, Drawers, DropdownMenus, ExampleForm, ExampleSite, Fields,
   FormEmailChanged, FormMessageChanged, FormNameChanged, FormSubmitted, Forms, Home,
   HoverCardClosed, HoverCardOpened, HoverCards, InputGroups, InputOtpChanged, InputOtps,
-  Inputs, MenubarClosed, MenubarOpened, Menubars, Model, MonacoEditor, NativeSelectChanged,
-  NativeSelects, OnRouteChange, OpenDialog, Paginations, PaginationChanged, PopoverClosed,
-  Popovers, Progresses, RadioGroups, ResizableSizesChanged, Resizables, ScrollAreas,
-  SelectChanged, Selects, Separators, SheetClosed, SheetOpened, Sheets, SidebarCollapsedToggled,
-  SidebarToggled, Sidebars, Skeletons, SliderChanged, Sliders, Spinners, StartedTrial,
-  Switches, SwitchToggled, TabChanged, Tables, Tabs, Toasts, ToggleBoldChanged,
-  ToggleDropdown, ToggleGroupChanged, ToggleGroups, ToggleItalicChanged, Toggles, Tooltips,
+  Inputs, MenubarClosed, MenubarOpened, Menubars, Model, MonacoEditor, NavMenuOpenChanged,
+  NavigationMenus, NativeSelectChanged, NativeSelects, OnRouteChange, OpenDialog, Paginations,
+  PaginationChanged, PopoverClosed, Popovers, Progresses, RadioGroups, ResizableSizesChanged,
+  Resizables, ScrollAreas, SelectChanged, Selects, Separators, SheetClosed, SheetOpened,
+  Sheets, SidebarCollapsedToggled, SidebarToggled, Sidebars, Skeletons, SliderChanged,
+  Sliders, Spinners, StartedTrial, Switches, SwitchToggled, TabChanged, Tables, Tabs,
+  Toasts, ToggleBoldChanged, ToggleDropdown, ToggleGroupChanged, ToggleGroups,
+  ToggleItalicChanged, Toggles, Tooltips,
 }
 import saola/preview/view as views
 
@@ -96,6 +98,13 @@ fn init(_args) -> #(Model, Effect(Msg)) {
       command_highlighted: -1,
       resizable_sizes: [30.0, 70.0],
       data_table_state: data_table.default_state,
+      carousel_index: 0,
+      carousel_can_prev: False,
+      carousel_can_next: True,
+      combobox_value: None,
+      combobox_query: "",
+      combobox_open: False,
+      nav_menu_open: None,
     ),
     effect.batch([modem.init(on_url_change), whatnext]),
   )
@@ -154,6 +163,9 @@ fn on_url_change(uri: Uri) -> Msg {
     "/commands" -> Commands
     "/resizables" -> Resizables
     "/data-tables" -> DataTables
+    "/carousels" -> Carousels
+    "/comboboxes" -> Comboboxes
+    "/navigation-menus" -> NavigationMenus
     _ -> Home
   }
   OnRouteChange(route)
@@ -383,6 +395,31 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       ),
       effect.none(),
     )
+    CarouselChanged(idx, can_prev, can_next) -> #(
+      Model(
+        ..model,
+        carousel_index: idx,
+        carousel_can_prev: can_prev,
+        carousel_can_next: can_next,
+      ),
+      effect.none(),
+    )
+    ComboboxOpenChanged(open) -> #(
+      Model(..model, combobox_open: open),
+      effect.none(),
+    )
+    ComboboxQueryChanged(q) -> #(
+      Model(..model, combobox_query: q),
+      effect.none(),
+    )
+    ComboboxSelected(val) -> #(
+      Model(..model, combobox_value: Some(val), combobox_open: False),
+      effect.none(),
+    )
+    NavMenuOpenChanged(id) -> #(
+      Model(..model, nav_menu_open: id),
+      effect.none(),
+    )
   }
 }
 
@@ -445,6 +482,9 @@ fn sidebar(current_route: model.Route) -> Element(Msg) {
     nav_link("/commands", "Command", current_route == Commands),
     nav_link("/resizables", "Resizable", current_route == Resizables),
     nav_link("/data-tables", "Data Table", current_route == DataTables),
+    nav_link("/carousels", "Carousel", current_route == Carousels),
+    nav_link("/comboboxes", "Combobox", current_route == Comboboxes),
+    nav_link("/navigation-menus", "Navigation Menu", current_route == NavigationMenus),
     nav_link("/dropdown-menus", "Dropdown Menus", current_route == DropdownMenus),
     nav_link("/tabs", "Tabs", current_route == Tabs),
     nav_link("/dialogs", "Dialogs", current_route == Dialogs),
@@ -519,6 +559,9 @@ fn main_pane(model: Model) -> Element(Msg) {
       Commands -> views.view_commands(model)
       Resizables -> views.view_resizables(model)
       DataTables -> views.view_data_tables(model)
+      Carousels -> views.view_carousels(model)
+      Comboboxes -> views.view_comboboxes(model)
+      NavigationMenus -> views.view_navigation_menus(model)
       D3Charts -> views.view_d3_charts()
       MonacoEditor -> views.view_monaco_editor()
       ExampleForm -> views.view_form_example(model)

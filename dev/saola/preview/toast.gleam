@@ -3,7 +3,7 @@ import lustre/attribute as a
 import lustre/element.{type Element, text}
 import lustre/element/html as h
 import saola/button
-import saola/preview/model.{type Model, type Msg, AddToast, DismissToast}
+import saola/preview/model.{type Model, type Msg, AddToast, DismissToast, StartedTrial}
 import saola/toast
 
 pub fn view_toasts(model: Model) -> Element(Msg) {
@@ -14,16 +14,81 @@ pub fn view_toasts(model: Model) -> Element(Msg) {
     ]),
     h.div([a.class("flex gap-3 flex-wrap mt-4")], [
       button.button_primary(
-        "Add Default Toast",
-        AddToast(toast.new_toast("Saved!", "Your changes have been saved.", toast.Default)),
+        "Default",
+        AddToast(toast.new_toast_simple(
+          "Saved!",
+          "Your changes have been saved.",
+          toast.Default,
+        )),
       ),
       button.button_full(
         button.Secondary,
-        "Add Destructive Toast",
+        "Destructive",
         button.Large,
         option.None,
         option.Some(
-          AddToast(toast.new_toast("Error", "Could not save changes.", toast.Destructive)),
+          AddToast(toast.new_toast_simple(
+            "Error",
+            "Could not save changes.",
+            toast.Destructive,
+          )),
+        ),
+        button.default_extra_attrs,
+      ),
+      button.button_full(
+        button.Secondary,
+        "Success",
+        button.Large,
+        option.None,
+        option.Some(
+          AddToast(toast.new_toast_simple(
+            "Success",
+            "Operation completed.",
+            toast.Success,
+          )),
+        ),
+        button.default_extra_attrs,
+      ),
+      button.button_full(
+        button.Secondary,
+        "Warning",
+        button.Large,
+        option.None,
+        option.Some(
+          AddToast(toast.new_toast_simple(
+            "Warning",
+            "This action may have side effects.",
+            toast.Warning,
+          )),
+        ),
+        button.default_extra_attrs,
+      ),
+      button.button_full(
+        button.Secondary,
+        "Info",
+        button.Large,
+        option.None,
+        option.Some(
+          AddToast(toast.new_toast_simple(
+            "Info",
+            "Here is some useful information.",
+            toast.Info,
+          )),
+        ),
+        button.default_extra_attrs,
+      ),
+      button.button_full(
+        button.Secondary,
+        "With Action",
+        button.Large,
+        option.None,
+        option.Some(
+          AddToast(toast.new_toast(
+            "Start your trial",
+            "Get 14 days of Pro features free.",
+            toast.Default,
+            option.Some(toast.ToastAction("Start trial", StartedTrial)),
+          )),
         ),
         button.default_extra_attrs,
       ),

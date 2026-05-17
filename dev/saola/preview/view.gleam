@@ -52,6 +52,9 @@ import saola/preview/spinner_preview
 import saola/preview/toggle_group_preview
 import saola/preview/toggle_preview
 import saola/preview/tooltip as tooltip_preview
+import saola/preview/carousel_preview
+import saola/preview/combobox_preview
+import saola/preview/navigation_menu_preview
 
 pub fn view_alerts() -> Element(Msg) {
   alert.view_alerts()
@@ -251,6 +254,18 @@ pub fn view_resizables(model: Model) -> Element(Msg) {
 
 pub fn view_data_tables(model: Model) -> Element(Msg) {
   data_table_preview.view_data_tables(model)
+}
+
+pub fn view_carousels(model: Model) -> Element(Msg) {
+  carousel_preview.view_carousels(model)
+}
+
+pub fn view_comboboxes(model: Model) -> Element(Msg) {
+  combobox_preview.view_comboboxes(model)
+}
+
+pub fn view_navigation_menus(model: Model) -> Element(Msg) {
+  navigation_menu_preview.view_navigation_menus(model)
 }
 
 pub fn view_forms() -> Element(Msg) {

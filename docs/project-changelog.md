@@ -2,6 +2,78 @@
 
 All notable changes to the Saola UI Kit are documented here.
 
+## [2026-05-17] — Batch 8: Carousel, Combobox, Navigation Menu, Toast Enhancement
+
+### Added
+
+**New Widgets**
+- **Carousel** (`src/saola/carousel.gleam`) — Horizontal/vertical scroll-snap carousel with prev/next navigation
+  - Backed by `assets/saola-carousel.mjs` web component
+  - Orientation support: Horizontal (default) or Vertical
+  - Loop mode for infinite scrolling
+  - Slide change detection via `slide-change` CustomEvent
+  - Full API: `carousel_full`, `carousel_simple`
+  - Responsive scroll-snap viewport
+
+- **Combobox** (`src/saola/combobox.gleam`) — Searchable select with filterable option list
+  - Case-insensitive substring filtering via `combobox_filter` helper
+  - Query/value/open state managed by consumer
+  - Check icon for selected option
+  - Full API: `combobox_full`, `combobox_simple`
+  - Keyboard accessible: role="combobox", role="listbox"
+
+- **Navigation Menu** (`src/saola/navigation_menu.gleam`) — Click-driven top navigation with dropdowns
+  - Link items with active state styling
+  - Dropdown support with click-to-open/close
+  - Two dropdown content modes: NavMenuSimple (list of links) or NavMenuRich (custom Element)
+  - Full API: `navigation_menu_full`, `navigation_menu_simple`
+
+### Modified
+
+**Toast Enhancement** (`src/saola/toast.gleam`) — BREAKING CHANGE: Now generic over `msg`
+  - Added variants: `Success`, `Warning`, `Info` (previous: Default, Destructive)
+  - Added optional action buttons via `ToastAction(label, on_click)` 
+  - Type signature changed from `Toast` → `Toast(msg)` (requires migration in consumers)
+  - New convenience function `new_toast_simple` (no action)
+  - CSS variants for new toast types (`toast-success`, `toast-warning`, `toast-info`)
+
+### Migration Guide
+
+For existing toast consumers:
+- Change `List(toast.Toast)` → `List(toast.Toast(Msg))`
+- Change `AddToast(toast.Toast)` → `AddToast(toast.Toast(Msg))`
+- Replace `toast.new_toast(t, d, v)` with `toast.new_toast_simple(t, d, v)` OR use `toast.new_toast(t, d, v, Some(ToastAction(...)))`
+
+### Preview
+
+- Updated `dev/saola/preview/model.gleam` — Added Carousels, Comboboxes, NavigationMenus routes; migrated Toast to generic msg
+- Updated `dev/saola/preview.gleam` — Wired all 3 new routes, init handlers, update branches, sidebar nav links, main_pane dispatchers
+- Updated `dev/saola/preview/view.gleam` — Added 3 dispatch functions for new widgets
+- Created `dev/saola/preview/carousel_preview.gleam` — Horizontal + vertical carousel demos
+- Created `dev/saola/preview/combobox_preview.gleam` — Simple + full search combobox demos
+- Created `dev/saola/preview/navigation_menu_preview.gleam` — Navigation menu with simple + rich dropdowns
+- Migrated `dev/saola/preview/toast.gleam` — Added Success/Warning/Info/action button demos
+
+### Tests
+
+- `test/new_widget_tests5.gleam` — New comprehensive test suite
+  - 27 new tests covering Carousel, Combobox, Navigation Menu, Toast variants & actions
+  - Total suite now at 253 tests passing
+  - Coverage includes: tag rendering, attribute presence, filter logic, open/closed states, variant classes, action button detection
+
+### CSS Changes
+
+- Added styles for `.carousel-root` (flex/overflow viewport)
+- Added ~50 lines for combobox (trigger, panel, options, search, empty state)
+- Added ~50 lines for navigation menu (menu, items, dropdowns, content panels)
+- Added toast variant CSS: `.toast-success`, `.toast-warning`, `.toast-info` with appropriate colors
+- All styles use Basecoat design tokens (--color-popover, --color-border, --radius-md, etc.)
+
+### Documentation
+
+- Updated `docs/development-roadmap.md` — Marked carousel, combobox, navigation_menu, toast as Complete
+- Updated project metrics: 45 widgets complete, 253 total tests passing
+
 ## [2026-05-17] — Batch 7: Navigation, Layout & Data Widgets
 
 ### Added
@@ -155,8 +227,9 @@ Core widgets through form controls, including:
 
 | Metric | Value |
 |--------|-------|
-| Total widgets shipped | 41 |
-| Test suite coverage | 230 tests passing |
+| Total widgets shipped | 45 |
+| Test suite coverage | 253 tests passing |
+| New tests (Batch 8) | 27 |
 | New tests (Batch 7) | 37 |
 | Total phases | 6 |
 | Completed phases | 2 (Phases 1-2) |
