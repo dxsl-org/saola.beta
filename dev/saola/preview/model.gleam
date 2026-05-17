@@ -1,6 +1,7 @@
 import gleam/option.{type Option}
 import gleam/time/calendar.{type Date, type Month}
 import saola/data_table
+import saola/theme
 import saola/toast as saola_toast
 
 // Note: Keep these in sync with the route handlers in view.gleam and the
@@ -149,6 +150,8 @@ pub type Model {
     combobox_open: Bool,
     // Navigation menu preview state
     nav_menu_open: Option(String),
+    // Active color theme
+    theme: theme.Theme,
   )
 }
 
@@ -211,4 +214,5 @@ pub type Msg {
   ComboboxQueryChanged(String)
   ComboboxSelected(String)
   NavMenuOpenChanged(Option(String))
+  ThemeToggled(theme.Theme)
 }

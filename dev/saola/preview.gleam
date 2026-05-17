@@ -8,7 +8,9 @@ import lustre/attribute as a
 import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html as h
+import lustre/event as e
 import modem
+import saola/theme
 
 import gleam/time/calendar
 import saola/data_table
@@ -31,7 +33,7 @@ import saola/preview/model.{
   Resizables, ScrollAreas, SelectChanged, Selects, Separators, SheetClosed, SheetOpened,
   Sheets, SidebarCollapsedToggled, SidebarToggled, Sidebars, Skeletons, SliderChanged,
   Sliders, Spinners, StartedTrial, Switches, SwitchToggled, TabChanged, Tables, Tabs,
-  Toasts, ToggleBoldChanged, ToggleDropdown, ToggleGroupChanged, ToggleGroups,
+  ThemeToggled, Toasts, ToggleBoldChanged, ToggleDropdown, ToggleGroupChanged, ToggleGroups,
   ToggleItalicChanged, Toggles, Tooltips,
 }
 import saola/preview/view as views
@@ -105,6 +107,7 @@ fn init(_args) -> #(Model, Effect(Msg)) {
       combobox_query: "",
       combobox_open: False,
       nav_menu_open: None,
+      theme: theme.Light,
     ),
     effect.batch([modem.init(on_url_change), whatnext]),
   )
@@ -422,6 +425,7 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       Model(..model, nav_menu_open: id),
       effect.none(),
     )
+    ThemeToggled(t) -> #(Model(..model, theme: t), effect.none())
   }
 }
 
@@ -433,15 +437,39 @@ fn result_unwrap(r: Result(a, e), default: a) -> a {
 }
 
 fn view(model: Model) -> Element(Msg) {
-  h.div([a.class("app-container")], [
-    sidebar(model.route),
+  h.div([a.class("app-container"), theme.theme_attr(model.theme)], [
+    sidebar(model.route, model.theme),
     main_pane(model),
   ])
 }
 
-fn sidebar(current_route: model.Route) -> Element(Msg) {
+fn sidebar(current_route: model.Route, current_theme: theme.Theme) -> Element(Msg) {
   h.div([a.class("sidebar")], [
     h.h2([a.class("sidebar-title")], [element.text("UI Showcase")]),
+    h.div([a.class("theme-toggle")], [
+      h.button(
+        [
+          a.type_("button"),
+          a.class("nav-link" <> case current_theme {
+            theme.Light -> " active"
+            _ -> ""
+          }),
+          e.on_click(ThemeToggled(theme.Light)),
+        ],
+        [element.text("Light")],
+      ),
+      h.button(
+        [
+          a.type_("button"),
+          a.class("nav-link" <> case current_theme {
+            theme.Dark -> " active"
+            _ -> ""
+          }),
+          e.on_click(ThemeToggled(theme.Dark)),
+        ],
+        [element.text("Dark")],
+      ),
+    ]),
     nav_link("/alerts", "Alerts", current_route == Alerts),
     nav_link("/badges", "Badges", current_route == Badges),
     nav_link("/cards", "Cards", current_route == Cards),

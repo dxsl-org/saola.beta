@@ -15,6 +15,8 @@ pub type FieldAttrs {
     description: String,
     error: String,
     orientation: FieldOrientation,
+    required: Bool,
+    hint: String,
   )
 }
 
@@ -23,6 +25,8 @@ pub const default_attrs = FieldAttrs(
   description: "",
   error: "",
   orientation: Vertical,
+  required: False,
+  hint: "",
 )
 
 /// Wraps an input with a label, optional description, and optional error message.
@@ -35,7 +39,8 @@ pub const default_attrs = FieldAttrs(
 /// )
 /// ```
 pub fn field(attrs: FieldAttrs, input: Element(msg)) -> Element(msg) {
-  let FieldAttrs(label:, description:, error:, orientation:) = attrs
+  let FieldAttrs(label:, description:, error:, orientation:, required:, hint:) =
+    attrs
   let is_invalid = error != ""
   h.div(
     [
@@ -52,13 +57,27 @@ pub fn field(attrs: FieldAttrs, input: Element(msg)) -> Element(msg) {
     [
       case label {
         "" -> element.none()
-        l -> h.label([a.class("label")], [h.text(l)])
+        l ->
+          h.label([a.class("label")], [
+            h.text(l),
+            case required {
+              True ->
+                h.span(
+                  [a.class("field-required"), a.attribute("aria-hidden", "true")],
+                  [h.text(" *")],
+                )
+              False -> element.none()
+            },
+          ])
       },
       input,
+      case hint {
+        "" -> element.none()
+        h_ -> h.p([a.class("field-hint")], [h.text(h_)])
+      },
       case description {
         "" -> element.none()
-        d ->
-          h.p([a.class("text-muted-foreground text-sm")], [h.text(d)])
+        d -> h.p([a.class("text-muted-foreground text-sm")], [h.text(d)])
       },
       case error {
         "" -> element.none()

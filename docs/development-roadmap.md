@@ -1,6 +1,6 @@
 # Saola Development Roadmap
 
-**Last updated:** 2026-05-17 (Batch 9: Empty, Item widgets)
+**Last updated:** 2026-05-17 (Batch 10: Theme System, Form Validation)
 
 ## Phase 1: Core Widgets (In Progress)
 
@@ -103,9 +103,11 @@ Complex data widgets.
 - **Completed:** 47
 - **In Progress:** 3
 - **Planned:** 5+
+- **Total Tests:** 284 passing
 
 ## Key Milestones
 
+- 2026-05-17: Batch 10 complete (theme system, form validation enhancement)
 - 2026-05-17: Batch 9 complete (empty, item)
 - 2026-05-17: Batch 8 complete (carousel, combobox, navigation_menu, toast enhancement)
 - 2026-05-17: Batch 7 complete (command, sidebar, resizable, data_table)

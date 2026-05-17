@@ -288,6 +288,8 @@ pub fn field_with_error_renders_test() {
         description: "",
         error: "Invalid email address.",
         orientation: field.Vertical,
+        required: False,
+        hint: "",
       ),
       input.input_email("you@example.com", fn(_) { Nil }),
     )
@@ -305,6 +307,8 @@ pub fn field_with_description_renders_test() {
         description: "Write a short description.",
         error: "",
         orientation: field.Vertical,
+        required: False,
+        hint: "",
       ),
       textarea.textarea_simple("About you", fn(_) { Nil }),
     )
@@ -321,6 +325,8 @@ pub fn field_horizontal_renders_test() {
         description: "",
         error: "",
         orientation: field.Horizontal,
+        required: False,
+        hint: "",
       ),
       switch.switch_simple("Active", True, fn(_) { Nil }),
     )

@@ -7,6 +7,7 @@ import saola/input
 import saola/preview/model.{type Msg, FormEmailChanged, FormNameChanged}
 import saola/select
 import saola/switch
+import saola/form
 
 pub fn view_fields(name: String, email: String) -> Element(Msg) {
   h.div([], [
@@ -27,6 +28,8 @@ pub fn view_fields(name: String, email: String) -> Element(Msg) {
           description: "We'll never share your email.",
           error: "",
           orientation: field.Vertical,
+          required: False,
+          hint: "",
         ),
         input.input_full(
           input.Email,
@@ -45,6 +48,8 @@ pub fn view_fields(name: String, email: String) -> Element(Msg) {
           description: "",
           error: "Username is already taken.",
           orientation: field.Vertical,
+          required: False,
+          hint: "",
         ),
         input.input_full(
           input.Text,
@@ -63,6 +68,8 @@ pub fn view_fields(name: String, email: String) -> Element(Msg) {
           description: "Used to calculate shipping.",
           error: "",
           orientation: field.Vertical,
+          required: False,
+          hint: "",
         ),
         select.select_simple(
           [
@@ -79,8 +86,32 @@ pub fn view_fields(name: String, email: String) -> Element(Msg) {
           description: "Receive product updates and offers.",
           error: "",
           orientation: field.Horizontal,
+          required: False,
+          hint: "",
         ),
         switch.switch_simple("", False, fn(_) { FormNameChanged("") }),
+      ),
+      field.field(
+        field.FieldAttrs(
+          label: "Required field",
+          description: "",
+          error: "",
+          orientation: field.Vertical,
+          required: True,
+          hint: "This field is mandatory.",
+        ),
+        input.input_text("", FormNameChanged),
+      ),
+      field.field(
+        form.field_attrs_from_result(
+          Error("This value is invalid."),
+          field.FieldAttrs(
+            ..field.default_attrs,
+            label: "With validation error",
+            required: True,
+          ),
+        ),
+        input.input_text("bad value", FormNameChanged),
       ),
     ]),
   ])

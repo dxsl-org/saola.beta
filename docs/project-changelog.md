@@ -2,6 +2,58 @@
 
 All notable changes to the Saola UI Kit are documented here.
 
+## [2026-05-17] — Batch 10: Theme System, Form Validation Enhancement
+
+### Added
+
+**New Modules**
+- **Theme** (`src/saola/theme.gleam`) — System-level theme management
+  - `Theme` ADT: `Light`, `Dark`, `System` variants
+  - `theme_attr(Theme) -> Attribute(msg)` — Returns `.dark` class for Dark theme, or `a.none()` for Light/System (System preference handled by index.html script)
+  - Enables dark mode theming throughout the UI kit
+
+- **Form** (`src/saola/form.gleam`) — Bridge for formal library integration
+  - `field_attrs_from_result(Result(String, String), FieldAttrs) -> FieldAttrs` — Maps validation results to field error state
+  - `Ok(_)` clears error, `Error(e)` sets error message
+  - Simplifies form validation workflows with formal library
+
+### Modified
+
+**Field Enhancement** (`src/saola/field.gleam`)
+  - Added `required: Bool` field to `FieldAttrs`
+  - Added `hint: String` field to `FieldAttrs`
+  - When `required: True`: renders `aria-required="true"` on wrapper + asterisk (`*`) indicator in label
+  - When `hint` non-empty: renders `<p class="field-hint">` below description
+  - Backward compatible: new fields default to `False` and empty string
+
+**Dark Mode Support** (`index.html`)
+  - Added system-preference dark mode detection script (3 lines)
+  - Automatically applies `.dark` class to root element based on `prefers-color-scheme` media query
+  - Defers to explicit `Theme.Dark` when set
+
+**Styling** (`assets/app.css`)
+  - Added `.field-hint` — gray text below field description
+  - Added `.field-required` — styles for required indicator and asterisk
+  - Added `.theme-toggle` — styles for dark mode toggle button
+
+### Preview Updates
+
+- Added dark mode toggle button in sidebar
+- Created required field + hint demos in Fields page
+- Showcases required indicator, hint text, and validation integration with field_attrs_from_result
+
+### Tests
+
+- `test/new_widget_tests7.gleam` — New comprehensive test suite
+  - 12 new tests covering Theme system and field enhancements
+  - Total suite now at **284 tests passing**
+  - Coverage includes: theme_attr output, required field aria-required, required asterisk rendering, hint paragraph rendering, field_attrs_from_result mapping
+
+### Documentation
+
+- Updated `docs/development-roadmap.md` — Updated last-updated timestamp and project metrics (284 tests)
+- Updated `docs/project-changelog.md` — Added Batch 10 entry and metrics
+
 ## [2026-05-17] — Batch 9: Empty, Item Widgets
 
 ### Added
@@ -291,7 +343,8 @@ Core widgets through form controls, including:
 | Metric | Value |
 |--------|-------|
 | Total widgets shipped | 47 |
-| Test suite coverage | 272 tests passing |
+| Test suite coverage | 284 tests passing |
+| New tests (Batch 10) | 12 |
 | New tests (Batch 9) | 19 |
 | New tests (Batch 8) | 27 |
 | New tests (Batch 7) | 37 |
