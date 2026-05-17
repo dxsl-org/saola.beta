@@ -11,23 +11,26 @@ import lustre/element/html as h
 import modem
 
 import gleam/time/calendar
+import saola/data_table
 import saola/preview/model.{
   type Model, type Msg, AccordionToggled, Accordions, AddToast, AlertDialogCancelled,
   AlertDialogConfirmed, AlertDialogOpened, AlertDialogs, Alerts, AspectRatios, Avatars,
   Badges, Breadcrumbs, ButtonGroups, Buttons, CalendarDateSelected, CalendarMonthChanged,
-  Calendars, Cards, CloseDialog, CollapsibleToggled, Collapsibles, ContextMenuClosed,
-  ContextMenuOpened, ContextMenus, D3Charts, DatePickerDateSelected, DatePickerMonthChanged,
-  DatePickerOpenChanged, DatePickers, Dialogs, DismissToast, DrawerClosed, DrawerOpened,
-  Drawers, DropdownMenus, ExampleForm, ExampleSite, Fields, FormEmailChanged,
-  FormMessageChanged, FormNameChanged, FormSubmitted, Forms, Home, HoverCardClosed,
-  HoverCardOpened, HoverCards, InputGroups, InputOtpChanged, InputOtps, Inputs,
-  MenubarClosed, MenubarOpened, Menubars, Model, MonacoEditor, NativeSelectChanged,
+  Calendars, Cards, CloseDialog, CollapsibleToggled, Collapsibles, CommandNavDown,
+  CommandNavUp, CommandQueryChanged, CommandSelected, Commands, ContextMenuClosed,
+  ContextMenuOpened, ContextMenus, D3Charts, DataTableFilterChanged, DataTablePageChanged,
+  DataTableSelectChanged, DataTableSortChanged, DataTables, DatePickerDateSelected,
+  DatePickerMonthChanged, DatePickerOpenChanged, DatePickers, Dialogs, DismissToast,
+  DrawerClosed, DrawerOpened, Drawers, DropdownMenus, ExampleForm, ExampleSite, Fields,
+  FormEmailChanged, FormMessageChanged, FormNameChanged, FormSubmitted, Forms, Home,
+  HoverCardClosed, HoverCardOpened, HoverCards, InputGroups, InputOtpChanged, InputOtps,
+  Inputs, MenubarClosed, MenubarOpened, Menubars, Model, MonacoEditor, NativeSelectChanged,
   NativeSelects, OnRouteChange, OpenDialog, Paginations, PaginationChanged, PopoverClosed,
-  Popovers, Progresses, RadioGroups, ScrollAreas, SelectChanged, Selects, Separators,
-  SheetClosed, SheetOpened, Sheets, Skeletons, SliderChanged, Sliders, Spinners,
-  StartedTrial, Switches, SwitchToggled, TabChanged, Tables, Tabs, Toasts,
-  ToggleBoldChanged, ToggleGroupChanged, ToggleGroups, ToggleItalicChanged, Toggles,
-  Tooltips, ToggleDropdown,
+  Popovers, Progresses, RadioGroups, ResizableSizesChanged, Resizables, ScrollAreas,
+  SelectChanged, Selects, Separators, SheetClosed, SheetOpened, Sheets, SidebarCollapsedToggled,
+  SidebarToggled, Sidebars, Skeletons, SliderChanged, Sliders, Spinners, StartedTrial,
+  Switches, SwitchToggled, TabChanged, Tables, Tabs, Toasts, ToggleBoldChanged,
+  ToggleDropdown, ToggleGroupChanged, ToggleGroups, ToggleItalicChanged, Toggles, Tooltips,
 }
 import saola/preview/view as views
 
@@ -87,6 +90,12 @@ fn init(_args) -> #(Model, Effect(Msg)) {
       context_menu_x: 0,
       context_menu_y: 0,
       drawer_open: False,
+      sidebar_open: True,
+      sidebar_collapsed: False,
+      command_query: "",
+      command_highlighted: -1,
+      resizable_sizes: [30.0, 70.0],
+      data_table_state: data_table.default_state,
     ),
     effect.batch([modem.init(on_url_change), whatnext]),
   )
@@ -141,6 +150,10 @@ fn on_url_change(uri: Uri) -> Msg {
     "/input-groups" -> InputGroups
     "/context-menus" -> ContextMenus
     "/drawers" -> Drawers
+    "/sidebars" -> Sidebars
+    "/commands" -> Commands
+    "/resizables" -> Resizables
+    "/data-tables" -> DataTables
     _ -> Home
   }
   OnRouteChange(route)
@@ -305,6 +318,71 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     )
     DrawerOpened -> #(Model(..model, drawer_open: True), effect.none())
     DrawerClosed -> #(Model(..model, drawer_open: False), effect.none())
+    SidebarToggled -> #(
+      Model(..model, sidebar_open: !model.sidebar_open),
+      effect.none(),
+    )
+    SidebarCollapsedToggled -> #(
+      Model(..model, sidebar_collapsed: !model.sidebar_collapsed),
+      effect.none(),
+    )
+    CommandQueryChanged(q) -> #(
+      Model(..model, command_query: q, command_highlighted: -1),
+      effect.none(),
+    )
+    CommandNavUp -> #(
+      Model(
+        ..model,
+        command_highlighted: model.command_highlighted - 1,
+      ),
+      effect.none(),
+    )
+    CommandNavDown -> #(
+      Model(
+        ..model,
+        command_highlighted: model.command_highlighted + 1,
+      ),
+      effect.none(),
+    )
+    CommandSelected(_) -> #(
+      Model(..model, command_query: "", command_highlighted: -1),
+      effect.none(),
+    )
+    ResizableSizesChanged(sizes) -> #(
+      Model(..model, resizable_sizes: sizes),
+      effect.none(),
+    )
+    DataTableSortChanged(key) -> #(
+      Model(
+        ..model,
+        data_table_state: data_table.toggle_sort(model.data_table_state, key),
+      ),
+      effect.none(),
+    )
+    DataTableFilterChanged(q) -> #(
+      Model(
+        ..model,
+        data_table_state: data_table.set_filter(model.data_table_state, q),
+      ),
+      effect.none(),
+    )
+    DataTablePageChanged(p) -> #(
+      Model(
+        ..model,
+        data_table_state: data_table.set_page(model.data_table_state, p),
+      ),
+      effect.none(),
+    )
+    DataTableSelectChanged(ids) -> #(
+      Model(
+        ..model,
+        data_table_state: data_table.DataTableState(
+          ..model.data_table_state,
+          selected: ids,
+        ),
+      ),
+      effect.none(),
+    )
   }
 }
 
@@ -363,6 +441,10 @@ fn sidebar(current_route: model.Route) -> Element(Msg) {
     nav_link("/input-groups", "Input Group", current_route == InputGroups),
     nav_link("/context-menus", "Context Menu", current_route == ContextMenus),
     nav_link("/drawers", "Drawer", current_route == Drawers),
+    nav_link("/sidebars", "Sidebar", current_route == Sidebars),
+    nav_link("/commands", "Command", current_route == Commands),
+    nav_link("/resizables", "Resizable", current_route == Resizables),
+    nav_link("/data-tables", "Data Table", current_route == DataTables),
     nav_link("/dropdown-menus", "Dropdown Menus", current_route == DropdownMenus),
     nav_link("/tabs", "Tabs", current_route == Tabs),
     nav_link("/dialogs", "Dialogs", current_route == Dialogs),
@@ -433,6 +515,10 @@ fn main_pane(model: Model) -> Element(Msg) {
       InputGroups -> views.view_input_groups()
       ContextMenus -> views.view_context_menus(model)
       Drawers -> views.view_drawers(model)
+      Sidebars -> views.view_sidebars(model)
+      Commands -> views.view_commands(model)
+      Resizables -> views.view_resizables(model)
+      DataTables -> views.view_data_tables(model)
       D3Charts -> views.view_d3_charts()
       MonacoEditor -> views.view_monaco_editor()
       ExampleForm -> views.view_form_example(model)

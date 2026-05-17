@@ -41,7 +41,11 @@ import saola/preview/button_group_preview
 import saola/preview/calendar_preview
 import saola/preview/context_menu_preview
 import saola/preview/date_picker_preview
+import saola/preview/command_preview
+import saola/preview/data_table_preview
 import saola/preview/drawer_preview
+import saola/preview/resizable_preview
+import saola/preview/sidebar_preview
 import saola/preview/input_group_preview
 import saola/preview/native_select_preview
 import saola/preview/spinner_preview
@@ -231,6 +235,22 @@ pub fn view_context_menus(model: Model) -> Element(Msg) {
 
 pub fn view_drawers(model: Model) -> Element(Msg) {
   drawer_preview.view_drawers(model)
+}
+
+pub fn view_sidebars(model: Model) -> Element(Msg) {
+  sidebar_preview.view_sidebars(model)
+}
+
+pub fn view_commands(model: Model) -> Element(Msg) {
+  command_preview.view_commands(model)
+}
+
+pub fn view_resizables(model: Model) -> Element(Msg) {
+  resizable_preview.view_resizables(model)
+}
+
+pub fn view_data_tables(model: Model) -> Element(Msg) {
+  data_table_preview.view_data_tables(model)
 }
 
 pub fn view_forms() -> Element(Msg) {

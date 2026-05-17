@@ -1,6 +1,6 @@
 # Saola Development Roadmap
 
-**Last updated:** 2026-05-17
+**Last updated:** 2026-05-17 (Batch 7: Command, Resizable, Sidebar, Data Table)
 
 ## Phase 1: Core Widgets (In Progress)
 
@@ -51,6 +51,7 @@ Specialized input and form control widgets.
 | Segmented Control | Complete | 100% |
 | Date Picker | Complete | 100% |
 | Calendar | Complete | 100% |
+| Command Palette | Complete | 100% |
 | Time Picker | In Progress | 0% |
 | Multiselect | In Progress | 0% |
 | Rating | In Progress | 0% |
@@ -69,7 +70,7 @@ New in this batch (May 16-17, 2026):
 | Context Menu | Complete | 100% |
 | Drawer | Complete | 100% |
 
-## Phase 5: Layout & Navigation (Planned)
+## Phase 5: Layout & Navigation (In Progress)
 
 Structural widgets for page layout.
 
@@ -78,38 +79,40 @@ Structural widgets for page layout.
 | Breadcrumb | Complete | 100% |
 | Pagination | Complete | 100% |
 | Tabs | Complete | 100% |
-| Sidebar | Planned | 0% |
+| Sidebar | Complete | 100% |
+| Resizable | Complete | 100% |
 | Navigation Bar | Planned | 0% |
 | Stepper | Planned | 0% |
 
-## Phase 6: Data Display (Planned)
+## Phase 6: Data Display (In Progress)
 
 Complex data widgets.
 
 | Widget | Status | Completion |
 |--------|--------|-----------|
-| Data Table | Planned | 0% |
+| Data Table | Complete | 100% |
 | Tree View | Planned | 0% |
 | Timeline | Planned | 0% |
 | Badge List | Planned | 0% |
 
 ## Project Metrics
 
-- **Total Widgets:** 43+
-- **Completed:** 37
+- **Total Widgets:** 47+
+- **Completed:** 41
 - **In Progress:** 3
 - **Planned:** 5+
 
 ## Key Milestones
 
+- 2026-05-17: Batch 7 complete (command, sidebar, resizable, data_table)
 - 2026-05-17: Batch 6 complete (spinner, native_select, button_group, input_group, context_menu, drawer)
 - 2026-05-16: Batch 5 complete (calendar, date_picker)
 - Previous: 29 widgets across phases 1-3
 
 ## Next Steps
 
-1. Complete Form & Input widgets (time_picker, multiselect, rating, search)
-2. Implement Layout & Navigation widgets
-3. Build Data Display widgets
+1. Complete remaining Form & Input widgets (time_picker, multiselect, rating, search)
+2. Implement Layout & Navigation widgets (navigation_bar, stepper)
+3. Build remaining Data Display widgets (tree_view, timeline, badge_list)
 4. Add comprehensive documentation
 5. Performance optimization pass

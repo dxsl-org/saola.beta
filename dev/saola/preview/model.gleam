@@ -1,5 +1,6 @@
 import gleam/option.{type Option}
 import gleam/time/calendar.{type Date, type Month}
+import saola/data_table
 import saola/toast as saola_toast
 
 // Note: Keep these in sync with the route handlers in view.gleam and the
@@ -53,6 +54,10 @@ pub type Route {
   InputGroups
   ContextMenus
   Drawers
+  Sidebars
+  Commands
+  Resizables
+  DataTables
 }
 
 pub type Model {
@@ -119,6 +124,16 @@ pub type Model {
     context_menu_y: Int,
     // Drawer preview state
     drawer_open: Bool,
+    // Sidebar preview state
+    sidebar_open: Bool,
+    sidebar_collapsed: Bool,
+    // Command preview state
+    command_query: String,
+    command_highlighted: Int,
+    // Resizable preview state
+    resizable_sizes: List(Float),
+    // Data table preview state
+    data_table_state: data_table.DataTableState,
   )
 }
 
@@ -165,4 +180,15 @@ pub type Msg {
   ContextMenuClosed
   DrawerOpened
   DrawerClosed
+  SidebarToggled
+  SidebarCollapsedToggled
+  CommandQueryChanged(String)
+  CommandNavUp
+  CommandNavDown
+  CommandSelected(String)
+  ResizableSizesChanged(List(Float))
+  DataTableSortChanged(String)
+  DataTableFilterChanged(String)
+  DataTablePageChanged(Int)
+  DataTableSelectChanged(List(String))
 }

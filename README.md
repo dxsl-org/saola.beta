@@ -49,6 +49,8 @@ fn view(model: Model) -> Element(Msg) {
 | `saola/card` | `card_simple` | `card` |
 | `saola/checkbox` | `checkbox_simple` | `checkbox_full` |
 | `saola/collapsible` | `collapsible_simple` | `collapsible_full` |
+| `saola/command` | — | `command_full`, `command_nav_up`, `command_nav_down`, `command_get_value_at`, `command_item_count` |
+| `saola/data_table` | `data_table_simple` | `data_table_full` |
 | `saola/dialog` | — | `dialog_full` |
 | `saola/field` | `field_simple` | `field` |
 | `saola/hover_card` | `hover_card_simple` | `hover_card_full` |
@@ -60,10 +62,12 @@ fn view(model: Model) -> Element(Msg) {
 | `saola/popover` | `popover_simple` | `popover_full` |
 | `saola/progress` | `progress_simple` | `progress_full` |
 | `saola/radio_group` | `radio_group_simple` | `radio_group_full` |
+| `saola/resizable` | `resizable_simple` | `resizable_full` |
 | `saola/scroll_area` | `scroll_area_simple` | `scroll_area_full` |
 | `saola/select` | `select_simple` | `select_full` |
 | `saola/separator` | `separator`, `separator_vertical` | — |
 | `saola/sheet` | `sheet_simple` | `sheet_full` |
+| `saola/sidebar` | `sidebar_simple` | `sidebar_full` |
 | `saola/skeleton` | `skeleton_text`, `skeleton_circle` | `skeleton` |
 | `saola/slider` | `slider_simple` | `slider_full` |
 | `saola/switch` | `switch_simple` | `switch_full` |
