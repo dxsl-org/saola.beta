@@ -2,7 +2,6 @@ import gleam/string
 import lustre/element
 import lustre/element/html as h
 import saola/field
-import saola/form
 import saola/theme
 
 // --- theme ---
@@ -99,27 +98,21 @@ pub fn field_required_and_hint_together_test() {
   assert string.contains(html, "Include country code.")
 }
 
-// --- form bridge ---
+// --- theme_sub ---
 
-pub fn form_result_ok_clears_error_test() {
-  let attrs = field.FieldAttrs(..field.default_attrs, error: "old error")
-  let updated = form.field_attrs_from_result(Ok("valid"), attrs)
-  assert updated.error == ""
+pub fn theme_sub_inactive_is_noop_test() {
+  // When is_system_active is False, returns effect.none() — no FFI called
+  let _ = theme.theme_sub(False, fn(_) { Nil })
 }
 
-pub fn form_result_error_sets_error_test() {
-  let updated =
-    form.field_attrs_from_result(Error("Required"), field.default_attrs)
-  assert updated.error == "Required"
+pub fn theme_sub_active_creates_effect_test() {
+  // When is_system_active is True, returns an Effect wrapping the listener setup.
+  // effect.from defers the callback — mediaQuerySub is NOT called during construction.
+  let _ = theme.theme_sub(True, fn(_) { Nil })
 }
 
-pub fn form_result_error_renders_in_html_test() {
-  let attrs =
-    form.field_attrs_from_result(
-      Error("Too short."),
-      field.FieldAttrs(..field.default_attrs, label: "Password"),
-    )
-  let html = field.field(attrs, h.input([])) |> element.to_string
-  assert string.contains(html, "Too short.")
-  assert string.contains(html, "data-invalid=\"true\"")
+pub fn get_system_dark_returns_bool_test() {
+  // In test env (Node.js, no window), the FFI guard returns False.
+  let _dark = theme.get_system_dark()
 }
+

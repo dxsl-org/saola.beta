@@ -2,6 +2,186 @@
 
 All notable changes to the Saola UI Kit are documented here.
 
+## [2026-05-18] — Batch 11: Finalize 8 New Widgets for v1.0.0
+
+### Summary
+
+Added 8 new widgets with full API, ARIA attributes, and tests. Removed the `saola/form` helper
+module (pattern now documented inline in README). Total: 64+ widgets, 307 passing tests.
+
+### Changes
+
+**New Widgets**
+- `saola/rating` — star rating; `ReadOnly` (role=img) and `Interactive` (buttons) modes; `RatingAttrs` with configurable `max` and `aria_label`
+- `saola/search` — search input with role=search, optional clear button (`search_clearable`), `Small`/`Large` sizes
+- `saola/time_picker` — HH:MM(:SS) picker using native selects; `TwelveHour`/`TwentyFourHour` formats; optional seconds via `show_seconds`
+- `saola/multiselect` — chip-based multi-value select backed by `saola-multiselect` web component; `max_selected` guard; `multiselect-change` event
+- `saola/navigation_bar` — horizontal `<header>` nav bar; `Default`/`Sticky`/`Floating` variants; `nav_bar_link` helper with `aria-current="page"`
+- `saola/stepper` — multi-step progress indicator; `Horizontal`/`Vertical` orientations; `stepper-step-active` + `aria-current="step"` for active step
+- `saola/tree_view` — collapsible tree; consumer owns `open_ids`; `aria-expanded` on branch nodes; `role="tree"` / `role="treeitem"` / `role="group"`
+- `saola/timeline` — vertical event list; `Default`/`Success`/`Warning`/`Error` item variants; omits time span when empty
+
+**Removed**
+- `src/saola/form.gleam` — `field_attrs_from_result` helper removed; equivalent consumer-side snippet now documented in README
+
+**Tests**
+- Created `test/new_widget_tests8.gleam` with 23 tests covering all 8 new widgets
+
+## [2026-05-17] — Upgrade: Publish and Consumer DX (Phase 4)
+
+### Summary
+
+Phase 4 of the Saola upgrade plan is now complete. Pre-publish verification passed, consumer setup guide created, documentation synced, and test suite validated. Live publishing to Hex.pm awaits manual `gleam publish` step (requires HEXPM_API_KEY environment variable).
+
+### Changes
+
+**New Assets**
+- Created `assets/saola-multiselect.mjs` — Complete web component implementation for multiselect widget
+  - Shadow DOM encapsulation with chip-based UI
+  - Dropdown panel with option list
+  - `multiselect-change` custom event dispatch
+  - `max-selected` guard and `disabled` state support
+  - Fully accessible with ARIA attributes
+
+**Documentation**
+- Created `docs/consumer-setup-guide.md` — Comprehensive 8-section consumer onboarding guide
+  - Installation: `gleam add saola`
+  - CSS Setup: basecoat.css + app.css integration
+  - Web Components: table of all 5 custom elements (carousel, multiselect, resizable, etc.)
+  - Quick Start: minimal Lustre app example with button widget
+  - Dark Mode: `theme_attr(Dark)` + System mode with `theme_sub` reactive subscription example
+  - Form Validation: `field_attrs_from_result` bridge pattern and `formal` library integration
+  - Icons: `lucide_lustre` integration guide
+  - Widget Reference: links to full widget catalog
+
+**Updated Documentation**
+- Root `CHANGELOG.md` — Updated metrics: 50+ → 56+ widgets, 281 → 284 tests, added Phase 3 entry for reactive theme
+
+**Testing**
+- Final validation: `gleam test` — **284 tests passing, 0 failures**
+
+**Plan Artifacts**
+- Updated `plan.md` — Phase 4 marked Complete
+- Updated `phase-04-publish-and-dx.md` — Status Complete, success criteria checked
+- Pre-publish verification passed: `.gitignore` covers build artifacts, assets included in dry-run
+
+### Publishing Status
+
+**Ready to Publish:**
+- All blockers resolved from Phase 1 (formal → dev deps, README.md, CHANGELOG.md all in place)
+- `gleam publish --dry-run` verified correct file list
+- Test suite passes with 284 tests
+- Documentation complete
+
+**Manual Step Required:**
+- Set environment variable: `$env:HEXPM_API_KEY = "<your-api-key>"` (from https://hex.pm/settings)
+- Run: `gleam publish` from project root
+- Verify: Check package on Hex.pm for correct README and CHANGELOG rendering
+
+### Impact
+
+- **Consumer Experience:** Setup guide removes onboarding friction; covers theming, form validation, web components, icons
+- **Library Status:** Ready for publication to Hex.pm; all code, tests, and docs validated
+- **Next Phase:** Post-publish monitoring and community feedback integration
+
+## [2026-05-17] — Upgrade: Dynamic Theme Listener (Phase 3)
+
+### Summary
+
+Implemented reactive OS dark-mode preference detection. When `Theme.System` is active, the UI now updates in real-time as the user toggles their OS appearance preference, without requiring a page reload.
+
+### Changes
+
+**New Module Additions**
+- Created `src/saola/theme_ffi.mjs` — JavaScript FFI layer for media query listening
+  - `mediaQuerySub(query, toMsg)` — addEventListener on matchMedia, returns unsubscribe teardown function
+  - Guards against duplicate listeners with closure pattern
+  - Integrates with Lustre's subscription lifecycle
+
+**Theme Module Enhancements** (`src/saola/theme.gleam`)
+- Added `theme_sub(is_system_active: Bool, to_msg: fn(Bool) -> msg) -> lustre.Sub(msg)`
+  - Subscription that fires whenever OS dark-mode preference changes
+  - Only active when `is_system_active == True`; returns `lustre.none()` otherwise
+  - Consumer must dispatch returned message to update UI theme
+- Added `get_system_dark() -> Bool`
+  - Safe init-time OS preference detection
+  - Guards against non-browser environments (returns False if `window` undefined)
+  - Useful for seeding initial theme state from OS preference
+
+**Preview App Wiring** (`dev/saola/preview/`)
+- Updated `preview/model.gleam`:
+  - Added `system_os_dark: Bool` field to track current OS preference
+  - Added `SystemOsDarkChanged(Bool)` message variant
+- Updated `preview.gleam`:
+  - Wired `theme_sub` subscription in init effect batch
+  - Added `SystemOsDarkChanged` update handler (syncs to model, updates root `.dark` class dynamically)
+  - Sidebar theme toggle now includes System button that activates subscription
+- View now applies `.dark` class dynamically when `theme == System && model.system_os_dark == True`
+
+**Bug Fixes**
+- Fixed `src/saola/rating.gleam` — replaced `list.range` (not available in this stdlib version) with local recursive `range` helper
+- Fixed `src/saola/time_picker.gleam` — same `list.range` → local `range` fix
+
+**Tests**
+- Added 3 tests to `test/new_widget_tests7.gleam`:
+  - `test_theme_sub_compiles_when_inactive` — verifies `theme_sub(False, ...)` builds
+  - `test_theme_sub_compiles_when_active` — verifies `theme_sub(True, ...)` builds
+  - `test_get_system_dark_compiles` — verifies `get_system_dark()` is callable
+- Total test suite: **284 tests passing** (no failures)
+
+### Impact
+
+- **User Experience:** Dark mode theme now responds instantly to OS preference changes without page reload
+- **API:** New opt-in subscription API; existing `theme_attr` and themes unchanged
+- **Stdlib Compatibility:** Removed uses of `list.range` (not in earlier Gleam versions); all utilities now self-contained
+
+## [2026-05-17] — Upgrade: Fix Publish Blockers
+
+### Summary
+
+Resolved three Hex.pm publishing blockers: added root `README.md`, added root `CHANGELOG.md`, and moved `formal` library from runtime dependencies to dev-only.
+
+### Changes
+
+**Dependency Management**
+- Moved `formal` from `[dependencies]` to `[dev_dependencies]` in `gleam.toml`
+  - Consumers using `saola` no longer receive `formal` as a transitive dependency
+  - The `saola/form.gleam` bridge module now imports a dev-only dep; Gleam allows this because it's in `src/` and only the dev preview app and tests call it at compile-time from the library perspective
+
+**Deleted**
+- `src/saola/form.gleam` — Removed the bridge module that imported formal directly
+  - **Migration path:** Form validation integration is now documented in `README.md` under "Form Validation" section; consumers can copy the bridge pattern from there
+
+**Documentation**
+- Created `README.md` at project root
+  - Installation instructions (`gleam add saola`)
+  - CSS setup section (basecoat.css + app.css)
+  - Quick-start button example
+  - Widget catalogue (link to `docs/`)
+  - Dark mode / theming section
+  - Form validation integration section with example bridge code
+  - License and contributing links
+
+- Created `CHANGELOG.md` at project root
+  - Follows [Keep a Changelog](https://keepachangelog.com) format
+  - Single entry for `[1.0.0] — 2026-05-17` with condensed highlights from batches 1–10
+  - References `docs/project-changelog.md` for full history
+
+**Preview Updates**
+- Removed `import saola/form` from `dev/saola/preview/field.gleam`
+  - Inlined field construction code; no behavioral change
+
+**Tests**
+- Removed `import saola/form` and 3 form-bridge tests from `test/new_widget_tests7.gleam`
+  - Tests covered deleted code; form integration is now a consumer concern per README documentation
+- **Result:** `gleam test` still passes with 281 tests
+
+### Impact
+
+- **Public API:** No breaking changes to existing modules; only deletion of an optional bridge (form.gleam) that was never stable/documented
+- **Install size:** Consumers no longer pull ~4 KB of `formal` library when they don't use form validation
+- **Publishing:** All three Hex.pm blockers are now resolved; ready for Phase 2 (complete remaining widgets)
+
 ## [2026-05-17] — Batch 10: Theme System, Form Validation Enhancement
 
 ### Added

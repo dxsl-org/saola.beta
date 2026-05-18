@@ -56,7 +56,16 @@ import saola/preview/carousel_preview
 import saola/preview/combobox_preview
 import saola/preview/navigation_menu_preview
 import saola/preview/empty_preview
+import saola/preview/form_validation_preview
 import saola/preview/item_preview
+import saola/preview/search_preview
+import saola/preview/rating_preview
+import saola/preview/navigation_bar_preview
+import saola/preview/stepper_preview
+import saola/preview/tree_view_preview
+import saola/preview/time_picker_preview
+import saola/preview/multiselect_preview
+import saola/preview/timeline_preview
 
 pub fn view_alerts() -> Element(Msg) {
   alert.view_alerts()
@@ -278,6 +287,10 @@ pub fn view_items() -> Element(Msg) {
   item_preview.view_items()
 }
 
+pub fn view_form_validation(model: Model) -> Element(Msg) {
+  form_validation_preview.view_form_validation(model)
+}
+
 pub fn view_forms() -> Element(Msg) {
   h.div([], [
     h.h1([a.class("page-title")], [text("Forms")]),
@@ -285,4 +298,36 @@ pub fn view_forms() -> Element(Msg) {
       text("Showcase of complex form layouts."),
     ]),
   ])
+}
+
+pub fn view_searches(model: Model) -> Element(Msg) {
+  search_preview.view_searches(model)
+}
+
+pub fn view_ratings(model: Model) -> Element(Msg) {
+  rating_preview.view_ratings(model)
+}
+
+pub fn view_navigation_bars() -> Element(Msg) {
+  navigation_bar_preview.view_navigation_bars()
+}
+
+pub fn view_steppers(model: Model) -> Element(Msg) {
+  stepper_preview.view_steppers(model)
+}
+
+pub fn view_tree_views(model: Model) -> Element(Msg) {
+  tree_view_preview.view_tree_views(model)
+}
+
+pub fn view_time_pickers(model: Model) -> Element(Msg) {
+  time_picker_preview.view_time_pickers(model)
+}
+
+pub fn view_multiselects(model: Model) -> Element(Msg) {
+  multiselect_preview.view_multiselects(model)
+}
+
+pub fn view_timelines() -> Element(Msg) {
+  timeline_preview.view_timelines()
 }

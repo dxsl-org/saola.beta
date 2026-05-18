@@ -1,7 +1,9 @@
+import gleam/dict.{type Dict}
 import gleam/option.{type Option}
 import gleam/time/calendar.{type Date, type Month}
 import saola/data_table
 import saola/theme
+import saola/time_picker.{type TimeValue}
 import saola/toast as saola_toast
 
 // Note: Keep these in sync with the route handlers in view.gleam and the
@@ -64,13 +66,21 @@ pub type Route {
   NavigationMenus
   Empties
   Items
+  FormValidation
+  Searches
+  Ratings
+  NavigationBars
+  Steppers
+  TreeViews
+  TimePickers
+  Multiselects
+  Timelines
 }
 
 pub type Model {
   Model(
     route: Route,
     // ID of the dropdown widget to be open
-    // (for the preview page of dropdown menus, where we have many widgets)
     open_dropdown: Option(String),
     // Active tab ID for the Tabs preview page
     active_tab: String,
@@ -152,6 +162,22 @@ pub type Model {
     nav_menu_open: Option(String),
     // Active color theme
     theme: theme.Theme,
+    // Tracks current OS dark-mode preference for System theme
+    system_os_dark: Bool,
+    // Form validation demo (signup form)
+    signup_name: String,
+    signup_email: String,
+    signup_password: String,
+    signup_confirm: String,
+    signup_errors: Dict(String, String),
+    signup_success: Bool,
+    // Batch 11 widget preview state
+    search_query: String,
+    rating_value: Int,
+    stepper_step: Int,
+    tree_open_ids: List(String),
+    time_picker_value: Option(TimeValue),
+    multiselect_values: List(String),
   )
 }
 
@@ -215,4 +241,18 @@ pub type Msg {
   ComboboxSelected(String)
   NavMenuOpenChanged(Option(String))
   ThemeToggled(theme.Theme)
+  SignupNameChanged(String)
+  SignupEmailChanged(String)
+  SignupPasswordChanged(String)
+  SignupConfirmChanged(String)
+  SignupSubmitted
+  SignupReset
+  SystemOsDarkChanged(Bool)
+  // Batch 11
+  SearchQueryChanged(String)
+  RatingChanged(Int)
+  StepperStepClicked(Int)
+  TreeNodeToggled(String)
+  TimePickerChanged(TimeValue)
+  MultiselectChanged(List(String))
 }

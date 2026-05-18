@@ -7,7 +7,6 @@ import saola/input
 import saola/preview/model.{type Msg, FormEmailChanged, FormNameChanged}
 import saola/select
 import saola/switch
-import saola/form
 
 pub fn view_fields(name: String, email: String) -> Element(Msg) {
   h.div([], [
@@ -103,13 +102,11 @@ pub fn view_fields(name: String, email: String) -> Element(Msg) {
         input.input_text("", FormNameChanged),
       ),
       field.field(
-        form.field_attrs_from_result(
-          Error("This value is invalid."),
-          field.FieldAttrs(
-            ..field.default_attrs,
-            label: "With validation error",
-            required: True,
-          ),
+        field.FieldAttrs(
+          ..field.default_attrs,
+          label: "With validation error",
+          required: True,
+          error: "This value is invalid.",
         ),
         input.input_text("bad value", FormNameChanged),
       ),

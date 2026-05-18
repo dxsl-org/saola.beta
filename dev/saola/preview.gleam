@@ -1,3 +1,5 @@
+import formal/form as f
+import gleam/dict
 import gleam/int
 import gleam/list
 import gleam/option.{None, Some}
@@ -33,8 +35,15 @@ import saola/preview/model.{
   Resizables, ScrollAreas, SelectChanged, Selects, Separators, SheetClosed, SheetOpened,
   Sheets, SidebarCollapsedToggled, SidebarToggled, Sidebars, Skeletons, SliderChanged,
   Sliders, Spinners, StartedTrial, Switches, SwitchToggled, TabChanged, Tables, Tabs,
-  ThemeToggled, Toasts, ToggleBoldChanged, ToggleDropdown, ToggleGroupChanged, ToggleGroups,
+  FormValidation, SignupConfirmChanged, SignupEmailChanged, SignupNameChanged,
+  SignupPasswordChanged, SignupReset, SignupSubmitted, SystemOsDarkChanged,
+  ThemeToggled, Toasts,
+  ToggleBoldChanged, ToggleDropdown, ToggleGroupChanged, ToggleGroups,
   ToggleItalicChanged, Toggles, Tooltips,
+  Searches, Ratings, NavigationBars, Steppers, TreeViews, TimePickers,
+  Multiselects, Timelines,
+  SearchQueryChanged, RatingChanged, StepperStepClicked, TreeNodeToggled,
+  TimePickerChanged, MultiselectChanged,
 }
 import saola/preview/view as views
 
@@ -108,8 +117,25 @@ fn init(_args) -> #(Model, Effect(Msg)) {
       combobox_open: False,
       nav_menu_open: None,
       theme: theme.Light,
+      system_os_dark: theme.get_system_dark(),
+      signup_name: "",
+      signup_email: "",
+      signup_password: "",
+      signup_confirm: "",
+      signup_errors: dict.new(),
+      signup_success: False,
+      search_query: "",
+      rating_value: 3,
+      stepper_step: 1,
+      tree_open_ids: [],
+      time_picker_value: None,
+      multiselect_values: [],
     ),
-    effect.batch([modem.init(on_url_change), whatnext]),
+    effect.batch([
+      modem.init(on_url_change),
+      whatnext,
+      theme.theme_sub(True, SystemOsDarkChanged),
+    ]),
   )
 }
 
@@ -171,6 +197,15 @@ fn on_url_change(uri: Uri) -> Msg {
     "/navigation-menus" -> NavigationMenus
     "/empties" -> Empties
     "/items" -> Items
+    "/form-validation" -> FormValidation
+    "/searches" -> Searches
+    "/ratings" -> Ratings
+    "/navigation-bars" -> NavigationBars
+    "/steppers" -> Steppers
+    "/tree-views" -> TreeViews
+    "/time-pickers" -> TimePickers
+    "/multiselects" -> Multiselects
+    "/timelines" -> Timelines
     _ -> Home
   }
   OnRouteChange(route)
@@ -426,6 +461,97 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       effect.none(),
     )
     ThemeToggled(t) -> #(Model(..model, theme: t), effect.none())
+    SystemOsDarkChanged(is_dark) -> #(
+      Model(..model, system_os_dark: is_dark),
+      effect.none(),
+    )
+    SignupNameChanged(v) -> #(Model(..model, signup_name: v), effect.none())
+    SignupEmailChanged(v) -> #(Model(..model, signup_email: v), effect.none())
+    SignupPasswordChanged(v) ->
+      #(Model(..model, signup_password: v), effect.none())
+    SignupConfirmChanged(v) ->
+      #(Model(..model, signup_confirm: v), effect.none())
+    SignupReset -> #(
+      Model(
+        ..model,
+        signup_name: "",
+        signup_email: "",
+        signup_password: "",
+        signup_confirm: "",
+        signup_errors: dict.new(),
+        signup_success: False,
+      ),
+      effect.none(),
+    )
+    SearchQueryChanged(q) -> #(
+      Model(..model, search_query: q),
+      effect.none(),
+    )
+    RatingChanged(v) -> #(Model(..model, rating_value: v), effect.none())
+    StepperStepClicked(s) -> #(Model(..model, stepper_step: s), effect.none())
+    TreeNodeToggled(id) -> {
+      let open = case list.contains(model.tree_open_ids, id) {
+        True -> list.filter(model.tree_open_ids, fn(x) { x != id })
+        False -> [id, ..model.tree_open_ids]
+      }
+      #(Model(..model, tree_open_ids: open), effect.none())
+    }
+    TimePickerChanged(tv) -> #(
+      Model(..model, time_picker_value: Some(tv)),
+      effect.none(),
+    )
+    MultiselectChanged(vals) -> #(
+      Model(..model, multiselect_values: vals),
+      effect.none(),
+    )
+    SignupSubmitted -> {
+      let values = [
+        #("name", model.signup_name),
+        #("email", model.signup_email),
+        #("password", model.signup_password),
+        #("confirm", model.signup_confirm),
+      ]
+      let schema = {
+        use _name <- f.field("name", f.parse_string |> f.check_not_empty)
+        use _email <- f.field("email", f.parse_email)
+        use password <- f.field(
+          "password",
+          f.parse_string |> f.check_string_length_more_than(7),
+        )
+        use _confirm <- f.field(
+          "confirm",
+          f.parse_string |> f.check_confirms(password),
+        )
+        f.success(Nil)
+      }
+      case f.new(schema) |> f.add_values(values) |> f.run {
+        Ok(_) -> #(
+          Model(
+            ..model,
+            signup_success: True,
+            signup_errors: dict.new(),
+          ),
+          effect.none(),
+        )
+        Error(failed_form) -> {
+          let errors =
+            list.fold(
+              ["name", "email", "password", "confirm"],
+              dict.new(),
+              fn(acc, name) {
+                case f.field_error_messages(failed_form, name) {
+                  [] -> acc
+                  [msg, ..] -> dict.insert(acc, name, msg)
+                }
+              },
+            )
+          #(
+            Model(..model, signup_errors: errors, signup_success: False),
+            effect.none(),
+          )
+        }
+      }
+    }
   }
 }
 
@@ -437,7 +563,15 @@ fn result_unwrap(r: Result(a, e), default: a) -> a {
 }
 
 fn view(model: Model) -> Element(Msg) {
-  h.div([a.class("app-container"), theme.theme_attr(model.theme)], [
+  let theme_class = case model.theme {
+    theme.System ->
+      case model.system_os_dark {
+        True -> a.class("dark")
+        False -> a.none()
+      }
+    _ -> theme.theme_attr(model.theme)
+  }
+  h.div([a.class("app-container"), theme_class], [
     sidebar(model.route, model.theme),
     main_pane(model),
   ])
@@ -468,6 +602,17 @@ fn sidebar(current_route: model.Route, current_theme: theme.Theme) -> Element(Ms
           e.on_click(ThemeToggled(theme.Dark)),
         ],
         [element.text("Dark")],
+      ),
+      h.button(
+        [
+          a.type_("button"),
+          a.class("nav-link" <> case current_theme {
+            theme.System -> " active"
+            _ -> ""
+          }),
+          e.on_click(ThemeToggled(theme.System)),
+        ],
+        [element.text("System")],
       ),
     ]),
     nav_link("/alerts", "Alerts", current_route == Alerts),
@@ -517,6 +662,19 @@ fn sidebar(current_route: model.Route, current_theme: theme.Theme) -> Element(Ms
     nav_link("/navigation-menus", "Navigation Menu", current_route == NavigationMenus),
     nav_link("/empties", "Empty", current_route == Empties),
     nav_link("/items", "Item", current_route == Items),
+    nav_link(
+      "/form-validation",
+      "Form Validation",
+      current_route == FormValidation,
+    ),
+    nav_link("/searches", "Search", current_route == Searches),
+    nav_link("/ratings", "Rating", current_route == Ratings),
+    nav_link("/navigation-bars", "Navigation Bar", current_route == NavigationBars),
+    nav_link("/steppers", "Stepper", current_route == Steppers),
+    nav_link("/tree-views", "Tree View", current_route == TreeViews),
+    nav_link("/time-pickers", "Time Picker", current_route == TimePickers),
+    nav_link("/multiselects", "Multiselect", current_route == Multiselects),
+    nav_link("/timelines", "Timeline", current_route == Timelines),
     nav_link("/dropdown-menus", "Dropdown Menus", current_route == DropdownMenus),
     nav_link("/tabs", "Tabs", current_route == Tabs),
     nav_link("/dialogs", "Dialogs", current_route == Dialogs),
@@ -596,6 +754,15 @@ fn main_pane(model: Model) -> Element(Msg) {
       NavigationMenus -> views.view_navigation_menus(model)
       Empties -> views.view_empties()
       Items -> views.view_items()
+      FormValidation -> views.view_form_validation(model)
+      Searches -> views.view_searches(model)
+      Ratings -> views.view_ratings(model)
+      NavigationBars -> views.view_navigation_bars()
+      Steppers -> views.view_steppers(model)
+      TreeViews -> views.view_tree_views(model)
+      TimePickers -> views.view_time_pickers(model)
+      Multiselects -> views.view_multiselects(model)
+      Timelines -> views.view_timelines()
       D3Charts -> views.view_d3_charts()
       MonacoEditor -> views.view_monaco_editor()
       ExampleForm -> views.view_form_example(model)

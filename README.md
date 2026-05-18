@@ -58,12 +58,15 @@ fn view(model: Model) -> Element(Msg) {
 | `saola/input_otp` | `input_otp_simple` | `input_otp_full` |
 | `saola/label` | `label_for` | — |
 | `saola/menubar` | `menubar_simple` | `menubar_full` |
+| `saola/multiselect` | `multiselect_simple` | `multiselect_full` |
 | `saola/pagination` | `pagination_simple` | `pagination_full` |
 | `saola/popover` | `popover_simple` | `popover_full` |
 | `saola/progress` | `progress_simple` | `progress_full` |
 | `saola/radio_group` | `radio_group_simple` | `radio_group_full` |
+| `saola/rating` | `rating_readonly`, `rating_interactive` | `rating_full` |
 | `saola/resizable` | `resizable_simple` | `resizable_full` |
 | `saola/scroll_area` | `scroll_area_simple` | `scroll_area_full` |
+| `saola/search` | `search_simple`, `search_clearable` | `search_full` |
 | `saola/select` | `select_simple` | `select_full` |
 | `saola/separator` | `separator`, `separator_vertical` | — |
 | `saola/sheet` | `sheet_simple` | `sheet_full` |
@@ -76,8 +79,27 @@ fn view(model: Model) -> Element(Msg) {
 | `saola/textarea` | — | `textarea_full` |
 | `saola/toast` | `new_toast` (factory) | `toaster` (container) |
 | `saola/toggle` | `toggle_simple` | `toggle_full` |
+| `saola/button_group` | `button_group_simple` | `button_group_full` |
+| `saola/calendar` | — | `calendar_full` |
+| `saola/carousel` | `carousel_simple` | `carousel_full` |
+| `saola/combobox` | `combobox_simple` | `combobox_full` |
+| `saola/context_menu` | — | `context_menu_full` |
+| `saola/date_picker` | — | `date_picker_full` |
+| `saola/drawer` | `drawer_simple` | `drawer_full` |
+| `saola/empty` | `empty_simple` | `empty_full` |
+| `saola/input_group` | `input_group_simple` | `input_group_full` |
+| `saola/item` | `item_simple`, `item_link` | `item_full` |
+| `saola/native_select` | `native_select_simple` | `native_select_full` |
+| `saola/navigation_bar` | `nav_bar_simple`, `nav_bar_link` | `nav_bar_full` |
+| `saola/navigation_menu` | `navigation_menu_simple` | `navigation_menu_full` |
+| `saola/spinner` | `spinner_simple` | `spinner_full` |
+| `saola/stepper` | `stepper_simple` | `stepper_full` |
+| `saola/theme` | `theme_attr` | — |
+| `saola/time_picker` | `time_picker_simple` | `time_picker_full` |
+| `saola/timeline` | `timeline_simple` | `timeline_full` |
 | `saola/toggle_group` | `toggle_group_simple` | `toggle_group_full` |
 | `saola/tooltip` | `tooltip`, `tooltip_side` | `attr`, `side_attr` |
+| `saola/tree_view` | `tree_view_simple` | `tree_view_full` |
 
 ### Third-party widget wrappers
 
@@ -88,6 +110,63 @@ These wrappers ship as custom elements (`<script>` required separately):
 | `saola/codemirror_editor` | `<saola-codemirror-editor>` | CodeMirror 6 |
 | `saola/monaco_editor` | `<saola-monaco-editor>` | Monaco / VS Code |
 | `saola/d3_bar_chart` | `<saola-d3-bar-chart>` | D3.js v7 |
+
+## Dark Mode / Theming
+
+Apply `theme_attr` to your root element:
+
+```gleam
+import saola/theme
+
+fn view(model: Model) -> Element(Msg) {
+  h.html([theme.theme_attr(model.theme)], [
+    // ...
+  ])
+}
+```
+
+`Theme` variants: `theme.Light` (default) | `theme.Dark` | `theme.System` (follows OS preference).
+
+Add this script to `<head>` to avoid flash-of-wrong-theme on load:
+
+```html
+<script>
+  if (window.matchMedia('(prefers-color-scheme: dark)').matches)
+    document.documentElement.classList.add('dark')
+</script>
+```
+
+## Form Fields and Validation
+
+Use `saola/field` to wrap any input with label, description, hint, and error:
+
+```gleam
+import saola/field
+import saola/input
+
+field.field(
+  field.FieldAttrs(
+    label: "Email", description: "", error: "",
+    orientation: field.Vertical, required: True, hint: "",
+  ),
+  input.input_full(input.Email, option.Some(input.SyncValue(model.email)),
+    on_input: option.Some(EmailChanged),
+    extra_attrs: input.InputExtraAttrs(..input.default_extra_attrs, placeholder: "you@example.com"),
+  ),
+)
+```
+
+To wire `formal` validation results into `FieldAttrs`:
+
+```gleam
+// Add `formal` to your app's [dependencies], then:
+fn field_from_result(result: Result(String, String), attrs: field.FieldAttrs) -> field.FieldAttrs {
+  case result {
+    Ok(_)  -> field.FieldAttrs(..attrs, error: "")
+    Error(e) -> field.FieldAttrs(..attrs, error: e)
+  }
+}
+```
 
 ## Design principles
 
