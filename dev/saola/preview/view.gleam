@@ -68,6 +68,7 @@ import saola/preview/multiselect_preview
 import saola/preview/timeline_preview
 import saola/preview/canvas_stress_test
 import saola/preview/heatmap_comparison
+import saola/preview/threat_intel
 import saola/preview/widget_dashboard
 
 pub fn view_alerts() -> Element(Msg) {
@@ -345,4 +346,8 @@ pub fn view_canvas_stress_test(model: Model) -> Element(Msg) {
 
 pub fn view_widget_dashboard(model: Model) -> Element(Msg) {
   widget_dashboard.view_widget_dashboard(model)
+}
+
+pub fn view_threat_intel_network(model: Model) -> Element(Msg) {
+  threat_intel.view_threat_intel_network(model)
 }

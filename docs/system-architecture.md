@@ -260,6 +260,10 @@ pub fn entity_graph_canvas(
 - Creates hit areas for nodes
 - Applies pan/zoom transforms
 - Returns typed messages on node click
+- Supports interactive selection and filtering via `EntityGraphCanvasAttrs`:
+  - `selected_ids: List(String)` — renders nodes in amber with white stroke ring
+  - `dimmed_ids: List(String)` — renders nodes/edges at 25% alpha for inactive state
+- Visual states: normal (blue) → dimmed (low alpha) → selected (amber highlight)
 
 ---
 

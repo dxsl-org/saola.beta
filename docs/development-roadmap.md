@@ -121,6 +121,7 @@ Complex data widgets.
 
 ## Key Milestones
 
+- 2026-05-18: **Entity Graph Canvas enhanced** (Added `selected_ids` and `dimmed_ids` attributes for interactive filtering/selection; Threat Intelligence Network demo showcases cross-cutting state sync between graph, table, and timeline)
 - 2026-05-18: **Canvas Architecture complete** (Display List rendering: CanvasCommand ADT, `<saola-canvas>` custom element, hit-testing system; D3 Force Layout Worker for graph visualization; entity_graph_canvas and bar_chart_canvas implementations; replaced Cytoscape with pure Gleam + Canvas 2D)
 - 2026-05-18: **Batch 11 complete** (8 additional widgets: rating, search, time_picker, multiselect, navigation_bar, stepper, tree_view, timeline — all with tests; `saola/form` removed; 307 tests passing)
 - 2026-05-17: **Phase 4 complete** (publish and DX: consumer setup guide, asset implementation, pre-publish verification; awaiting manual `gleam publish` with HEXPM_API_KEY)

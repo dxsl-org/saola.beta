@@ -24,6 +24,8 @@ pub type EntityGraphCanvasAttrs {
     height: Float,
     pan: #(Float, Float),
     zoom: Float,
+    selected_ids: List(String),
+    dimmed_ids: List(String),
   )
 }
 
@@ -32,6 +34,8 @@ pub const default_entity_graph_canvas_attrs = EntityGraphCanvasAttrs(
   height: 400.0,
   pan: #(0.0, 0.0),
   zoom: 1.0,
+  selected_ids: [],
+  dimmed_ids: [],
 )
 
 const node_radius = 20.0
@@ -47,7 +51,7 @@ pub fn entity_graph_canvas(
   attrs: EntityGraphCanvasAttrs,
   on_node_tap: Option(fn(String) -> msg),
 ) -> canvas.CanvasOutput(msg) {
-  let EntityGraphCanvasAttrs(width:, height:, pan:, zoom:) = attrs
+  let EntityGraphCanvasAttrs(width:, height:, pan:, zoom:, selected_ids:, dimmed_ids:) = attrs
   let pos_map = build_position_map(positions)
   let #(px, py) = pan
   let commands =
@@ -58,8 +62,8 @@ pub fn entity_graph_canvas(
         canvas.Scale(zoom, zoom),
         canvas.Translate(float.negate(width /. 2.0), float.negate(height /. 2.0)),
       ],
-      edge_commands(edges, pos_map, width, height),
-      node_commands(nodes, pos_map, width, height),
+      edge_commands(edges, pos_map, width, height, dimmed_ids),
+      node_commands(nodes, pos_map, width, height, selected_ids, dimmed_ids),
       [canvas.Restore],
     ])
   let hit_areas = case on_node_tap {
@@ -119,11 +123,16 @@ fn node_commands(
   pos_map: Dict(String, #(Float, Float)),
   w: Float,
   h: Float,
+  selected_ids: List(String),
+  dimmed_ids: List(String),
 ) -> List(canvas.CanvasCommand) {
-  let circle_cmds =
-    list.flat_map(nodes, fn(node) {
-      let GraphNode(id:, ..) = node
-      case dict.get(pos_map, id) {
+  let normal = list.filter(nodes, fn(n) { !list.contains(selected_ids, n.id) && !list.contains(dimmed_ids, n.id) })
+  let dimmed = list.filter(nodes, fn(n) { list.contains(dimmed_ids, n.id) })
+  let selected = list.filter(nodes, fn(n) { list.contains(selected_ids, n.id) })
+
+  let draw_circles = fn(ns: List(GraphNode)) {
+    list.flat_map(ns, fn(node) {
+      case dict.get(pos_map, node.id) {
         Error(_) -> []
         Ok(#(nx, ny)) -> {
           let #(cx, cy) = scale_position(nx, ny, w, h)
@@ -131,27 +140,58 @@ fn node_commands(
         }
       }
     })
-  let label_cmds =
-    list.flat_map(nodes, fn(node) {
-      let GraphNode(id:, label:, ..) = node
-      case dict.get(pos_map, id) {
+  }
+
+  let draw_labels = fn(ns: List(GraphNode)) {
+    list.flat_map(ns, fn(node) {
+      case dict.get(pos_map, node.id) {
         Error(_) -> []
         Ok(#(nx, ny)) -> {
           let #(cx, cy) = scale_position(nx, ny, w, h)
-          [canvas.FillText(label, cx, cy)]
+          [canvas.FillText(node.label, cx, cy)]
         }
       }
     })
+  }
+
+  let draw_selected_rings =
+    list.flat_map(selected, fn(node) {
+      case dict.get(pos_map, node.id) {
+        Error(_) -> []
+        Ok(#(nx, ny)) -> {
+          let #(cx, cy) = scale_position(nx, ny, w, h)
+          [
+            canvas.BeginPath,
+            canvas.Arc(cx, cy, node_radius +. 3.0, 0.0, two_pi, False),
+            canvas.Stroke,
+          ]
+        }
+      }
+    })
+
   list.flatten([
+    // dimmed nodes at 25% alpha
+    [canvas.Save, canvas.SetAlpha(0.25), canvas.SetFill("#2563eb")],
+    draw_circles(dimmed),
+    [canvas.Restore],
+    // normal nodes
     [canvas.SetFill("#2563eb")],
-    circle_cmds,
+    draw_circles(normal),
+    // selected nodes in amber
+    [canvas.SetFill("#f59e0b")],
+    draw_circles(selected),
+    // selected ring (white stroke)
+    [canvas.SetStroke("#ffffff"), canvas.SetLineWidth(2.0)],
+    draw_selected_rings,
+    // labels for all non-dimmed
     [
       canvas.SetFill("#ffffff"),
       canvas.SetFont("11px sans-serif"),
       canvas.SetTextAlign("center"),
       canvas.SetTextBaseline("middle"),
     ],
-    label_cmds,
+    draw_labels(normal),
+    draw_labels(selected),
   ])
 }
 
@@ -160,11 +200,21 @@ fn edge_commands(
   pos_map: Dict(String, #(Float, Float)),
   w: Float,
   h: Float,
+  dimmed_ids: List(String),
 ) -> List(canvas.CanvasCommand) {
-  let line_cmds =
-    list.flat_map(edges, fn(edge) {
-      let GraphEdge(source:, target:, ..) = edge
-      case dict.get(pos_map, source), dict.get(pos_map, target) {
+  let edge_color = "hsl(215 16% 47%)"
+  let normal_edges =
+    list.filter(edges, fn(edge) {
+      !list.contains(dimmed_ids, edge.source) || !list.contains(dimmed_ids, edge.target)
+    })
+  let dimmed_edges =
+    list.filter(edges, fn(edge) {
+      list.contains(dimmed_ids, edge.source) && list.contains(dimmed_ids, edge.target)
+    })
+
+  let draw_edges = fn(es: List(GraphEdge)) {
+    list.flat_map(es, fn(edge) {
+      case dict.get(pos_map, edge.source), dict.get(pos_map, edge.target) {
         Ok(#(snx, sny)), Ok(#(tnx, tny)) -> {
           let #(sx, sy) = scale_position(snx, sny, w, h)
           let #(tx, ty) = scale_position(tnx, tny, w, h)
@@ -173,12 +223,15 @@ fn edge_commands(
         _, _ -> []
       }
     })
-  [
-    canvas.SetStroke("hsl(215 16% 47%)"),
-    canvas.SetFill("hsl(215 16% 47%)"),
-    canvas.SetLineWidth(1.0),
-    ..line_cmds
-  ]
+  }
+
+  list.flatten([
+    [canvas.SetStroke(edge_color), canvas.SetFill(edge_color), canvas.SetLineWidth(1.0)],
+    draw_edges(normal_edges),
+    [canvas.Save, canvas.SetAlpha(0.15), canvas.SetStroke(edge_color), canvas.SetFill(edge_color)],
+    draw_edges(dimmed_edges),
+    [canvas.Restore],
+  ])
 }
 
 fn draw_edge(sx: Float, sy: Float, tx: Float, ty: Float) -> List(canvas.CanvasCommand) {

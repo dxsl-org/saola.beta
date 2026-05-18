@@ -2,6 +2,7 @@ import gleam/dict.{type Dict}
 import gleam/option.{type Option}
 import gleam/time/calendar.{type Date, type Month}
 import saola/data_table
+import saola/graph_layout.{type NodePosition}
 import saola/theme
 import saola/time_picker.{type TimeValue}
 import saola/toast as saola_toast
@@ -78,6 +79,7 @@ pub type Route {
   CanvasStressTest
   WidgetDashboard
   HeatmapComparison
+  ThreatIntelNetwork
 }
 
 pub type Model {
@@ -190,6 +192,17 @@ pub type Model {
     dash_page: Int,
     dash_drawer_open: Bool,
     dash_selected_id: Option(String),
+    // Threat Intelligence Network demo
+    threat_selected_ids: List(String),
+    threat_severity_filter: List(String),
+    threat_search: String,
+    threat_graph_positions: List(NodePosition),
+    threat_graph_layout_done: Bool,
+    threat_graph_pan: #(Float, Float),
+    threat_graph_zoom: Float,
+    threat_graph_hovered: Option(String),
+    threat_table_state: data_table.DataTableState,
+    threat_timeline_entity: Option(String),
     // Heatmap comparison
     heatmap_size: Int,
     heatmap_cell_px: Int,
@@ -292,6 +305,23 @@ pub type Msg {
   DashPageChanged(Int)
   DashRowClicked(String)
   DashDrawerClosed
+  // Heatmap comparison
+  // Threat Intelligence Network
+  ThreatIntelRouteEntered
+  ThreatEntitySelected(String)
+  ThreatEntityDeselected
+  ThreatNodeHovered(Option(String))
+  ThreatSeverityFilterChanged(List(String))
+  ThreatSearchChanged(String)
+  ThreatSearchCleared
+  ThreatGraphPanned(Float, Float)
+  ThreatGraphZoomed(Float)
+  ThreatTableSortChanged(String)
+  ThreatTablePageChanged(Int)
+  ThreatTableRowSelected(List(String))
+  ThreatTimelineEntityChanged(Option(String))
+  ThreatLayoutReceived(graph_layout.LayoutResult)
+  ThreatFiltersCleared
   // Heatmap comparison
   HeatmapSizeChanged(Int)
   HeatmapCellPxChanged(Int)

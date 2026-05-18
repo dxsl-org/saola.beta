@@ -2,6 +2,45 @@
 
 All notable changes to the Saola UI Kit are documented here.
 
+## [2026-05-18] — Entity Graph Canvas Enhancement: Selection & Dimming
+
+### Summary
+
+Extended `entity_graph_canvas` widget with cross-cutting selection and dimming support, enabling interactive threat intelligence and knowledge graph visualizations. Selection state now syncs across graph, data table, and timeline simultaneously.
+
+### Changes
+
+**Canvas Attribute Enhancements** (`src/saola/entity_graph_canvas.gleam`)
+- Added `selected_ids: List(String)` to `EntityGraphCanvasAttrs` — highlights nodes and routes them visually distinct (amber color)
+- Added `dimmed_ids: List(String)` to `EntityGraphCanvasAttrs` — renders nodes/edges at 25% alpha
+- Nodes render in three visual states:
+  - **Normal** (blue circles)
+  - **Dimmed** (25% alpha when in `dimmed_ids`)
+  - **Selected** (amber circles with white stroke ring)
+- Edge rendering respects dimming: edges between two dimmed nodes render at 25% alpha
+- All changes backward compatible: both fields default to empty lists
+
+**Preview Demo** (new showcase, not shipped)
+- Created `/threat-intel-network` preview page — Palantir-style 3-column layout
+- Left sidebar: search input, severity multiselect filter with progress badges
+- Center: entity graph canvas with pan/zoom, node selection
+- Right panel: data table + vertical timeline
+- Cross-cutting state: selecting a node in graph syncs selection to table row + timeline highlight
+- 16 new Msg variants handling graph, table, and timeline interactions
+- Demonstrates real-world use of canvas selection for intelligence dashboards
+
+**CSS Enhancements** (`assets/app.css`)
+- Added styles for threat intelligence dashboard layout
+- Flex-based 3-column layout with resizable dividers
+- Badge styles for severity levels with progress indicators
+- Timeline and data table styling for demo context
+
+### Impact
+
+- **API Stability:** No breaking changes; existing `entity_graph_canvas()` calls work unchanged
+- **Visualization Capability:** Enables interactive filtering, drill-down, and correlation in graph-based UIs
+- **Demo Value:** Threat Intelligence Network showcase demonstrates real-world canvas + table + timeline integration patterns
+
 ## [2026-05-18] — Canvas Architecture: Display List Rendering & D3 Graph Layout
 
 ### Summary

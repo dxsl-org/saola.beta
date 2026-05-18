@@ -14,8 +14,11 @@ import lustre/element/html as h
 import lustre/event as e
 import modem
 import saola/canvas_command as canvas
+import saola/graph_layout
 import saola/lustre_heatmap
+import saola/preview/threat_intel_data
 import saola/theme
+import saola/toast
 
 import gleam/time/calendar
 import saola/data_table
@@ -56,6 +59,12 @@ import saola/preview/model.{
   HeatmapSvgCellClicked, HeatmapCanvasCellClicked,
   HeatmapPaintStarted, HeatmapPaintEnded,
   HeatmapAnimTick,
+  ThreatIntelNetwork,
+  ThreatIntelRouteEntered, ThreatEntitySelected, ThreatEntityDeselected,
+  ThreatNodeHovered, ThreatSeverityFilterChanged, ThreatSearchChanged,
+  ThreatSearchCleared, ThreatGraphPanned, ThreatGraphZoomed,
+  ThreatTableSortChanged, ThreatTablePageChanged, ThreatTableRowSelected,
+  ThreatTimelineEntityChanged, ThreatLayoutReceived, ThreatFiltersCleared,
 }
 import saola/preview/view as views
 
@@ -149,6 +158,16 @@ fn init(_args) -> #(Model, Effect(Msg)) {
       dash_page: 1,
       dash_drawer_open: False,
       dash_selected_id: None,
+      threat_selected_ids: [],
+      threat_severity_filter: [],
+      threat_search: "",
+      threat_graph_positions: [],
+      threat_graph_layout_done: False,
+      threat_graph_pan: #(0.0, 0.0),
+      threat_graph_zoom: 1.0,
+      threat_graph_hovered: None,
+      threat_table_state: data_table.default_state,
+      threat_timeline_entity: None,
       heatmap_size: 80,
       heatmap_cell_px: 6,
       heatmap_scheme: "blues",
@@ -241,6 +260,7 @@ fn on_url_change(uri: Uri) -> Msg {
     "/canvas-stress-test" -> CanvasStressTest
     "/widget-dashboard" -> WidgetDashboard
     "/heatmap-comparison" -> HeatmapComparison
+    "/threat-intel-network" -> ThreatIntelNetwork
     _ -> Home
   }
   OnRouteChange(route)
@@ -251,6 +271,8 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     OnRouteChange(route) -> {
       let eff = case route {
         HeatmapComparison -> effect.from(heatmap_anim_tick_effect)
+        ThreatIntelNetwork ->
+          effect.from(fn(dispatch) { dispatch(ThreatIntelRouteEntered) })
         _ -> effect.none()
       }
       #(Model(..model, route: route, heatmap_last_ts: 0.0), eff)
@@ -708,6 +730,157 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
         eff,
       )
     }
+    ThreatIntelRouteEntered -> {
+      let nodes =
+        list.map(threat_intel_data.all_actors(), fn(actor) {
+          graph_layout.LayoutNode(id: actor.id)
+        })
+      let edges =
+        list.map(threat_intel_data.all_edges(), fn(edge) {
+          graph_layout.LayoutEdge(source: edge.source, target: edge.target)
+        })
+      #(model, graph_layout.request_layout(nodes, edges, ThreatLayoutReceived))
+    }
+    ThreatLayoutReceived(result) -> #(
+      Model(
+        ..model,
+        threat_graph_positions: result.positions,
+        threat_graph_layout_done: True,
+      ),
+      effect.none(),
+    )
+    ThreatEntitySelected(id) -> {
+      let new_ids = case list.contains(model.threat_selected_ids, id) {
+        True -> []
+        False -> [id]
+      }
+      let new_toast = toast.new_toast_simple("Entity selected", id, toast.Info)
+      let new_toasts = case new_ids {
+        [] -> model.toasts
+        _ -> list.append(model.toasts, [new_toast])
+      }
+      #(
+        Model(
+          ..model,
+          threat_selected_ids: new_ids,
+          threat_timeline_entity: case new_ids {
+            [] -> None
+            _ -> Some(id)
+          },
+          threat_table_state: data_table.DataTableState(
+            ..model.threat_table_state,
+            selected: new_ids,
+          ),
+          toasts: new_toasts,
+        ),
+        effect.none(),
+      )
+    }
+    ThreatEntityDeselected -> #(
+      Model(
+        ..model,
+        threat_selected_ids: [],
+        threat_timeline_entity: None,
+        threat_table_state: data_table.DataTableState(
+          ..model.threat_table_state,
+          selected: [],
+        ),
+      ),
+      effect.none(),
+    )
+    ThreatNodeHovered(opt_id) -> #(
+      Model(..model, threat_graph_hovered: opt_id),
+      effect.none(),
+    )
+    ThreatSeverityFilterChanged(values) -> #(
+      Model(..model, threat_severity_filter: values),
+      effect.none(),
+    )
+    ThreatSearchChanged(q) -> #(
+      Model(
+        ..model,
+        threat_search: q,
+        threat_table_state: data_table.set_filter(model.threat_table_state, q),
+      ),
+      effect.none(),
+    )
+    ThreatSearchCleared -> #(
+      Model(
+        ..model,
+        threat_search: "",
+        threat_table_state: data_table.set_filter(model.threat_table_state, ""),
+      ),
+      effect.none(),
+    )
+    ThreatGraphPanned(dx, dy) -> {
+      let #(px, py) = model.threat_graph_pan
+      #(
+        Model(..model, threat_graph_pan: #(px +. dx, py +. dy)),
+        effect.none(),
+      )
+    }
+    ThreatGraphZoomed(delta) -> {
+      let new_zoom =
+        float.clamp(
+          model.threat_graph_zoom *. { 1.0 -. delta /. 500.0 },
+          0.3,
+          3.0,
+        )
+      #(Model(..model, threat_graph_zoom: new_zoom), effect.none())
+    }
+    ThreatTableSortChanged(key) -> #(
+      Model(
+        ..model,
+        threat_table_state: data_table.toggle_sort(
+          model.threat_table_state,
+          key,
+        ),
+      ),
+      effect.none(),
+    )
+    ThreatTablePageChanged(page) -> #(
+      Model(
+        ..model,
+        threat_table_state: data_table.set_page(model.threat_table_state, page),
+      ),
+      effect.none(),
+    )
+    ThreatTableRowSelected(ids) -> {
+      let new_entity = case ids {
+        [] -> None
+        [id, ..] -> Some(id)
+      }
+      #(
+        Model(
+          ..model,
+          threat_selected_ids: ids,
+          threat_timeline_entity: new_entity,
+          threat_table_state: data_table.DataTableState(
+            ..model.threat_table_state,
+            selected: ids,
+          ),
+        ),
+        effect.none(),
+      )
+    }
+    ThreatTimelineEntityChanged(opt) -> #(
+      Model(..model, threat_timeline_entity: opt),
+      effect.none(),
+    )
+    ThreatFiltersCleared -> #(
+      Model(
+        ..model,
+        threat_severity_filter: [],
+        threat_search: "",
+        threat_selected_ids: [],
+        threat_timeline_entity: None,
+        threat_table_state: data_table.DataTableState(
+          ..data_table.set_filter(model.threat_table_state, ""),
+          selected: [],
+        ),
+      ),
+      effect.none(),
+    )
     SignupSubmitted -> {
       let values = [
         #("name", model.signup_name),
@@ -918,6 +1091,11 @@ fn sidebar(current_route: model.Route, current_theme: theme.Theme) -> Element(Ms
       "Heatmap SVG vs Canvas",
       current_route == HeatmapComparison,
     ),
+    nav_link(
+      "/threat-intel-network",
+      "Threat Intel Network",
+      current_route == ThreatIntelNetwork,
+    ),
     nav_link("/dropdown-menus", "Dropdown Menus", current_route == DropdownMenus),
     nav_link("/tabs", "Tabs", current_route == Tabs),
     nav_link("/dialogs", "Dialogs", current_route == Dialogs),
@@ -1009,6 +1187,7 @@ fn main_pane(model: Model) -> Element(Msg) {
       CanvasStressTest -> views.view_canvas_stress_test(model)
       WidgetDashboard -> views.view_widget_dashboard(model)
       HeatmapComparison -> views.view_heatmap_comparison(model)
+      ThreatIntelNetwork -> views.view_threat_intel_network(model)
       D3Charts -> views.view_d3_charts()
       MonacoEditor -> views.view_monaco_editor()
       ExampleForm -> views.view_form_example(model)
