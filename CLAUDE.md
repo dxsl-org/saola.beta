@@ -4,6 +4,8 @@
 
 Call UI building blocks **widgets**, not *components*. In Lustre, `component` is a heavier construct that carries its own runtime instance. Saola widgets are pure functions.
 
+When this project grows, we will add complex UI elements in the form of (Lustre) *componenent*.
+
 ---
 
 ## Saola Widget Rules
@@ -71,19 +73,26 @@ let class = case variant {
 }
 ```
 
-### 7. Flat API — no compound component pattern
+### 7. Flat API — prefer constructors over builder pattern
+
+We prefer flat functions over builder/compound patterns, because Gleam’s features make builders verbose and unnecessary.
 
 ```gleam
-// CORRECT: flat function
+// Preferred: flat function
 alert_full(Destructive, title: "Error", description: "...", icon: some_icon)
+alert_danger(title: "Error")
 
-// WRONG: compound/builder pattern
-Alert.root() |> Alert.title("Error") |> Alert.description("...")
+// Discourage: compound/builder pattern
+Alert.root() |> Alert.title("Error") |> Alert.description("...") |> Alert.icon(some_icon)
 ```
+
+Builder patterns are not banned but should only be used in rare cases where they significantly improve ergonomics.
 
 ### 8. ARIA attributes — explicit, no Radix dependency
 
-Add ARIA attributes directly via Lustre's typed helpers:
+- Prefer semantic HTML tags over ARIA attributes (e.g., use `<button>` instead of `<div role="button">`).
+- Design widget constructors to accept ARIA attributes relevant to the widget (grouped in a parameter). This helps users learn which attributes are applicable.
+- If the design is incomplete, users can manually add ARIA attributes via `lustre/attribute`.
 
 ```gleam
 a.role("alert")
