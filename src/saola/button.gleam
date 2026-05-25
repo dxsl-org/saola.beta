@@ -5,15 +5,15 @@ import lustre/element.{type Element}
 import lustre/element/html as h
 import lustre/event as e
 
-// The icons are group by the starting letter, and placed in the modules
-// of corresponding letter. For example, "arrow" icon is in "icons/la" module.
 import saola/icon/lx
 
-pub type ButtonVariant(a) {
+pub type ButtonVariant {
   Primary
   Secondary
-  // It holds an element created by the functions in `icons/l*` modules.
-  WithIcon(Element(a))
+  Outline
+  Ghost
+  Link
+  Destructive
 }
 
 pub type ButtonSize {
@@ -34,7 +34,6 @@ pub type ButtonRoleType {
   Reset
 }
 
-/// Extra attributes for button
 pub type ButtonExtraAttrs {
   ButtonExtraAttrs(
     disabled: Bool,
@@ -43,42 +42,39 @@ pub type ButtonExtraAttrs {
   )
 }
 
-/// Fully customizable button
+/// Fully customizable button.
 ///
 /// Example:
 /// ```gleam
-/// type Msg {
-///    UserClickSubmit
-/// }
-///
-/// button_full(Primary, "Submit", Large, Some(UserClickSubmit))
-/// button_full(Secondary, "Pay", Small, None)
+/// button_full(Primary, "Save", Large, None, Some(UserClickSave), default_extra_attrs)
+/// button_full(Outline, "Delete", Large, Some(icon/lt.trash([])), Some(UserClickDelete), default_extra_attrs)
 /// ```
 pub fn button_full(
-  variant: ButtonVariant(msg),
+  variant: ButtonVariant,
   label: String,
   size: ButtonSize,
-  // Note: `msg` is lowercase, it is a generic (type parameter)
+  icon: Option(Element(msg)),
   click_message: Option(msg),
   extra_attrs: ButtonExtraAttrs,
 ) -> Element(msg) {
-  // We are following the CSS class here: https://basecoatui.com/kitchen-sink/#button
   let css_name = case size, variant {
     Large, Primary -> "btn-lg-primary"
     Large, Secondary -> "btn-lg-secondary"
-    Large, WithIcon(_i) -> "btn-lg-outline"
+    Large, Outline -> "btn-lg-outline"
+    Large, Ghost -> "btn-lg-ghost"
+    Large, Link -> "btn-lg-link"
+    Large, Destructive -> "btn-lg-destructive"
     Small, Primary -> "btn-sm-primary"
     Small, Secondary -> "btn-sm-secondary"
-    Small, WithIcon(_i) -> "btn-sm-outline"
+    Small, Outline -> "btn-sm-outline"
+    Small, Ghost -> "btn-sm-ghost"
+    Small, Link -> "btn-sm-link"
+    Small, Destructive -> "btn-sm-destructive"
   }
-  let css_class = a.class(css_name)
   let event_handler =
     click_message |> option.map(e.on_click) |> option.unwrap(a.none())
-  let icon = case variant {
-    WithIcon(icon) -> icon
-    _ -> element.none()
-  }
-  let label = case string.trim(label) {
+  let icon_el = option.unwrap(icon, element.none())
+  let label_el = case string.trim(label) {
     "" -> element.none()
     text -> h.text(text)
   }
@@ -92,53 +88,68 @@ pub fn button_full(
     Some(Submit) -> a.type_("submit")
     Some(Reset) -> a.type_("reset")
   }
-  let aria_label_attr = a.aria_label(extra_attrs.aria.label)
+  let aria_label_attr = case extra_attrs.aria.label {
+    "" -> a.none()
+    l -> a.aria_label(l)
+  }
   let aria_expanded_attr = case extra_attrs.aria.expanded {
     None -> a.none()
     Some(expanded) -> a.aria_expanded(expanded)
   }
   h.button(
     [
-      css_class,
+      a.class(css_name),
       event_handler,
       disabled_attr,
       type_attr,
       aria_label_attr,
       aria_expanded_attr,
     ],
-    [icon, label],
+    [icon_el, label_el],
   )
 }
 
-// -- Default values. Useful for compositon  --
+// --- Default values ---
 
 pub const default_aria = ButtonAria("", None)
 
 pub const default_extra_attrs = ButtonExtraAttrs(False, None, default_aria)
 
-// -- Some common used buttons --
+// --- Convenience shortcuts ---
 
-/// Create a primary button.
-/// 
-/// Example:
-/// ```gleam
-/// type Msg {
-///    UserClickSave
-/// }
-/// 
-/// button_primary(UserClickSave)
-/// ```
-/// 
 pub fn button_primary(label: String, click_message: msg) -> Element(msg) {
-  button_full(Primary, label, Large, Some(click_message), default_extra_attrs)
+  button_full(Primary, label, Large, None, Some(click_message), default_extra_attrs)
 }
 
-pub fn button_close(click_message: msg) -> Element(msg) {
+pub fn button_secondary(label: String, click_message: msg) -> Element(msg) {
+  button_full(Secondary, label, Large, None, Some(click_message), default_extra_attrs)
+}
+
+pub fn button_outline(label: String, click_message: msg) -> Element(msg) {
+  button_full(Outline, label, Large, None, Some(click_message), default_extra_attrs)
+}
+
+pub fn button_ghost(label: String, click_message: msg) -> Element(msg) {
+  button_full(Ghost, label, Large, None, Some(click_message), default_extra_attrs)
+}
+
+pub fn button_destructive(label: String, click_message: msg) -> Element(msg) {
+  button_full(Destructive, label, Large, None, Some(click_message), default_extra_attrs)
+}
+
+/// Submit button (type="submit"). Use inside a <form>.
+pub fn button_submit(label: String) -> Element(msg) {
   button_full(
-    WithIcon(lx.x([])),
-    "",
-    Small,
-    Some(click_message),
-    default_extra_attrs,
+    Primary,
+    label,
+    Large,
+    None,
+    None,
+    ButtonExtraAttrs(False, Some(Submit), default_aria),
   )
+}
+
+/// Small icon-only close button (×).
+pub fn button_close(click_message: msg) -> Element(msg) {
+  button_full(Outline, "", Small, Some(lx.x([])), Some(click_message), default_extra_attrs)
 }
