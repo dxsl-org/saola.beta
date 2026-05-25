@@ -294,7 +294,7 @@ class SaolaWorldMap extends HTMLElement {
     })
     .attr('opacity', d => d.dimmed ? 0.18 : 1)
 
-    const radius = d => Math.max(4, Math.min(11, 3 + d.connections * 0.85))
+    const radius = d => Math.max(2, Math.min(5, 1.5 + d.connections * 0.25))
 
     all.select('.dot')
       .attr('r', radius)
@@ -303,7 +303,7 @@ class SaolaWorldMap extends HTMLElement {
       .attr('stroke-width', d => d.selected ? 2 : 0.8)
 
     all.select('.pulse-ring')
-      .attr('r', d => d.selected ? radius(d) + 6 : 0)
+      .attr('r', d => d.selected ? radius(d) + 3 : 0)
       .attr('stroke', d => SEVERITY_MARKER_COLORS[d.severity] || '#6b7280')
       .attr('opacity', d => d.selected ? 0.55 : 0)
   }
