@@ -8,7 +8,10 @@ import saola/icon/lc
 import saola/icon/lp
 import saola/icon/ls
 import saola/icon/lt
-import saola/preview/model.{type Message, type Model, ToggleDropdown}
+import saola/preview/event_helper
+import saola/preview/model.{
+  type Message, type Model, ToggleDropdown, UserClickedOutside,
+}
 
 fn is_dropdown_open(model: Model, id: String) -> Bool {
   case model.open_dropdown {
@@ -17,7 +20,7 @@ fn is_dropdown_open(model: Model, id: String) -> Bool {
   }
 }
 
-pub fn view_dropdown_menus(model: Model) -> Element(Message) {
+pub fn view(model: Model) -> Element(Message) {
   let basic_items = [
     dd.Flat(dd.Item("Save")),
     dd.Flat(dd.Item("Edit")),
@@ -26,10 +29,10 @@ pub fn view_dropdown_menus(model: Model) -> Element(Message) {
   ]
 
   let items_with_icons = [
-    dd.Flat(dd.ItemWithIcon(lp.plus([]), "New Item")),
-    dd.Flat(dd.ItemWithIcon(lp.pencil([]), "Edit Item")),
-    dd.Flat(dd.Separator),
-    dd.Flat(dd.ItemWithIcon(lt.trash([]), "Delete Item")),
+    lp.plus([]) |> dd.ItemWithIcon("New Item") |> dd.Flat,
+    lp.pencil([]) |> dd.ItemWithIcon("Edit Item") |> dd.Flat,
+    dd.Separator |> dd.Flat,
+    lt.trash([]) |> dd.ItemWithIcon("Delete Item") |> dd.Flat,
   ]
 
   let items_with_links = [
@@ -71,7 +74,10 @@ pub fn view_dropdown_menus(model: Model) -> Element(Message) {
 
   let trigger_with_icon_only = dd.TriggerAttrs("", Some(ls.settings([])), "")
 
-  h.div([], [
+  // Wrapping the page in a div that fires UserClickedOutside whenever the user
+  // clicks anywhere that is not inside a `.dropdown-menu` element, allowing all
+  // open dropdowns to be closed.
+  h.div([event_helper.on_click_outside(".dropdown-menu", UserClickedOutside)], [
     h.h1([a.class("page-title")], [text("Dropdown Menus")]),
     h.p([a.class("page-description")], [
       text("Showcase of dropdown menu components."),

@@ -92,7 +92,7 @@ pub fn view_buttons() -> Element(Message) {
 }
 
 pub fn view_dropdown_menus(model: Model) -> Element(Message) {
-  dropdown_menu.view_dropdown_menus(model)
+  dropdown_menu.view(model)
 }
 
 pub fn view_tabs(model: Model) -> Element(Message) {

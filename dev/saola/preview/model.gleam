@@ -231,10 +231,15 @@ pub type Model {
 
 pub type Message {
   OnRouteChange(Route)
+  // Hold the ID of the Dropdown to be toggled
   ToggleDropdown(String)
   TabChanged(String)
   OpenDialog
   CloseDialog
+  // User clicked outside an open widget (dropdown, dialog, popover, etc.),
+  // we will close all open widgets when receiving this message.
+  // When to emit this message depends on particular page.
+  UserClickedOutside
   AddToast(toast.Toast(Message))
   DismissToast(String)
   FormNameChanged(String)

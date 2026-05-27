@@ -62,7 +62,7 @@ import saola/preview/model.{
   ThreatTableSortChanged, ThreatTimelineEntityChanged, TimePickerChanged,
   TimePickers, Timelines, Toasts, ToggleBoldChanged, ToggleDropdown,
   ToggleGroupChanged, ToggleGroups, ToggleItalicChanged, Toggles, Tooltips,
-  TreeNodeToggled, TreeViews, WidgetDashboard,
+  TreeNodeToggled, TreeViews, UserClickedOutside, WidgetDashboard,
   HeatmapHover, HeatmapRipple,
 }
 import saola/preview/view
@@ -285,6 +285,7 @@ fn update(model: Model, msg: Message) -> #(Model, Effect(Message)) {
       }
       #(Model(..model, open_dropdown: new_open), effect.none())
     }
+    UserClickedOutside -> #(Model(..model, open_dropdown: None), effect.none())
     TabChanged(id) -> #(Model(..model, active_tab: id), effect.none())
     OpenDialog -> #(Model(..model, is_dialog_open: True), effect.none())
     CloseDialog -> #(Model(..model, is_dialog_open: False), effect.none())
