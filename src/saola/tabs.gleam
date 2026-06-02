@@ -88,6 +88,20 @@ fn render_panel(tab: Tab(msg), is_active: Bool) -> Element(msg) {
 /// NOTE: `aria-hidden` alone does not remove inactive panels from keyboard
 /// tab order. Add `[role="tabpanel"][aria-hidden="true"] { display: none; }`
 /// to your CSS so focusable elements inside hidden panels are unreachable.
+///
+/// ## Examples
+///
+/// ```gleam
+/// tabs_full(
+///   tabs: [
+///     Tab(id: "account", label: "Account", content: html.p([], [element.text("Account settings")])),
+///     TabWithIcon(id: "security", icon: lock_icon, label: "Security", content: html.p([], [element.text("Security settings")])),
+///   ],
+///   active_id: model.active_tab,
+///   on_tab_change: TabChanged,
+///   class: "my-tabs",
+/// )
+/// ```
 pub fn tabs_full(
   tabs tabs: List(Tab(msg)),
   active_id active_id: String,
@@ -113,6 +127,19 @@ pub fn tabs_full(
 }
 
 /// Simple tabs with default styling.
+///
+/// ## Examples
+///
+/// ```gleam
+/// tabs_simple(
+///   tabs: [
+///     Tab(id: "overview", label: "Overview", content: overview_view()),
+///     Tab(id: "details", label: "Details", content: details_view()),
+///   ],
+///   active_id: model.active_tab,
+///   on_tab_change: TabChanged,
+/// )
+/// ```
 pub fn tabs_simple(
   tabs tabs: List(Tab(msg)),
   active_id active_id: String,
