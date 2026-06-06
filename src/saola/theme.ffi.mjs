@@ -1,9 +1,10 @@
-const registered = {}
+const DARK_QUERY = '(prefers-color-scheme: dark)'
+let darkRegistered = false
 
-export function watchMediaQuery(query, callback) {
-  if (registered[query]) return
-  registered[query] = true
-  window.matchMedia(query).addEventListener('change', e => callback(e.matches))
+export function watchDarkMode(callback) {
+  if (darkRegistered) return
+  darkRegistered = true
+  window.matchMedia(DARK_QUERY).addEventListener('change', e => callback(e.matches))
 }
 
 export function getCurrentDarkMode() {

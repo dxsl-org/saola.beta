@@ -83,18 +83,13 @@ pub fn field_required_and_hint_together_test() {
 
 // --- watch_system_dark ---
 
-pub fn watch_system_dark_inactive_is_noop_test() {
-  // When is_active is False, returns effect.none() — no FFI called
-  let _ = theme.watch_system_dark(False, fn(_) { Nil })
-}
-
-pub fn watch_system_dark_active_creates_effect_test() {
-  // When is_active is True, returns an Effect wrapping the listener setup.
+pub fn watch_system_dark_creates_effect_test() {
+  // Returns an Effect wrapping the listener setup.
   // effect.from defers the callback — watchMediaQuery is NOT called during construction.
-  let _ = theme.watch_system_dark(True, fn(_) { Nil })
+  let _ = theme.watch_system_dark(fn(_) { Nil })
 }
 
-pub fn get_system_dark_returns_bool_test() {
+pub fn is_system_dark_returns_bool_test() {
   // In test env (Node.js, no window), the FFI guard returns False.
-  let _dark = theme.get_system_dark()
+  let _dark = theme.is_system_dark()
 }

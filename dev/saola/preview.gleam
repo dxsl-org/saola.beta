@@ -11,7 +11,6 @@ import lustre/attribute as a
 import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html as h
-import lustre/event as e
 import modem
 import saola/canvas_command as canvas
 import saola/component/combobox as cb
@@ -58,7 +57,7 @@ import saola/preview/model.{
   Skeletons, SliderChanged, Sliders, Spinners, StartedTrial, StepperStepClicked,
   Steppers, StressBarClicked, StressOffsetChanged, StressZoomChanged,
   SwitchToggled, Switches, SystemOsDarkChanged, TabChanged, Tables, Tabs,
-  ThemeToggled, ThreatEntityDeselected, ThreatEntitySelected,
+  ThemeSelected, ThreatEntityDeselected, ThreatEntitySelected,
   ThreatFiltersCleared, ThreatGraphPanned, ThreatGraphZoomed, ThreatIntelNetwork,
   ThreatIntelRouteEntered, ThreatLayoutReceived, ThreatMapCountryClicked,
   ThreatNodeHovered, ThreatSearchChanged, ThreatSearchCleared,
@@ -69,6 +68,7 @@ import saola/preview/model.{
   TreeNodeToggled, TreeViews, UserClickedOutside, WidgetDashboard,
 }
 import saola/preview/view
+import saola/preview/view/sidebar
 
 pub fn main() {
   let assert Ok(_) = cb.register()
@@ -145,7 +145,7 @@ fn init(_args) -> #(Model, Effect(Message)) {
       combobox_query: "",
       nav_menu_open: None,
       theme: theme.Light,
-      system_os_dark: theme.get_system_dark(),
+      os_color_scheme: theme.is_system_dark(),
       signup_name: "",
       signup_email: "",
       signup_password: "",
@@ -193,8 +193,8 @@ fn init(_args) -> #(Model, Effect(Message)) {
     effect.batch([
       modem.init(on_url_change),
       whatnext,
-      theme.watch_system_dark(True, SystemOsDarkChanged),
-      theme.apply_to_html(theme.Light, theme.get_system_dark()),
+      theme.watch_system_dark(SystemOsDarkChanged),
+      theme.apply_to_html(theme.Light, theme.is_system_dark()),
     ]),
   )
 }
@@ -537,13 +537,13 @@ fn update(model: Model, msg: Message) -> #(Model, Effect(Message)) {
       Model(..model, nav_menu_open: id),
       effect.none(),
     )
-    ThemeToggled(t) -> #(
+    ThemeSelected(t) -> #(
       Model(..model, theme: t),
-      theme.apply_to_html(t, model.system_os_dark),
+      theme.apply_to_html(t, model.os_color_scheme),
     )
-    SystemOsDarkChanged(is_dark) -> #(
-      Model(..model, system_os_dark: is_dark),
-      theme.apply_to_html(model.theme, is_dark),
+    SystemOsDarkChanged(scheme) -> #(
+      Model(..model, os_color_scheme: scheme),
+      theme.apply_to_html(model.theme, scheme),
     )
     SignupNameChanged(v) -> #(Model(..model, signup_name: v), effect.none())
     SignupEmailChanged(v) -> #(Model(..model, signup_email: v), effect.none())
@@ -1014,171 +1014,9 @@ fn result_unwrap(r: Result(a, e), default: a) -> a {
 
 fn view(model: Model) -> Element(Message) {
   h.div([a.class("app-container")], [
-    sidebar(model.route, model.theme),
+    sidebar.view(model.route, model.theme),
     main_pane(model),
   ])
-}
-
-fn sidebar(
-  current_route: model.Route,
-  current_theme: theme.Theme,
-) -> Element(Message) {
-  h.div([a.class("sidebar")], [
-    h.h2([a.class("sidebar-title")], [element.text("UI Showcase")]),
-    h.div([a.class("theme-toggle")], [
-      h.button(
-        [
-          a.type_("button"),
-          a.class(
-            "nav-link"
-            <> case current_theme {
-              theme.Light -> " active"
-              _ -> ""
-            },
-          ),
-          e.on_click(ThemeToggled(theme.Light)),
-        ],
-        [element.text("Light")],
-      ),
-      h.button(
-        [
-          a.type_("button"),
-          a.class(
-            "nav-link"
-            <> case current_theme {
-              theme.Dark -> " active"
-              _ -> ""
-            },
-          ),
-          e.on_click(ThemeToggled(theme.Dark)),
-        ],
-        [element.text("Dark")],
-      ),
-      h.button(
-        [
-          a.type_("button"),
-          a.class(
-            "nav-link"
-            <> case current_theme {
-              theme.System -> " active"
-              _ -> ""
-            },
-          ),
-          e.on_click(ThemeToggled(theme.System)),
-        ],
-        [element.text("System")],
-      ),
-    ]),
-    nav_link("/alerts", "Alerts", current_route == Alerts),
-    nav_link("/badges", "Badges", current_route == Badges),
-    nav_link("/cards", "Cards", current_route == Cards),
-    nav_link("/buttons", "Buttons", current_route == Buttons),
-    nav_link("/inputs", "Inputs", current_route == Inputs),
-    nav_link("/forms", "Forms", current_route == Forms),
-    nav_link("/separators", "Separator", current_route == Separators),
-    nav_link("/tooltips", "Tooltip", current_route == Tooltips),
-    nav_link("/switches", "Switch", current_route == Switches),
-    nav_link("/sliders", "Slider", current_route == Sliders),
-    nav_link("/selects", "Select", current_route == Selects),
-    nav_link("/fields", "Field", current_route == Fields),
-    nav_link("/accordions", "Accordion", current_route == Accordions),
-    nav_link("/progress", "Progress", current_route == Progresses),
-    nav_link("/skeletons", "Skeleton", current_route == Skeletons),
-    nav_link("/avatars", "Avatar", current_route == Avatars),
-    nav_link("/radio-groups", "Radio Group", current_route == RadioGroups),
-    nav_link("/toggles", "Toggle", current_route == Toggles),
-    nav_link("/toggle-groups", "Toggle Group", current_route == ToggleGroups),
-    nav_link("/breadcrumbs", "Breadcrumb", current_route == Breadcrumbs),
-    nav_link("/paginations", "Pagination", current_route == Paginations),
-    nav_link("/scroll-areas", "Scroll Area", current_route == ScrollAreas),
-    nav_link("/aspect-ratios", "Aspect Ratio", current_route == AspectRatios),
-    nav_link("/collapsibles", "Collapsible", current_route == Collapsibles),
-    nav_link("/popovers", "Popover", current_route == Popovers),
-    nav_link("/alert-dialogs", "Alert Dialog", current_route == AlertDialogs),
-    nav_link("/hover-cards", "Hover Card", current_route == HoverCards),
-    nav_link("/input-otps", "Input OTP", current_route == InputOtps),
-    nav_link("/sheets", "Sheet", current_route == Sheets),
-    nav_link("/menubars", "Menubar", current_route == Menubars),
-    nav_link("/calendars", "Calendar", current_route == Calendars),
-    nav_link("/date-pickers", "Date Picker", current_route == DatePickers),
-    nav_link("/spinners", "Spinner", current_route == Spinners),
-    nav_link("/native-selects", "Native Select", current_route == NativeSelects),
-    nav_link("/button-groups", "Button Group", current_route == ButtonGroups),
-    nav_link("/input-groups", "Input Group", current_route == InputGroups),
-    nav_link("/context-menus", "Context Menu", current_route == ContextMenus),
-    nav_link("/drawers", "Drawer", current_route == Drawers),
-    nav_link("/sidebars", "Sidebar", current_route == Sidebars),
-    nav_link("/commands", "Command", current_route == Commands),
-    nav_link("/resizables", "Resizable", current_route == Resizables),
-    nav_link("/data-tables", "Data Table", current_route == DataTables),
-    nav_link("/carousels", "Carousel", current_route == Carousels),
-    nav_link("/comboboxes", "Combobox", current_route == Comboboxes),
-    nav_link(
-      "/navigation-menus",
-      "Navigation Menu",
-      current_route == NavigationMenus,
-    ),
-    nav_link("/empties", "Empty", current_route == Empties),
-    nav_link("/items", "Item", current_route == Items),
-    nav_link(
-      "/form-validation",
-      "Form Validation",
-      current_route == FormValidation,
-    ),
-    nav_link("/searches", "Search", current_route == Searches),
-    nav_link("/ratings", "Rating", current_route == Ratings),
-    nav_link(
-      "/navigation-bars",
-      "Navigation Bar",
-      current_route == NavigationBars,
-    ),
-    nav_link("/steppers", "Stepper", current_route == Steppers),
-    nav_link("/tree-views", "Tree View", current_route == TreeViews),
-    nav_link("/time-pickers", "Time Picker", current_route == TimePickers),
-    nav_link("/multiselects", "Multiselect", current_route == Multiselects),
-    nav_link("/timelines", "Timeline", current_route == Timelines),
-    nav_link("/tabs", "Tabs", current_route == Tabs),
-    nav_link("/dialogs", "Dialogs", current_route == Dialogs),
-    nav_link("/tables", "Tables", current_route == Tables),
-    nav_link("/toasts", "Toasts", current_route == Toasts),
-    nav_link(
-      "/dropdown-menus",
-      "Dropdown Menus",
-      current_route == DropdownMenus,
-    ),
-    nav_link(
-      "/canvas-stress-test",
-      "Canvas Stress Test",
-      current_route == CanvasStressTest,
-    ),
-    nav_link(
-      "/widget-dashboard",
-      "Widget Dashboard",
-      current_route == WidgetDashboard,
-    ),
-    nav_link(
-      "/heatmap-comparison",
-      "Heatmap SVG vs Canvas",
-      current_route == HeatmapComparison,
-    ),
-    nav_link(
-      "/threat-intel-network",
-      "Threat Intel Network",
-      current_route == ThreatIntelNetwork,
-    ),
-    nav_link("/d3-charts", "D3 Charts", current_route == D3Charts),
-    nav_link("/monaco-editor", "Code Editor", current_route == MonacoEditor),
-    nav_link("/example-form", "Example Form", current_route == ExampleForm),
-    nav_link("/example-site", "Example Site", current_route == ExampleSite),
-  ])
-}
-
-fn nav_link(path: String, label: String, is_active: Bool) -> Element(Message) {
-  let active_class = case is_active {
-    True -> " active"
-    False -> ""
-  }
-  h.a([a.href(path), a.class("nav-link" <> active_class)], [element.text(label)])
 }
 
 fn main_pane(model: Model) -> Element(Message) {

@@ -178,8 +178,8 @@ pub type Model {
     nav_menu_open: Option(String),
     // Active color theme
     theme: theme.Theme,
-    // Tracks current OS dark-mode preference for System theme
-    system_os_dark: Bool,
+    // Tracks current OS color scheme for System theme
+    os_color_scheme: theme.OsColorScheme,
     // Form validation demo (signup form)
     signup_name: String,
     signup_email: String,
@@ -299,14 +299,14 @@ pub type Message {
   ComboboxQueryChanged(String)
   ComboboxSelected(String)
   NavMenuOpenChanged(Option(String))
-  ThemeToggled(theme.Theme)
+  ThemeSelected(theme.Theme)
   SignupNameChanged(String)
   SignupEmailChanged(String)
   SignupPasswordChanged(String)
   SignupConfirmChanged(String)
   SignupSubmitted
   SignupReset
-  SystemOsDarkChanged(Bool)
+  SystemOsDarkChanged(theme.OsColorScheme)
   // Batch 11
   SearchQueryChanged(String)
   RatingChanged(Int)
