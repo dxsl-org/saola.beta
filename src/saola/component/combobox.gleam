@@ -122,6 +122,7 @@ type Message {
   ParentPreselectedItem(String)
 }
 
+/// Message that this component will emit to parent
 pub type EmitMessage {
   Focused
   Selected(String)
@@ -158,6 +159,13 @@ pub fn preselect_value(value: String) -> Attribute(m) {
   a.attribute(attr_preselect_value, value)
 }
 
+/// Encodes an `Item` to JSON. Use with `encode_choices` or directly with
+/// `json.array` when building the `choices` property.
+pub fn encode_item(item: Item) -> json.Json {
+  let Item(value:, name:) = item
+  json.object([#("value", json.string(value)), #("name", json.string(name))])
+}
+
 // -- Shortcuts to let parent element easily register event handlers -- //
 
 /// Fires when the combobox input receives focus.
@@ -187,13 +195,6 @@ pub fn on_clear_clicked(message: message) -> Attribute(message) {
 }
 
 // -- Internal implementation -- //
-
-/// Encodes an `Item` to JSON. Use with `encode_choices` or directly with
-/// `json.array` when building the `choices` property.
-pub fn encode_item(item: Item) -> json.Json {
-  let Item(value:, name:) = item
-  json.object([#("value", json.string(value)), #("name", json.string(name))])
-}
 
 /// Encodes a list of `Item`s to JSON for the `choices` property.
 ///
@@ -445,12 +446,9 @@ fn render_trigger(
       a.type_("button"),
       a.class("btn-outline"),
       a.id(trigger_id),
-      a.attribute("aria-haspopup", "listbox"),
-      a.attribute("aria-expanded", case is_open {
-        True -> "true"
-        False -> "false"
-      }),
-      a.attribute("aria-controls", listbox_id),
+      a.aria_haspopup("listbox"),
+      a.aria_expanded(is_open),
+      a.aria_controls(listbox_id),
       a.style("width", "12rem"),
       ev.on_click(UserFocusedInput),
     ],
@@ -477,24 +475,24 @@ fn render_popover(
         a.type_("text"),
         a.value(model.filter_text),
         a.placeholder("Search..."),
-        a.attribute("autocomplete", "off"),
+        a.autocomplete("off"),
         a.attribute("autocorrect", "off"),
-        a.attribute("spellcheck", "false"),
-        a.attribute("aria-autocomplete", "list"),
-        a.attribute("role", "combobox"),
-        a.attribute("aria-expanded", "true"),
-        a.attribute("aria-controls", listbox_id),
-        a.attribute("aria-labelledby", trigger_id),
+        a.spellcheck(False),
+        a.aria_autocomplete("list"),
+        a.role("combobox"),
+        a.aria_expanded(True),
+        a.aria_controls(listbox_id),
+        a.aria_labelledby(trigger_id),
         ev.on_input(UserWroteText),
         setup_keyup_handler(focused_item),
       ]),
     ]),
     keyed.div(
       [
-        a.attribute("role", "listbox"),
+        a.role("listbox"),
         a.id(listbox_id),
-        a.attribute("aria-orientation", "vertical"),
-        a.attribute("aria-labelledby", trigger_id),
+        a.aria_orientation("vertical"),
+        a.aria_labelledby(trigger_id),
         a.attribute("data-empty", "No results."),
       ],
       render_options(model),
@@ -514,12 +512,9 @@ fn render_options(model: Model) -> List(#(String, Element(Message))) {
       item.value,
       h.div(
         [
-          a.attribute("role", "option"),
+          a.role("option"),
           a.attribute("data-value", item.value),
-          case is_selected {
-            True -> a.attribute("aria-selected", "true")
-            False -> a.none()
-          },
+          a.aria_selected(is_selected),
           case is_focused {
             True -> a.class("active")
             False -> a.none()
