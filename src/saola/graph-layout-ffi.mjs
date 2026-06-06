@@ -5,7 +5,7 @@ export function request_layout(nodes, edges, callback) {
 
   if (!worker) {
     worker = new Worker(
-      new URL('./graph_layoutworker.js', import.meta.url),
+      new URL('./graph_layout_worker.js', import.meta.url),
       { type: 'module' },
     )
   }
