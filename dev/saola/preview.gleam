@@ -51,7 +51,7 @@ import saola/preview/model.{
   MultiselectChanged, Multiselects, NativeSelectChanged, NativeSelects,
   NavMenuOpenChanged, NavigationBars, NavigationMenus, OnRouteChange, OpenDialog,
   PaginationChanged, Paginations, PopoverClosed, PopoverOpened, Popovers,
-  Progresses, RadioGroups, RatingChanged, Ratings, ResizableSizesChanged,
+  Progresses, RadioGroups, RatingChanged, Ratings, ResizableSplitSizesChanged,
   Resizables, ScrollAreas, SearchQueryChanged, Searches, SelectChanged, Selects,
   Separators, SheetClosed, SheetOpened, Sheets, SidebarCollapsedToggled,
   SidebarToggled, Sidebars, SignupConfirmChanged, SignupEmailChanged,
@@ -484,7 +484,7 @@ fn update(model: Model, msg: Message) -> #(Model, Effect(Message)) {
       Model(..model, command_query: "", command_highlighted: -1),
       effect.none(),
     )
-    ResizableSizesChanged(sizes) -> #(
+    ResizableSplitSizesChanged(sizes) -> #(
       Model(..model, resizable_split_sizes: sizes),
       effect.none(),
     )
