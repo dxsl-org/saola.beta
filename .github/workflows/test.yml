@@ -19,6 +19,9 @@ jobs:
           gleam-version: "1.16.0"
           rebar3-version: "3"
           # elixir-version: "1"
+      - uses: oven-sh/setup-bun@v2.2.0
       - run: gleam deps download
+      # Tests import FFI wrappers (world-map → d3); node deps must be present
+      - run: bun install
       - run: gleam test
       - run: gleam format --check src test dev
