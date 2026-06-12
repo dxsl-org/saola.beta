@@ -1,0 +1,58 @@
+/* @generated saola-css — do not edit; regenerated from basecoat */
+@layer saola;
+@import "./base.css";
+@layer saola.components {
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 6);
+    border-radius: var(--radius-xl);
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+    background-color: var(--color-card);
+    padding-block: calc(var(--spacing) * 6);
+    color: var(--color-card-foreground);
+    --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+    > header {
+      container-type: inline-size;
+      container-name: card-header;
+      display: grid;
+      grid-auto-rows: min-content;
+      grid-template-rows: auto auto;
+      align-items: flex-start;
+      gap: calc(var(--spacing) * 1.5);
+      padding-inline: calc(var(--spacing) * 6);
+      &:has(*[data-slot="card-action"]) {
+        grid-template-columns: 1fr auto;
+      }
+      &:is(.border-b) {
+        padding-bottom: calc(var(--spacing) * 6);
+      }
+      h2 {
+        --tw-leading: 1;
+        line-height: 1;
+        --tw-font-weight: var(--font-weight-semibold);
+        font-weight: var(--font-weight-semibold);
+      }
+      p {
+        font-size: var(--text-sm);
+        line-height: var(--tw-leading, var(--text-sm--line-height));
+        color: var(--color-muted-foreground);
+      }
+    }
+    > section {
+      padding-inline: calc(var(--spacing) * 6);
+    }
+    > footer {
+      display: flex;
+      align-items: center;
+      padding-inline: calc(var(--spacing) * 6);
+      &:is(.border-t) {
+        padding-top: calc(var(--spacing) * 6);
+      }
+    }
+  }
+
+}

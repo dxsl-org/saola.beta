@@ -1,0 +1,84 @@
+@layer saola;
+@import "./base.css";
+@layer saola.components {
+
+  .empty {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    border-radius: var(--radius-lg, 0.5rem);
+    border: 1px dashed var(--color-border, #e5e7eb);
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  @media (min-width: 768px) {
+    .empty { padding: 3rem; }
+  }
+
+  .empty-header {
+    display: flex;
+    max-width: 24rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .empty-media {
+    margin-bottom: 0.5rem;
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+  }
+
+  .empty-media-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-md, 0.375rem);
+    background: var(--color-muted, #f3f4f6);
+    color: var(--color-foreground, #111827);
+  }
+
+  .empty-media-icon svg { width: 1.5rem; height: 1.5rem; }
+
+  .empty-title {
+    font-size: 1.125rem;
+    line-height: 1.4;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  .empty-description {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-muted-foreground, #6b7280);
+    margin: 0;
+  }
+
+  .empty-description a {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .empty-description a:hover { color: var(--color-primary, #0f172a); }
+
+  .empty-content {
+    display: flex;
+    width: 100%;
+    max-width: 24rem;
+    min-width: 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.875rem;
+  }
+
+}

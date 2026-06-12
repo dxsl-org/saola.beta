@@ -1,0 +1,11 @@
+@layer saola;
+@import "./base.css";
+@layer saola.components {
+
+  .pagination {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+}

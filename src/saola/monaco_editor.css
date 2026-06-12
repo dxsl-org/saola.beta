@@ -1,0 +1,20 @@
+@layer saola;
+@import "./base.css";
+@layer saola.components {
+
+  /* Light-DOM host layout for the <saola-codemirror-editor> custom element. */
+  .saola-monaco-editor {
+    display: block;
+    min-width: 0;
+    border: 1px solid color-mix(in oklab, currentColor 16%, transparent);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #1e1e1e;
+  }
+
+  .saola-monaco-editor__surface {
+    width: 100%;
+    min-height: 180px;
+  }
+
+}

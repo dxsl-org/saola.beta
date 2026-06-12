@@ -1,0 +1,82 @@
+@layer saola;
+@import "./base.css";
+@layer saola.components {
+
+  .context-menu-trigger {
+    position: relative;
+    display: inline-block;
+  }
+
+  .context-menu-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 49;
+  }
+
+  .context-menu-popup {
+    position: fixed;
+    z-index: 50;
+    min-width: 10rem;
+    padding: 0.25rem;
+    background-color: var(--color-popover, #fff);
+    border: 1px solid var(--color-border, #dee2e6);
+    border-radius: var(--radius-md, 0.375rem);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .context-menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.375rem 0.625rem;
+    font-size: 0.875rem;
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm, 0.25rem);
+    cursor: pointer;
+    text-align: left;
+    color: var(--color-foreground, #212529);
+    transition: background-color 0.1s;
+  }
+
+  .context-menu-item:hover {
+    background-color: var(--color-accent, #f1f3f5);
+  }
+
+  .context-menu-item-destructive {
+    color: var(--color-destructive, #dc3545);
+  }
+
+  .context-menu-item-destructive:hover {
+    background-color: color-mix(in oklab, var(--color-destructive, #dc3545) 10%, transparent);
+  }
+
+  .context-menu-item-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    padding: 0.375rem 0.625rem;
+    font-size: 0.875rem;
+    color: var(--color-foreground, #212529);
+  }
+
+  .context-menu-shortcut {
+    margin-left: 1.5rem;
+    font-size: 0.75rem;
+    opacity: 0.6;
+  }
+
+  .context-menu-separator {
+    height: 1px;
+    margin: 0.25rem 0;
+    background-color: var(--color-border, #dee2e6);
+  }
+
+  .context-menu-group-label {
+    padding: 0.25rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-muted-foreground, #6c757d);
+  }
+
+}

@@ -2,6 +2,98 @@
 
 All notable changes to the Saola UI Kit are documented here.
 
+## [2026-06-12] — Modular CSS Distribution
+
+### Summary
+
+Restructured CSS from monolithic `assets/app.css` + `assets/basecoat.css` into modular per-widget files colocated with Gleam code, plus layered bundles for convenient import. Enables granular CSS loading in Vite apps, leak-free embedding into shadcn/Tailwind hosts, and transparent Basecoat submodule syncs.
+
+### Changes
+
+**CSS Architecture Overhaul**
+- **Per-widget colocated CSS:** 54 widget CSS files (`src/saola/<widget>.css`) — 25 auto-generated from compiled Basecoat, 29 hand-authored for Basecoat gaps and custom layouts
+- **Shared base:** `src/saola/base.css` contains `@property` passthrough (Tailwind v4 custom properties), `@layer saola.theme` design tokens, and `@layer saola.base` scoped reset (`:where(widget-roots)` for zero specificity)
+- **Cascade layers:** All CSS wrapped in `@layer saola` with sublayers `saola.theme`, `saola.base`, `saola.components`, `saola.charts` → unlayered consumer CSS always wins
+- **Generated/custom contract:** Generated files carry `/* @generated saola-css */` sentinel; slicer refuses to overwrite, preserves `/* saola:custom */` region on re-runs
+- **Built bundles** (`priv/static/`): saola.css (full), saola-base.css (tokens+reset), saola-components.css (base+UI), saola-charts.css (base+charts), saola-preflight.css (opt-in global reset)
+
+**CSS Pipeline**
+- **Slicer** (`scripts/build-css.mjs`): Strategy-B selector-set classification of compiled Basecoat CSS; deterministic mapping to 25 widgets via `css-section-map.json`; fail-loud on unmapped selectors
+- **Bundler** (`scripts/bundle-css.mjs`): Ordered concatenation (not `@import`) via committed manifest `css-bundle-manifest.json` to avoid Lightning CSS deduplication ambiguity; fail-loud on file↔manifest mismatch
+- **Rerunnable:** `just build-css` re-executes after basecoat submodule sync; regenerated outputs committed
+
+**Consumer Imports**
+1. **Full bundle** — `<link rel="stylesheet" href="/path/to/saola.css">`
+2. **Group bundles** — load base + components or charts separately
+3. **Per-widget granular** (Vite) — Vite alias to package `src/saola/` tree; per-widget imports with internal deduplication of `./base.css`
+4. **Optional preflight** — `saola-preflight.css` for full Tailwind reset (not required when embedding into shadcn/Tailwind hosts)
+
+**Demo Migration**
+- Deleted `assets/component.css`
+- Slimmed `assets/app.css` to 460 lines (demo-only layout styles)
+- Created `dev/dev-widgets.css` (dev-only aggregate for Vite HMR)
+- Demo now imports granular SOURCE files for CSS (no pre-built bundles)
+
+**Security & Validation**
+- Slicer validates URLs: only `data:image/svg+xml` + relative `url()` allowed; `@import` fails build
+- `.build-css/` directory added to `.gitignore`
+- Manifest validation: fail-loud if `src/saola/*.css` files absent from manifest
+
+**Documentation**
+- Updated `README.md` — added "CSS Distribution" section with 3 import modes, layer architecture, and basecoat sync workflow
+- Created `docs/code-standards.md` — CSS standards, file naming, per-widget authoring, layer contract, design tokens
+- Updated `docs/system-architecture.md` — added "CSS Architecture" section with modular design rationale, pipeline diagram, build structure
+
+### Technical Details
+
+**Selector-Set Slicing (Strategy B, verified June 12)**
+- Compiled `assets/basecoat.css` has exactly 1 comment (banner) — Tailwind v4 strips all fragment markers
+- Slicer iterates 25 `@layer components` blocks, classifies each by selector prefix (`.btn*`→button, `.alert*`→alert, etc.)
+- Multi-block aggregation: one widget's selectors may span blocks (~330, ~393, ~397 in compiled output) → slicer collects all
+- Mapping via `css-section-map.json` (hand-curated inventory); one selector → one widget entry (fail-loud on mismatch)
+- Strategy-A fallback pre-approved: if selector ambiguity arises, re-invoke `@reference` compile from source (preserves 26 fragment markers)
+
+**Scoped Reset Scope (`:where(widget-roots)` — verified June 12)**
+- Reproduces Tailwind preflight defaults on known widget root selectors only: `box-sizing: border-box`, `border: 0 solid`, `border-color: var(--color-border)`, `outline-color: var(--color-ring)`, margin/font audited
+- Zero specificity via `:where()` — host styles always win
+- Global preflight (`*`/`html`/`body`) dropped from embedded path, isolated in opt-in `saola-preflight.css`
+- Eliminates reset bleed on non-widget content (e.g., full-page overlays, custom layouts)
+
+**Distribution Contract (verified June 12)**
+- Gleam copies only `.gleam` + FFI `.mjs/.js/.ts` from `src/` into `build/` — NOT `.css`
+- Primary: `priv/static/` bundles ship in Hex tarballs (`priv/` included in tarballs)
+- Secondary: per-widget colocated files import via documented Vite-alias recipe; path = package `src/` tree (`build/packages/saola/src/saola/…`)
+- Upstream public repo handles final packaging (saola.beta is internal-only, no Hex publishing)
+
+**Build Toolchain**
+- All verify commands use `bun` (not npm): `bun scripts/build-css.mjs && bun scripts/bundle-css.mjs`
+- Dual lockfiles (`package-lock.json` + `bun.lock`) may drift — reconciliation out of scope
+- CSS file naming: snake_case to match `.gleam` module names
+
+### Impact
+
+- **Consumer Experience:** Flexibility to import granular CSS or full bundles; zero CSS bloat for single-widget usage in Vite apps
+- **Embedding:** Scoped reset prevents style bleed; unlayered consumer CSS always wins → safe for shadcn/Tailwind host apps
+- **Maintenance:** Transparent Basecoat syncs via re-runnable pipeline; generated regions protected by sentinel; custom regions preserved
+- **Distribution:** Both `priv/static/` bundles and granular `src/` files ship; consumers choose import strategy
+- **Performance:** Optional preflight means smaller initial CSS for apps that already have a global reset
+
+### Validation
+
+- Slicer tested: selector-set classification, multi-block aggregation, fail-loud guards, URL validation
+- Bundler tested: manifest order preservation, file presence validation
+- Integration verified: all 5 bundles build, dev preview imports granular SOURCE files with HMR working
+- Demo app (`just preview`) renders all 54 widgets with correct CSS
+
+### Scope Notes
+
+Deferred to future phases:
+- Dual-lockfile reconciliation (bun.lock ↔ package-lock.json drift flagged but not resolved)
+- Upstream package structure for public Hex publishing (handled by upstream repo)
+- Advanced CSS minification / source map generation (Lightning CSS production defaults sufficient)
+
+---
+
 ## [2026-06-12] — Docs Site: 3-Column Layout + API Reference
 
 ### Summary

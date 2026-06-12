@@ -1,0 +1,18 @@
+@layer saola;
+@import "../base.css";
+@layer saola.components {
+
+  resizable-split.resizable-root {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border: 1px solid var(--color-border, #dee2e6);
+    border-radius: var(--radius-md, 0.375rem);
+  }
+
+  resizable-split::part(handle):hover {
+    background-color: var(--color-primary, #0d6efd);
+  }
+
+}

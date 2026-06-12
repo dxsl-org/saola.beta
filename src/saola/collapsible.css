@@ -1,0 +1,66 @@
+/* @generated saola-css — do not edit; regenerated from basecoat */
+@layer saola;
+@import "./base.css";
+@layer saola.components {
+
+  details {
+    &::details-content {
+      block-size: 0;
+      display: block;
+      opacity: 0%;
+      transition-property: all;
+      transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+      transition-duration: var(--tw-duration, var(--default-transition-duration));
+      transition-behavior: allow-discrete;
+    }
+    &[open]::details-content {
+      block-size: auto;
+      block-size: calc-size(auto, size);
+      opacity: 100%;
+    }
+    summary {
+      display: inline-flex;
+      cursor: pointer;
+      align-items: center;
+    }
+  }
+  details > summary::-webkit-details-marker {
+    display: none;
+  }
+
+}
+/* saola:custom */
+@layer saola.components {
+
+  .collapsible {
+    width: 100%;
+  }
+
+  .collapsible-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: left;
+    border-radius: var(--radius-md, 0.375rem);
+  }
+
+  .collapsible-trigger:hover {
+    background-color: var(--color-muted, #e9ecef);
+  }
+
+  .collapsible-content[aria-hidden="true"] {
+    display: none;
+  }
+
+  .collapsible-content {
+    padding: 0.5rem 0.75rem;
+  }
+
+}

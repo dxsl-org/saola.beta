@@ -1,0 +1,126 @@
+/* @generated saola-css — do not edit; regenerated from basecoat */
+@layer saola;
+@import "./base.css";
+@layer saola.components {
+
+  .toaster {
+    pointer-events: none;
+    position: fixed;
+    bottom: calc(var(--spacing) * 0);
+    z-index: 50;
+    display: flex;
+    width: 100%;
+    flex-direction: column-reverse;
+    padding: calc(var(--spacing) * 4);
+    @media (width >= 40rem) {
+      max-width: calc(var(--spacing) * 90);
+    }
+    &:not([data-align]), &[data-align='end'] {
+      right: calc(var(--spacing) * 0);
+    }
+    &[data-align='start'] {
+      left: calc(var(--spacing) * 0);
+    }
+    &[data-align='center'] {
+      left: calc(1 / 2 * 100%);
+      --tw-translate-x: calc(calc(1 / 2 * 100%) * -1);
+      translate: var(--tw-translate-x) var(--tw-translate-y);
+    }
+    .toast {
+      pointer-events: auto;
+      margin-top: calc(var(--spacing) * 4);
+      display: grid;
+      width: 100%;
+      animation: toast-up 0.3s ease-in-out;
+      grid-template-rows: 1fr;
+      transition-property: grid-template-rows,opacity,margin;
+      transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+      transition-duration: var(--tw-duration, var(--default-transition-duration));
+      --tw-duration: 300ms;
+      transition-duration: 300ms;
+      --tw-ease: var(--ease-in-out);
+      transition-timing-function: var(--ease-in-out);
+      .toast-content {
+        display: flex;
+        align-items: center;
+        gap: calc(var(--spacing) * 2.5);
+        overflow: hidden;
+        border-radius: var(--radius-lg);
+        border-style: var(--tw-border-style);
+        border-width: 1px;
+        background-color: var(--color-popover);
+        padding: calc(var(--spacing) * 3);
+        font-size: 13px;
+        color: var(--color-popover-foreground);
+        --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+        box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+        svg {
+          width: calc(var(--spacing) * 4);
+          height: calc(var(--spacing) * 4);
+          flex-shrink: 0;
+        }
+        section {
+          h2 {
+            --tw-font-weight: var(--font-weight-medium);
+            font-weight: var(--font-weight-medium);
+            --tw-tracking: var(--tracking-tight);
+            letter-spacing: var(--tracking-tight);
+          }
+          p {
+            word-break: break-all;
+            color: var(--color-muted-foreground);
+          }
+        }
+        footer {
+          margin-left: auto;
+          display: flex;
+          flex-direction: column;
+          gap: calc(var(--spacing) * 2);
+          [data-toast-action], [data-toast-cancel] {
+            height: calc(var(--spacing) * 6);
+            padding-inline: calc(var(--spacing) * 2.5);
+            font-size: var(--text-xs);
+            line-height: var(--tw-leading, var(--text-xs--line-height));
+          }
+        }
+      }
+      &[aria-hidden='true'] {
+        margin: calc(var(--spacing) * 0);
+        grid-template-rows: 0fr;
+        overflow: hidden;
+        border-style: var(--tw-border-style);
+        border-width: 0px;
+        padding: calc(var(--spacing) * 0);
+        opacity: 0%;
+        .toast-content {
+          border-style: var(--tw-border-style);
+          border-width: 0px;
+        }
+      }
+    }
+  }
+
+}
+
+@keyframes toast-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+/* saola:custom */
+@layer saola.components {
+
+  .toast-success {
+    border-left: 4px solid #198754;
+  }
+
+  .toast-warning {
+    border-left: 4px solid #fd7e14;
+  }
+
+  .toast-info {
+    border-left: 4px solid #0dcaf0;
+  }
+
+}

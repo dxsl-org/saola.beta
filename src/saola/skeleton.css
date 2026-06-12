@@ -1,0 +1,29 @@
+@layer saola;
+@import "./base.css";
+@layer saola.components {
+
+  @keyframes skeleton-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .skeleton {
+    display: block;
+    background-color: var(--color-muted, #e9ecef);
+    border-radius: var(--radius-md, 0.375rem);
+    animation: skeleton-pulse 2s ease-in-out infinite;
+  }
+
+  .skeleton-text {
+    height: 1rem;
+    width: 100%;
+    border-radius: 0.25rem;
+  }
+
+  .skeleton-circle {
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 9999px;
+  }
+
+}

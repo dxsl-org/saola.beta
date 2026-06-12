@@ -418,6 +418,62 @@ Dark mode applied via `.dark` class prefix (Basecoat convention).
 
 ---
 
+## CSS Architecture
+
+### Modular CSS Distribution (June 2026)
+
+Saola CSS is now distributed as modular, per-widget files colocated with Gleam code, plus layered bundles for convenient import.
+
+**Design:**
+- Each widget lives in `src/saola/<widget>.css` (e.g., `button.css`, `dialog.css`)
+- A shared `src/saola/base.css` contains design tokens, CSS custom properties (`@property` passthrough), and a scoped reset (applied via `:where(widget-roots)` for zero specificity — host styles always win)
+- All CSS wrapped in `@layer saola` with sublayers (`saola.theme`, `saola.base`, `saola.components`, `saola.charts`) so unlayered consumer CSS always has priority
+
+**Generated vs. Authored:**
+- **Generated** (25 files, `/* @generated saola-css */` sentinel): derived from compiled Basecoat CSS by a selector-set slicer; regenerated on every `just build-css`
+  - Slicer reads `assets/basecoat.css`, classifies selectors by widget, emits per-widget files with `@layer saola.components` + `@import "./base.css"`
+  - Slicer refuses to overwrite files lacking sentinel; preserves custom augmentations in `/* saola:custom */` region
+- **Authored** (29 files, no sentinel): hand-written CSS for widgets with Basecoat gaps (e.g., `carousel.css` for host layout, `code_editor.css` for editor UI)
+
+**Bundles** (`priv/static/`, built by ordered concatenation):
+1. **saola.css** — full bundle (base + all components + charts)
+2. **saola-base.css** — tokens + scoped reset only
+3. **saola-components.css** — base + all UI widgets
+4. **saola-charts.css** — base + chart widgets (D3 bar chart, Lustre heatmap, world map, etc.)
+5. **saola-preflight.css** — opt-in global Tailwind reset (not needed for embedding into shadcn/Tailwind apps)
+
+**Per-widget imports** (for Vite consumers with alias):
+```js
+// vite.config.js
+resolve: {
+  alias: { '@saola': resolve('./node_modules/saola/src/saola') }
+}
+```
+Then in CSS:
+```css
+@import '@saola/button.css';      /* imports base.css internally */
+@import '@saola/dialog.css';
+```
+Duplicate `@import "./base.css"` across widgets is idempotent (Vite deduplicates).
+
+**File naming:**
+- CSS files use snake_case to match `.gleam` module names (e.g., `button.gleam` → `button.css`, `data_table.gleam` → `data_table.css`)
+- Shadow-DOM widgets (carousel, d3_bar_chart, entity_graph_3d) are excluded from CSS distribution; they define styles inline
+
+**Pipeline** (`just build-css`):
+1. Slicer (`scripts/build-css.mjs`): reads `assets/basecoat.css`, emits `src/saola/base.css` + 25 generated `src/saola/*.css` files
+2. Bundler (`scripts/bundle-css.mjs`): reads manifest (`scripts/css-bundle-manifest.json`), concatenates files, emits `priv/static/*.css` bundles
+3. Fail-loud guards: unmapped selector → error, missing manifest entry → error, non-sentinel file overwrite → refused
+
+**Updating Basecoat** (full workflow):
+1. Review `external/basecoat/scripts/build.js` changes
+2. Run `cd external/basecoat && bun run build`
+3. Copy output: `cp external/basecoat/packages/css/dist/basecoat.cdn.css assets/basecoat.css`
+4. Run `just build-css` — slicer and bundler regenerate all outputs
+5. Commit updated `assets/basecoat.css`, regenerated `src/saola/*.css` files, and bundles together
+
+---
+
 ## Build & Deployment
 
 ### Project Structure
@@ -425,14 +481,28 @@ Dark mode applied via `.dark` class prefix (Basecoat convention).
 ```
 src/saola/
 ├── *.gleam           # Widget modules
+├── *.css             # Per-widget CSS (25 generated + 29 authored)
+├── base.css          # Shared tokens, reset, @property passthrough
 ├── *_ffi.mjs         # JavaScript FFI helpers
 ├── *_worker.js       # Worker threads
 └── theme.gleam       # Theme system
 
 assets/
-├── app.css           # Widget styles (Basecoat)
-├── basecoat.css      # Design tokens
+├── app.css           # Legacy (sliced into per-widget files during build-css)
+├── basecoat.css      # Slicer input (compiled Tailwind v4 from external/basecoat)
 └── saola-*.mjs       # Web component definitions
+
+priv/static/
+├── saola.css              # Full bundle (base + components + charts)
+├── saola-base.css         # Tokens + reset only
+├── saola-components.css   # Base + UI widgets
+├── saola-charts.css       # Base + chart widgets
+└── saola-preflight.css    # Opt-in global reset
+
+scripts/
+├── build-css.mjs              # Selector-set slicer
+├── bundle-css.mjs             # Ordered-concatenation bundler
+└── css-bundle-manifest.json   # Load order (manifesting glob nondeterminism)
 
 dev/saola/preview/
 └── *.gleam           # Dev preview app (not shipped)

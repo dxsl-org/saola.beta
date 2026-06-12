@@ -1,0 +1,12 @@
+@layer saola;
+@import "./base.css";
+@layer saola.components {
+
+  /* Light-DOM host layout for the <saola-carousel> custom element.
+     Inner shadow-DOM styles are encapsulated in carousel.ffi.mjs's template. */
+  .carousel-root {
+    display: block;
+    width: 100%;
+  }
+
+}

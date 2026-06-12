@@ -1,0 +1,130 @@
+/* @generated saola-css — do not edit; regenerated from basecoat */
+@layer saola;
+@import "./base.css";
+@layer saola.components {
+
+  .fieldset {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 6);
+    > legend {
+      margin-bottom: calc(var(--spacing) * 3);
+      font-size: var(--text-base);
+      line-height: var(--tw-leading, var(--text-base--line-height));
+      --tw-font-weight: var(--font-weight-medium);
+      font-weight: var(--font-weight-medium);
+    }
+  }
+  .field {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 3);
+    &[data-invalid="true"] {
+      color: var(--color-destructive);
+    }
+    &>* {
+      width: 100%;
+    }
+    &>.sr-only {
+      width: auto;
+    }
+    h2, h3 {
+      display: flex;
+      width: fit-content;
+      align-items: center;
+      gap: calc(var(--spacing) * 2);
+      font-size: var(--text-sm);
+      line-height: var(--tw-leading, var(--text-sm--line-height));
+      --tw-leading: var(--leading-snug);
+      line-height: var(--leading-snug);
+      --tw-font-weight: var(--font-weight-medium);
+      font-weight: var(--font-weight-medium);
+    }
+    [role="alert"] {
+      font-size: var(--text-sm);
+      line-height: var(--tw-leading, var(--text-sm--line-height));
+      --tw-font-weight: var(--font-weight-normal);
+      font-weight: var(--font-weight-normal);
+      color: var(--color-destructive);
+      ul {
+        margin-left: calc(var(--spacing) * 4);
+        display: flex;
+        list-style-type: disc;
+        flex-direction: column;
+        gap: calc(var(--spacing) * 1);
+      }
+    }
+    section {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: calc(var(--spacing) * 1.5);
+      --tw-leading: var(--leading-snug);
+      line-height: var(--leading-snug);
+    }
+    &[data-orientation='horizontal'] {
+      flex-direction: row;
+      align-items: center;
+      &:has(>section) {
+        align-items: flex-start;
+      }
+      & p {
+        text-wrap: balance;
+      }
+      &:has(>section) {
+        &>[type=checkbox],[type=radio] {
+          margin-top: 1px;
+        }
+      }
+      &>label {
+        flex: auto;
+      }
+    }
+  }
+  .fieldset legend + p, .field > p, .field section > p {
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    --tw-leading: var(--leading-normal);
+    line-height: var(--leading-normal);
+    --tw-font-weight: var(--font-weight-normal);
+    font-weight: var(--font-weight-normal);
+    color: var(--color-muted-foreground);
+    &>a {
+      text-decoration-line: underline;
+    }
+    &>a {
+      text-underline-offset: 4px;
+    }
+    &>a:hover {
+      color: var(--color-primary);
+    }
+  }
+  .fieldset legend + p {
+    margin-top: calc(var(--spacing) * -1.5);
+  }
+  .field > p {
+    &:last-child {
+      margin-top: calc(var(--spacing) * 0);
+    }
+    &:nth-last-child(2) {
+      margin-top: calc(var(--spacing) * -1);
+    }
+  }
+
+}
+/* saola:custom */
+@layer saola.components {
+
+  .field-hint {
+    font-size: var(--text-sm, 0.875rem);
+    color: var(--color-muted-foreground);
+    margin-top: 0.25rem;
+  }
+
+  .field-required {
+    color: var(--color-destructive);
+    margin-left: 0.125rem;
+  }
+
+}

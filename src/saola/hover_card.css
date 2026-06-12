@@ -1,0 +1,26 @@
+@layer saola;
+@import "./base.css";
+@layer saola.components {
+
+  .hover-card-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  .hover-card {
+    position: absolute;
+    z-index: 50;
+    min-width: 12rem;
+    padding: 1rem;
+    background-color: var(--color-background, #fff);
+    border: 1px solid var(--color-border, #dee2e6);
+    border-radius: var(--radius-md, 0.375rem);
+    box-shadow: 0 4px 12px rgba(0,0,0,.1);
+  }
+
+  .hover-card[data-side="bottom"] { top: 100%; margin-top: 0.5rem; }
+  .hover-card[data-side="top"] { bottom: 100%; margin-bottom: 0.5rem; }
+  .hover-card[data-side="left"] { right: 100%; margin-right: 0.5rem; top: 0; }
+  .hover-card[data-side="right"] { left: 100%; margin-left: 0.5rem; top: 0; }
+
+}

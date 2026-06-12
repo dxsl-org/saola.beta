@@ -1,0 +1,40 @@
+@layer saola;
+@import "./base.css";
+@layer saola.components {
+
+  .sheet {
+    position: fixed;
+    z-index: 100;
+    background-color: var(--color-background, #fff);
+    box-shadow: 0 0 40px rgba(0,0,0,.2);
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sheet-right  { top: 0; right: 0; bottom: 0; width: min(24rem, 90vw); }
+  .sheet-left   { top: 0; left: 0; bottom: 0; width: min(24rem, 90vw); }
+  .sheet-top    { top: 0; left: 0; right: 0; height: min(16rem, 90vh); }
+  .sheet-bottom { bottom: 0; left: 0; right: 0; height: min(16rem, 90vh); }
+
+  .sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--color-border, #dee2e6);
+  }
+
+  .sheet-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .sheet-content {
+    flex: 1;
+    padding: 1.25rem;
+    overflow: auto;
+  }
+
+}

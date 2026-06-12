@@ -1,0 +1,17 @@
+@layer saola;
+@import "./base.css";
+@layer saola.components {
+
+  .scroll-area {
+    overflow: hidden;
+    position: relative;
+  }
+
+  .scroll-area-viewport {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    border-radius: inherit;
+  }
+
+}

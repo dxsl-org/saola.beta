@@ -1,0 +1,29 @@
+@layer saola;
+@import "./base.css";
+@layer saola.components {
+
+  .progress {
+    position: relative;
+    height: 0.5rem;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 9999px;
+    background-color: var(--color-muted, #e9ecef);
+  }
+
+  .progress-bar {
+    height: 100%;
+    border-radius: inherit;
+    background-color: var(--color-primary, #0d6efd);
+    transition: width 300ms ease;
+  }
+
+  .progress-bar-success {
+    background-color: var(--color-success, #198754);
+  }
+
+  .progress-bar-destructive {
+    background-color: var(--color-destructive, #dc3545);
+  }
+
+}

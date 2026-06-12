@@ -1,0 +1,41 @@
+@layer saola;
+@import "./base.css";
+@layer saola.charts {
+
+  .saola-lustre-bar-chart {
+    display: block;
+    min-width: 0;
+    margin: 0;
+  }
+
+  .saola-lustre-bar-chart figcaption {
+    margin: 0 0 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .saola-lustre-bar-chart svg {
+    display: block;
+    width: 100%;
+    overflow: visible;
+  }
+
+  .saola-lustre-bar-chart .axis text,
+  .saola-lustre-bar-chart .value {
+    fill: currentColor;
+    font-size: 12px;
+  }
+
+  .saola-lustre-bar-chart .grid line {
+    stroke: color-mix(in oklab, currentColor 18%, transparent);
+  }
+
+  .saola-lustre-bar-chart .bar {
+    fill: var(--saola-chart-bar, #2563eb);
+  }
+
+  .saola-lustre-bar-chart .bar:hover {
+    fill: var(--saola-chart-bar-hover, #1d4ed8);
+  }
+
+}

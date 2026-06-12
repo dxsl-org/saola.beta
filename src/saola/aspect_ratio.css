@@ -1,0 +1,22 @@
+@layer saola;
+@import "./base.css";
+@layer saola.components {
+
+  .aspect-ratio {
+    width: 100%;
+  }
+
+  .aspect-ratio-inner {
+    position: relative;
+    height: 0;
+    overflow: hidden;
+  }
+
+  .aspect-ratio-content {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+}

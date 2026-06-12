@@ -1,0 +1,97 @@
+/* @generated saola-css — do not edit; regenerated from basecoat */
+@layer saola;
+@import "./base.css";
+@layer saola.components {
+
+  .button-group {
+    display: inline-flex;
+    width: fit-content;
+    align-items: stretch;
+    > *:focus-visible, > :is(.dropdown-menu, .popover, .select) > button:focus-visible {
+      position: relative;
+      z-index: 10;
+    }
+    > hr[role='separator'] {
+      margin: calc(var(--spacing) * 0);
+      height: auto;
+      width: calc(var(--spacing) * 0);
+      flex-shrink: 0;
+      align-self: stretch;
+      border-style: var(--tw-border-style);
+      border-width: 1px;
+      border-color: var(--color-input);
+    }
+    &:not([data-orientation='vertical']) {
+      > *:not(:first-child), > :is(.dropdown-menu, .popover, .select):not(:first-child) > button {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-left-style: var(--tw-border-style);
+        border-left-width: 0px;
+      }
+      > *:not(:last-child), > :is(.dropdown-menu, .popover, .select):not(:last-child) > button {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+    }
+    &[data-orientation='vertical'] {
+      flex-direction: column;
+      > hr[role='separator'] {
+        height: 1px;
+        width: auto;
+      }
+      > *:not(:first-child), > :is(.dropdown-menu, .popover, .select):not(:first-child) > button {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        border-top-style: var(--tw-border-style);
+        border-top-width: 0px;
+      }
+      > *:not(:last-child), > :is(.dropdown-menu, .popover, .select):not(:last-child) > button {
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+    }
+  }
+
+}
+/* saola:custom */
+@layer saola.components {
+
+  /* Additional layout modifiers for vertical orientation and negative-margin joining */
+  .button-group {
+    display: inline-flex;
+    flex-direction: row;
+  }
+
+  .button-group-vertical {
+    flex-direction: column;
+  }
+
+  .button-group > * {
+    border-radius: 0;
+  }
+
+  .button-group > *:first-child {
+    border-radius: var(--radius-md, 0.375rem) 0 0 var(--radius-md, 0.375rem);
+  }
+
+  .button-group > *:last-child {
+    border-radius: 0 var(--radius-md, 0.375rem) var(--radius-md, 0.375rem) 0;
+  }
+
+  .button-group-vertical > *:first-child {
+    border-radius: var(--radius-md, 0.375rem) var(--radius-md, 0.375rem) 0 0;
+  }
+
+  .button-group-vertical > *:last-child {
+    border-radius: 0 0 var(--radius-md, 0.375rem) var(--radius-md, 0.375rem);
+  }
+
+  .button-group > * + * {
+    margin-left: -1px;
+  }
+
+  .button-group-vertical > * + * {
+    margin-top: -1px;
+  }
+
+}

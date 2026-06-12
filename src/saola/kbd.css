@@ -1,0 +1,32 @@
+/* @generated saola-css — do not edit; regenerated from basecoat */
+@layer saola;
+@import "./base.css";
+@layer saola.components {
+
+  .kbd {
+    pointer-events: none;
+    display: inline-flex;
+    height: calc(var(--spacing) * 5);
+    width: fit-content;
+    min-width: calc(var(--spacing) * 5);
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--spacing) * 1);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-muted);
+    padding-inline: calc(var(--spacing) * 1);
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    line-height: var(--tw-leading, var(--text-xs--line-height));
+    --tw-font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-muted-foreground);
+    -webkit-user-select: none;
+    user-select: none;
+    & svg:not([class*='size-']) {
+      width: calc(var(--spacing) * 3);
+      height: calc(var(--spacing) * 3);
+    }
+  }
+
+}

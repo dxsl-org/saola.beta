@@ -1,0 +1,102 @@
+@layer saola;
+@import "./base.css";
+@layer saola.components {
+
+  .nav-menu {
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-menu-list {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-menu-item {
+    position: relative;
+  }
+
+  .nav-menu-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    text-decoration: none;
+    color: var(--color-foreground, #212529);
+    transition: background-color 0.1s, color 0.1s;
+  }
+
+  .nav-menu-link:hover {
+    background-color: var(--color-accent, #f8f9fa);
+    color: var(--color-accent-foreground, #212529);
+  }
+
+  .nav-menu-link-active {
+    background-color: var(--color-accent, #f8f9fa);
+    color: var(--color-accent-foreground, #212529);
+  }
+
+  .nav-menu-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 0.375rem;
+    background: none;
+    cursor: pointer;
+    color: var(--color-foreground, #212529);
+    transition: background-color 0.1s;
+  }
+
+  .nav-menu-trigger:hover {
+    background-color: var(--color-accent, #f8f9fa);
+  }
+
+  .nav-menu-trigger-icon {
+    width: 0.75rem;
+    height: 0.75rem;
+    transition: transform 0.2s;
+  }
+
+  .nav-menu-content {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 50;
+    min-width: 180px;
+    background: var(--color-popover, #fff);
+    border: 1px solid var(--color-border, #dee2e6);
+    border-radius: 0.375rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 0.25rem;
+  }
+
+  .nav-menu-simple-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-menu-simple-link {
+    display: block;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    text-decoration: none;
+    color: var(--color-foreground, #212529);
+    border-radius: 0.25rem;
+  }
+
+  .nav-menu-simple-link:hover {
+    background-color: var(--color-accent, #f8f9fa);
+  }
+
+}

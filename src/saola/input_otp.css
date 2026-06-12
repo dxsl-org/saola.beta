@@ -1,0 +1,19 @@
+@layer saola;
+@import "./base.css";
+@layer saola.components {
+
+  .input-otp {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .input-otp-slot {
+    width: 2.5rem;
+    height: 2.5rem;
+    text-align: center;
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+
+}

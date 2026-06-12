@@ -1,0 +1,232 @@
+{
+  "_comment": "Selector-prefix → widget mapping for the Strategy-B slicer. Keys are matched against the FIRST selector of each @layer components block in the compiled assets/basecoat.css. More-specific patterns (longer strings) take priority over shorter ones. Section→widget names follow source basecoat markers; Radio→radio_group.css, Range→slider.css, Tables→table.css, Toasts→toast.css.",
+
+  "taxonomy": {
+    "layer-decl": "Top-level @layer declaration (e.g. @layer properties; or @layer theme, base, ...) — emitted verbatim only for the Tailwind-native layers we discard; saola layers are generated fresh",
+    "theme-token": "@layer theme { :root, :host { ... } } or top-level :root { } / .dark { } blocks with design tokens",
+    "preflight": "@layer base { ... } blocks styling global elements (*,html,body,h1-h6,a,...) — isolated to .build-css/preflight.css; scoped subset reproduced in base.css",
+    "registered-property": "Top-level @property --tw-* rules — passthrough, emitted unwrapped at top level of base.css, deduped",
+    "properties-layer": "@layer properties { ... } block — passthrough, emitted unwrapped at top level of base.css",
+    "utilities-block": "@layer utilities; declaration — discard (no utility classes in our output)",
+    "keyframes": "@keyframes rule — route to the widget whose block immediately precedes it",
+    "component-section": "@layer components { ... } blocks — classified by selector set against widgetSelectorMap"
+  },
+
+  "widgetSelectorMap": [
+    {
+      "_comment": "Switch must come before Checkbox because its selector is more specific (adds [role='switch'])",
+      "selectorPrefix": ":is(.form, .field) input[type='checkbox'][role='switch']",
+      "widget": "switch"
+    },
+    {
+      "selectorPrefix": ".input[type='checkbox'][role='switch']",
+      "widget": "switch"
+    },
+    {
+      "selectorPrefix": ":is(.form, .field) input[type='checkbox']",
+      "widget": "checkbox"
+    },
+    {
+      "selectorPrefix": ".input[type='checkbox']",
+      "widget": "checkbox"
+    },
+    {
+      "selectorPrefix": ":is(.form, .field) input[type='radio']",
+      "widget": "radio_group"
+    },
+    {
+      "selectorPrefix": ".input[type='radio']",
+      "widget": "radio_group"
+    },
+    {
+      "selectorPrefix": ":is(.form, .field) input[type='range']",
+      "widget": "slider"
+    },
+    {
+      "selectorPrefix": ".input[type='range']",
+      "widget": "slider"
+    },
+    {
+      "selectorPrefix": ":is(.form, .field) input[type=",
+      "widget": "input"
+    },
+    {
+      "selectorPrefix": ".input[type=",
+      "widget": "input"
+    },
+    {
+      "selectorPrefix": ":is(.form, .field) select",
+      "widget": "select"
+    },
+    {
+      "selectorPrefix": "select.select",
+      "widget": "select"
+    },
+    {
+      "selectorPrefix": "*:not(select).select",
+      "widget": "select"
+    },
+    {
+      "selectorPrefix": ":is(.form, .field) textarea",
+      "widget": "textarea"
+    },
+    {
+      "selectorPrefix": ".textarea",
+      "widget": "textarea"
+    },
+    {
+      "selectorPrefix": ":is(.form, .field) label",
+      "widget": "label"
+    },
+    {
+      "selectorPrefix": ".label",
+      "widget": "label"
+    },
+    {
+      "selectorPrefix": ".alert",
+      "widget": "alert"
+    },
+    {
+      "selectorPrefix": ".badge",
+      "widget": "badge"
+    },
+    {
+      "selectorPrefix": ".btn",
+      "widget": "button"
+    },
+    {
+      "selectorPrefix": ".button-group",
+      "widget": "button_group"
+    },
+    {
+      "selectorPrefix": ".card",
+      "widget": "card"
+    },
+    {
+      "selectorPrefix": "details",
+      "widget": "collapsible"
+    },
+    {
+      "selectorPrefix": ".command",
+      "widget": "command"
+    },
+    {
+      "selectorPrefix": ".command-dialog",
+      "widget": "command"
+    },
+    {
+      "selectorPrefix": ".dialog",
+      "widget": "dialog"
+    },
+    {
+      "selectorPrefix": ".dropdown-menu",
+      "widget": "dropdown_menu"
+    },
+    {
+      "selectorPrefix": ".fieldset",
+      "widget": "field"
+    },
+    {
+      "selectorPrefix": ".field",
+      "widget": "field"
+    },
+    {
+      "selectorPrefix": ".kbd",
+      "widget": "kbd"
+    },
+    {
+      "selectorPrefix": "[data-popover]",
+      "widget": "popover"
+    },
+    {
+      "selectorPrefix": ".popover",
+      "widget": "popover"
+    },
+    {
+      "selectorPrefix": ".sidebar",
+      "widget": "sidebar"
+    },
+    {
+      "selectorPrefix": ".table",
+      "widget": "table"
+    },
+    {
+      "selectorPrefix": ".tabs",
+      "widget": "tabs"
+    },
+    {
+      "selectorPrefix": ".toaster",
+      "widget": "toast"
+    },
+    {
+      "selectorPrefix": "[data-tooltip]",
+      "widget": "tooltip"
+    }
+  ],
+
+  "widgetOutputFiles": {
+    "alert": "alert.css",
+    "badge": "badge.css",
+    "button": "button.css",
+    "button_group": "button_group.css",
+    "card": "card.css",
+    "checkbox": "checkbox.css",
+    "collapsible": "collapsible.css",
+    "command": "command.css",
+    "dialog": "dialog.css",
+    "dropdown_menu": "dropdown_menu.css",
+    "field": "field.css",
+    "input": "input.css",
+    "kbd": "kbd.css",
+    "label": "label.css",
+    "popover": "popover.css",
+    "radio_group": "radio_group.css",
+    "slider": "slider.css",
+    "select": "select.css",
+    "sidebar": "sidebar.css",
+    "switch": "switch.css",
+    "table": "table.css",
+    "tabs": "tabs.css",
+    "textarea": "textarea.css",
+    "toast": "toast.css",
+    "tooltip": "tooltip.css"
+  },
+
+  "_comment_authoredWidgetRoots": "Root selectors from Phase-02 authored widget CSS files (not generated from basecoat). Added to the :where(<widget-roots>) scoped reset so they inherit box-sizing/border defaults.",
+  "authoredWidgetRoots": [
+    ".accordion",
+    ".progress",
+    ".skeleton",
+    ".avatar",
+    ".breadcrumb",
+    ".pagination",
+    ".scroll-area",
+    ".aspect-ratio",
+    ".hover-card",
+    ".input-otp",
+    ".sheet",
+    ".menubar",
+    ".calendar",
+    ".date-picker",
+    ".spinner",
+    ".native-select",
+    ".native-select-wrapper",
+    ".input-group",
+    ".context-menu-popup",
+    ".drawer",
+    ".drawer-root",
+    ".data-table-root",
+    ".carousel-root",
+    ".combobox-wrapper",
+    ".nav-menu",
+    ".empty",
+    ".item",
+    ".saola-lustre-bar-chart",
+    ".saola-monaco-editor",
+    ".sidebar-left",
+    ".sidebar-right",
+    "resizable-split",
+    "multi-select",
+    "combo-box"
+  ]
+}

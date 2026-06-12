@@ -189,15 +189,132 @@ Requires [Just](https://just.systems/) and [Bun](https://bun.sh/).
 3. The live preview app lives in `dev/saola/preview/`; add a showcase page for any new widget.
 4. Follow the rules in `CLAUDE.md` for widget API conventions.
 
-To update the bundled Basecoat CSS after pulling submodule changes:
+## CSS Distribution
 
-```sh
-cd external/basecoat && bun run build
-cp external/basecoat/packages/css/dist/basecoat.cdn.css assets/basecoat.css
+### Three import modes for consumers
+
+**1. Full bundle** — drop-in, everything included:
+```html
+<link rel="stylesheet" href="/path/to/saola.css">
 ```
 
-The `basecoat` submodule used to be placed under "dev", but "dev" is one of the directories that Gleam will scan for source code
-to build, so `basecoat` deep directory tree will waste Gleam attempt.
+**2. Group bundles** — load only the layer(s) you need:
+```html
+<link rel="stylesheet" href="/path/to/saola-base.css">        <!-- tokens + scoped reset only -->
+<link rel="stylesheet" href="/path/to/saola-components.css">  <!-- base + all UI widgets -->
+<link rel="stylesheet" href="/path/to/saola-charts.css">      <!-- base + chart widgets -->
+```
+
+**3. Per-widget granular** (Vite consumers) — import only what you use. Requires a Vite alias pointing at the package `src/` tree. Add this to your `vite.config.js`:
+```js
+import { resolve } from 'path';
+export default {
+  resolve: {
+    alias: {
+      '@saola': resolve('./node_modules/saola/src/saola'),
+      // or for a local checkout: resolve('./build/packages/saola/src/saola')
+    },
+  },
+};
+```
+Then in your CSS entry:
+```css
+@import '@saola/button.css';
+@import '@saola/dialog.css';
+/* add only the widgets you use */
+```
+Per-widget files import `base.css` themselves. Duplicate `@import "./base.css"` across widgets is idempotent (Vite deduplicates).
+
+**Opt-in global preflight** — only if your app needs the full Tailwind/Basecoat reset (not required for embedding Saola into an existing shadcn/Tailwind app):
+```html
+<link rel="stylesheet" href="/path/to/saola-preflight.css">
+```
+
+### Distribution contract
+
+- `priv/static/` bundles are the primary shipped artifact (`priv/` is included in Hex tarballs).
+- Per-widget colocated `src/saola/*.css` files also ship in the tarball and are importable via the Vite alias recipe above.
+- Final packaging is managed by the upstream public repo (`saola.beta` is internal-only).
+- Bundles are built by ordered concatenation (not `@import`) to avoid Lightning CSS / postcss-import deduplication ambiguity. The concat order is committed in `scripts/css-bundle-manifest.json`.
+
+### Layer architecture
+
+All saola CSS uses cascade layers so unlayered consumer CSS always wins:
+
+```
+@layer saola, saola.theme, saola.base, saola.components, saola.charts;
+       ^       ^             ^           ^                 ^
+       root    tokens        scoped      widgets           charts
+               (:root/.dark) reset       (components)
+```
+
+By default the scoped reset targets only known widget root selectors via `:where(…)` — zero specificity, host styles always win. Load `saola-preflight.css` to opt into the global reset.
+
+### Updating the bundled Basecoat CSS (full sync workflow)
+
+**Security gate — ALWAYS perform these steps in order:**
+
+1. **Diff-review the submodule build script before running it** — the build script executes untrusted third-party code:
+   ```sh
+   git diff HEAD external/basecoat   # inspect what changed
+   # Manually review external/basecoat/scripts/build.js
+   # and external/basecoat/package.json devDeps for new/changed scripts
+   ```
+2. **Build the upstream CSS** (only after the review above):
+   ```sh
+   cd external/basecoat && bun run build
+   ```
+3. **Copy the compiled output** into the saola repo:
+   ```sh
+   cp external/basecoat/packages/css/dist/basecoat.cdn.css assets/basecoat.css
+   ```
+4. **Run the full CSS pipeline** — slices and bundles in one command:
+   ```sh
+   just build-css
+   # equivalent to: bun scripts/build-css.mjs && bun scripts/bundle-css.mjs
+   ```
+   The slicer is deterministic and fails loudly if any compiled selector has no mapping in `scripts/css-section-map.json` (catches upstream renames/removals). The bundler fails loudly if any `src/saola/*.css` is absent from `scripts/css-bundle-manifest.json`.
+
+5. **Commit** the updated `assets/basecoat.css`, the regenerated `src/saola/*.css` / `src/saola/base.css`, and the updated `priv/static/` bundles together.
+
+### CSS pipeline
+
+**Full pipeline order:**
+
+```
+assets/basecoat.css          (compiled Tailwind v4 — slicer input)
+       │
+       ▼
+bun scripts/build-css.mjs    (Strategy-B selector-set slicer)
+       │
+       ├── src/saola/base.css            (@property passthrough + tokens + scoped reset)
+       ├── src/saola/<widget>.css ×25    (generated; each @imports base.css)
+       └── .build-css/preflight.css      (gitignored; source for saola-preflight.css bundle)
+       │
+       ▼
+bun scripts/bundle-css.mjs   (ordered-concatenation bundler, manifest = css-bundle-manifest.json)
+       │
+       ├── priv/static/saola.css             (base + components + charts — full bundle)
+       ├── priv/static/saola-base.css        (base only)
+       ├── priv/static/saola-components.css  (base + all component widgets)
+       ├── priv/static/saola-charts.css      (base + chart widgets)
+       ├── priv/static/saola-preflight.css   (base + global preflight — opt-in)
+       └── dev/dev-widgets.css               (dev-only aggregate @imports for Vite HMR)
+```
+
+The slicer reads `assets/basecoat.css` (the compiled Tailwind v4 build) and emits:
+
+| Output | Description |
+|--------|-------------|
+| `src/saola/base.css` | `@property` passthrough + `@layer saola.theme` tokens + `@layer saola.base` scoped reset |
+| `src/saola/<widget>.css` ×25 | Per-widget component CSS wrapped in `@layer saola.components`, each imports `./base.css` |
+| `.build-css/preflight.css` | Isolated global Tailwind reset (gitignored; bundled into `saola-preflight.css`) |
+
+Each generated per-widget file opens with `/* @generated saola-css … */`. The slicer refuses to overwrite any file lacking this sentinel (protects hand-written augmentations). A `/* saola:custom */` marker after the generated region is preserved verbatim on every re-run.
+
+The 29 authored widget files (those without the sentinel, from Phase 02) are picked up directly by the bundler via `scripts/css-bundle-manifest.json`.
+
+The `basecoat` submodule is placed under `external/` rather than `dev/` because Gleam scans `dev/` for source code to build.
 
 ## Licence
 

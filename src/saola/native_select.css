@@ -1,0 +1,50 @@
+@layer saola;
+@import "./base.css";
+@layer saola.components {
+
+  .native-select-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .native-select {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    padding: 0.5rem 2.25rem 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--color-foreground, #212529);
+    background-color: var(--color-background, #fff);
+    border: 1px solid var(--color-input, #dee2e6);
+    border-radius: var(--radius-md, 0.375rem);
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .native-select-sm {
+    padding: 0.25rem 2rem 0.25rem 0.625rem;
+    font-size: 0.8125rem;
+  }
+
+  .native-select:focus {
+    outline: none;
+    border-color: var(--color-ring, #86b7fe);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-ring, #86b7fe) 25%, transparent);
+  }
+
+  .native-select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .native-select-icon {
+    position: absolute;
+    right: 0.6rem;
+    pointer-events: none;
+    font-size: 0.75rem;
+    color: var(--color-muted-foreground, #6c757d);
+  }
+
+}

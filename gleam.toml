@@ -30,7 +30,11 @@ bun = "system"
 
 [tools.lustre.html]
 title = "Preview"
+# Primary dev server is Vite (bun run vite / just vite-dev-preview); this config is only
+# used by the secondary `lustre/dev start` preview server.
+# lustre/dev serves priv/static/ at the root — /saola.css resolves if the server honours that path.
+# If /saola.css 404s (lustre/dev doesn't mount priv/static), the Vite dev loop is unaffected.
 stylesheets = [
-  { href = "/app.css" },
-  { href = "/basecoat.css" }
+  { href = "/saola.css" },
+  { href = "/app.css" }
 ]
