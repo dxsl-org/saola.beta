@@ -43,6 +43,23 @@ pub type ButtonExtraAttrs {
   )
 }
 
+fn css_class(size: ButtonSize, variant: ButtonVariant) -> String {
+  case size, variant {
+    Large, Primary -> "btn-lg-primary"
+    Large, Secondary -> "btn-lg-secondary"
+    Large, Outline -> "btn-lg-outline"
+    Large, Ghost -> "btn-lg-ghost"
+    Large, Link -> "btn-lg-link"
+    Large, Destructive -> "btn-lg-destructive"
+    Small, Primary -> "btn-sm-primary"
+    Small, Secondary -> "btn-sm-secondary"
+    Small, Outline -> "btn-sm-outline"
+    Small, Ghost -> "btn-sm-ghost"
+    Small, Link -> "btn-sm-link"
+    Small, Destructive -> "btn-sm-destructive"
+  }
+}
+
 /// Fully customizable button.
 ///
 /// Example:
@@ -58,20 +75,6 @@ pub fn button(
   click_message: Option(msg),
   extra_attrs: ButtonExtraAttrs,
 ) -> Element(msg) {
-  let css_name = case size, variant {
-    Large, Primary -> "btn-lg-primary"
-    Large, Secondary -> "btn-lg-secondary"
-    Large, Outline -> "btn-lg-outline"
-    Large, Ghost -> "btn-lg-ghost"
-    Large, Link -> "btn-lg-link"
-    Large, Destructive -> "btn-lg-destructive"
-    Small, Primary -> "btn-sm-primary"
-    Small, Secondary -> "btn-sm-secondary"
-    Small, Outline -> "btn-sm-outline"
-    Small, Ghost -> "btn-sm-ghost"
-    Small, Link -> "btn-sm-link"
-    Small, Destructive -> "btn-sm-destructive"
-  }
   let icon_el = option.unwrap(icon, element.none())
   let label_el = case string.trim(label) {
     "" -> element.none()
@@ -101,10 +104,57 @@ pub fn button(
   }
   h.button(
     list.flatten([
-      [a.class(css_name)],
+      [a.class(css_class(size, variant))],
       click_attrs,
       disabled_attrs,
       type_attrs,
+      aria_label_attrs,
+      aria_expanded_attrs,
+    ]),
+    [icon_el, label_el],
+  )
+}
+
+/// `<a>` element styled as a button — use when the action navigates to a URL.
+/// For in-page actions (dialogs, toggles, events) use `button` instead.
+///
+/// - `disabled`: adds `aria-disabled="true"` and `tabindex="-1"` (no native disabled on anchors).
+/// - `type_`: ignored — not applicable to `<a>`.
+///
+/// Example:
+/// ```gleam
+/// button_anchor(Primary, "Docs", Large, None, "/docs", default_extra_attrs)
+/// button_anchor(Outline, "GitHub", Large, Some(ext_icon), "https://github.com/...", default_extra_attrs)
+/// ```
+pub fn button_anchor(
+  variant: ButtonVariant,
+  label: String,
+  size: ButtonSize,
+  icon: Option(Element(msg)),
+  href: String,
+  extra_attrs: ButtonExtraAttrs,
+) -> Element(msg) {
+  let icon_el = option.unwrap(icon, element.none())
+  let label_el = case string.trim(label) {
+    "" -> element.none()
+    text -> h.text(text)
+  }
+  let disabled_attrs = case extra_attrs.disabled {
+    True -> [a.attribute("aria-disabled", "true"), a.attribute("tabindex", "-1")]
+    False -> []
+  }
+  let aria_label_attrs = case extra_attrs.aria.label {
+    "" -> []
+    l -> [a.aria_label(l)]
+  }
+  let aria_expanded_attrs = case extra_attrs.aria.expanded {
+    None -> []
+    Some(expanded) -> [a.aria_expanded(expanded)]
+  }
+  h.a(
+    list.flatten([
+      [a.class(css_class(size, variant)), a.href(href)],
+      disabled_attrs,
       aria_label_attrs,
       aria_expanded_attrs,
     ]),
@@ -176,4 +226,26 @@ pub fn button_close(click_message: msg) -> Element(msg) {
     Some(click_message),
     default_extra_attrs,
   )
+}
+
+// --- Anchor shortcuts ---
+
+/// Primary button rendered as `<a href>`. Use for navigation URLs.
+pub fn button_primary_anchor(label: String, href: String) -> Element(msg) {
+  button_anchor(Primary, label, Large, None, href, default_extra_attrs)
+}
+
+/// Secondary button rendered as `<a href>`. Use for navigation URLs.
+pub fn button_secondary_anchor(label: String, href: String) -> Element(msg) {
+  button_anchor(Secondary, label, Large, None, href, default_extra_attrs)
+}
+
+/// Outline button rendered as `<a href>`. Use for navigation URLs.
+pub fn button_outline_anchor(label: String, href: String) -> Element(msg) {
+  button_anchor(Outline, label, Large, None, href, default_extra_attrs)
+}
+
+/// Ghost button rendered as `<a href>`. Use for navigation URLs.
+pub fn button_ghost_anchor(label: String, href: String) -> Element(msg) {
+  button_anchor(Ghost, label, Large, None, href, default_extra_attrs)
 }
