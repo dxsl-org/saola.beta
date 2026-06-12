@@ -278,6 +278,9 @@ pub fn command_nav_up(highlighted: Int, items: List(CommandItem(msg))) -> Int {
   command_clamp_highlight(highlighted - 1, items)
 }
 
-pub fn command_nav_down(highlighted: Int, items: List(CommandItem(msg))) -> Int {
+pub fn command_nav_down(
+  highlighted: Int,
+  items: List(CommandItem(msg)),
+) -> Int {
   command_clamp_highlight(highlighted + 1, items)
 }

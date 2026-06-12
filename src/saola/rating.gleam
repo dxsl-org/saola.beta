@@ -96,7 +96,10 @@ pub fn rating_readonly(value: Int) -> Element(msg) {
   rating(value, ReadOnly, None, default_attrs)
 }
 
-pub fn rating_interactive(value: Int, on_change: fn(Int) -> msg) -> Element(msg) {
+pub fn rating_interactive(
+  value: Int,
+  on_change: fn(Int) -> msg,
+) -> Element(msg) {
   rating(value, Interactive, Some(on_change), default_attrs)
 }
 

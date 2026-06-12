@@ -34,6 +34,9 @@ pub fn scroll_area(
   )
 }
 
-pub fn scroll_area_simple(content: Element(msg), height: String) -> Element(msg) {
+pub fn scroll_area_simple(
+  content: Element(msg),
+  height: String,
+) -> Element(msg) {
   scroll_area(content, height, "100%", "")
 }

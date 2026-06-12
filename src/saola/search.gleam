@@ -84,7 +84,10 @@ pub fn search(
   )
 }
 
-pub fn search_simple(value: String, on_input: fn(String) -> msg) -> Element(msg) {
+pub fn search_simple(
+  value: String,
+  on_input: fn(String) -> msg,
+) -> Element(msg) {
   search(Large, value, on_input, None, default_attrs)
 }
 

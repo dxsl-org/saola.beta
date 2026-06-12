@@ -167,7 +167,10 @@ fn render_data_row(
   )
 }
 
-fn render_toolbar(filter: String, on_filter: fn(String) -> msg) -> Element(msg) {
+fn render_toolbar(
+  filter: String,
+  on_filter: fn(String) -> msg,
+) -> Element(msg) {
   h.div([a.class("data-table-toolbar")], [
     h.input([
       a.type_("text"),

@@ -60,7 +60,10 @@ fn all_employees() -> List(Employee) {
   ]
 }
 
-fn filter_employees(employees: List(Employee), query: String) -> List(Employee) {
+fn filter_employees(
+  employees: List(Employee),
+  query: String,
+) -> List(Employee) {
   case string.trim(query) {
     "" -> employees
     q -> {
