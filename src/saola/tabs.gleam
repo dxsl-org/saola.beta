@@ -108,9 +108,9 @@ pub fn tabs(
   on_tab_change on_tab_change: fn(String) -> msg,
   class class: String,
 ) -> Element(msg) {
-  let extra_class = case class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case class {
+    "" -> []
+    c -> [a.class(c)]
   }
   let triggers =
     tabs
@@ -120,7 +120,7 @@ pub fn tabs(
   let panels =
     tabs
     |> list.map(fn(tab) { render_panel(tab, tab_id_field(tab) == active_id) })
-  h.div([a.class("tabs"), extra_class], [
+  h.div(list.flatten([[a.class("tabs")], extra_class_attrs]), [
     h.div([a.role("tablist")], triggers),
     ..panels
   ])

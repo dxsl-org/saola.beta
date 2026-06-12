@@ -1,3 +1,4 @@
+import gleam/list
 import gleam/option.{type Option, None, Some}
 import lustre/attribute as a
 import lustre/element.{type Element}
@@ -62,18 +63,21 @@ pub fn nav_bar_link(
   label: String,
   is_active: Bool,
 ) -> Element(msg) {
+  let aria_current_attrs = case is_active {
+    True -> [a.attribute("aria-current", "page")]
+    False -> []
+  }
   h.a(
-    [
-      a.href(href),
-      a.class(case is_active {
-        True -> "nav-bar-link nav-bar-link-active"
-        False -> "nav-bar-link"
-      }),
-      case is_active {
-        True -> a.attribute("aria-current", "page")
-        False -> a.none()
-      },
-    ],
+    list.flatten([
+      [
+        a.href(href),
+        a.class(case is_active {
+          True -> "nav-bar-link nav-bar-link-active"
+          False -> "nav-bar-link"
+        }),
+      ],
+      aria_current_attrs,
+    ]),
     [h.text(label)],
   )
 }

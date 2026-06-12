@@ -1,3 +1,4 @@
+import gleam/list
 import lustre/attribute as a
 import lustre/element.{type Element}
 import lustre/element/html as h
@@ -48,20 +49,23 @@ pub fn toggle(
     "" -> base_class
     c -> base_class <> " " <> c
   }
+  let disabled_attrs = case attrs.disabled {
+    True -> [a.disabled(True)]
+    False -> []
+  }
   h.button(
-    [
-      a.type_("button"),
-      a.class(full_class),
-      a.attribute("aria-pressed", case pressed {
-        True -> "true"
-        False -> "false"
-      }),
-      case attrs.disabled {
-        True -> a.disabled(True)
-        False -> a.none()
-      },
-      e.on_click(on_change(!pressed)),
-    ],
+    list.flatten([
+      [
+        a.type_("button"),
+        a.class(full_class),
+        a.attribute("aria-pressed", case pressed {
+          True -> "true"
+          False -> "false"
+        }),
+        e.on_click(on_change(!pressed)),
+      ],
+      disabled_attrs,
+    ]),
     [h.text(label)],
   )
 }

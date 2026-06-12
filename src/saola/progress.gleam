@@ -1,4 +1,5 @@
 import gleam/int
+import gleam/list
 import lustre/attribute as a
 import lustre/element.{type Element}
 import lustre/element/html as h
@@ -54,25 +55,27 @@ pub fn progress(value: Int, attrs: ProgressAttrs) -> Element(msg) {
     Success -> "progress-bar progress-bar-success"
     Destructive -> "progress-bar progress-bar-destructive"
   }
-  let extra_class = case class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case class {
+    "" -> []
+    c -> [a.class(c)]
   }
-  let label_attr = case label {
-    "" -> a.none()
-    l -> a.aria_label(l)
+  let label_attrs = case label {
+    "" -> []
+    l -> [a.aria_label(l)]
   }
   h.div(
-    [
-      a.class("progress"),
-      extra_class,
-      a.role("progressbar"),
-      a.attribute("aria-valuemin", int.to_string(min)),
-      a.attribute("aria-valuemax", int.to_string(max)),
-      a.attribute("aria-valuenow", int.to_string(value)),
-      a.attribute("aria-live", "polite"),
-      label_attr,
-    ],
+    list.flatten([
+      [a.class("progress")],
+      extra_class_attrs,
+      [
+        a.role("progressbar"),
+        a.attribute("aria-valuemin", int.to_string(min)),
+        a.attribute("aria-valuemax", int.to_string(max)),
+        a.attribute("aria-valuenow", int.to_string(value)),
+        a.attribute("aria-live", "polite"),
+      ],
+      label_attrs,
+    ]),
     [h.div([a.class(bar_class), a.style("width", pct <> "%")], [])],
   )
 }

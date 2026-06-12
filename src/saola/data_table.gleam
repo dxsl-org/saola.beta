@@ -217,9 +217,9 @@ pub fn data_table(
   attrs: DataTableAttrs,
 ) -> Element(msg) {
   let total = list.length(rows)
-  let extra_class = case attrs.class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case attrs.class {
+    "" -> []
+    c -> [a.class(c)]
   }
   let paged_rows = case attrs.show_pagination {
     False -> rows
@@ -228,7 +228,7 @@ pub fn data_table(
       |> list.drop({ state.page - 1 } * state.page_size)
       |> list.take(state.page_size)
   }
-  h.div([a.class("data-table-root"), extra_class], [
+  h.div(list.flatten([[a.class("data-table-root")], extra_class_attrs]), [
     case attrs.show_filter {
       False -> h.text("")
       True -> render_toolbar(state.filter, on_filter)

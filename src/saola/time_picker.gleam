@@ -53,31 +53,33 @@ pub fn time_picker(
   let minute_opts = range(0, 59)
   let second_opts = range(0, 59)
 
+  let disabled_attrs = case attrs.disabled {
+    True -> [a.disabled(True)]
+    False -> []
+  }
+
   let hour_select =
     h.div([a.class("time-picker-field")], [
       h.label([a.class("time-picker-label")], [h.text("HH")]),
       h.select(
-        [
-          a.class("select time-picker-select"),
-          a.attribute("aria-label", "Hour"),
-          case attrs.disabled {
-            True -> a.disabled(True)
-            False -> a.none()
-          },
-          e.on_change(fn(v) {
-            let h = int.parse(v) |> result_unwrap(current.hour)
-            on_change(TimeValue(..current, hour: h))
-          }),
-        ],
+        list.flatten([
+          [
+            a.class("select time-picker-select"),
+            a.attribute("aria-label", "Hour"),
+            e.on_change(fn(v) {
+              let h = int.parse(v) |> result_unwrap(current.hour)
+              on_change(TimeValue(..current, hour: h))
+            }),
+          ],
+          disabled_attrs,
+        ]),
         list.map(hour_opts, fn(n) {
+          let selected_attrs = case n == current.hour {
+            True -> [a.selected(True)]
+            False -> []
+          }
           h.option(
-            [
-              a.value(int.to_string(n)),
-              case n == current.hour {
-                True -> a.selected(True)
-                False -> a.none()
-              },
-            ],
+            list.flatten([[a.value(int.to_string(n))], selected_attrs]),
             pad2(n),
           )
         }),
@@ -90,27 +92,24 @@ pub fn time_picker(
     h.div([a.class("time-picker-field")], [
       h.label([a.class("time-picker-label")], [h.text("MM")]),
       h.select(
-        [
-          a.class("select time-picker-select"),
-          a.attribute("aria-label", "Minute"),
-          case attrs.disabled {
-            True -> a.disabled(True)
-            False -> a.none()
-          },
-          e.on_change(fn(v) {
-            let m = int.parse(v) |> result_unwrap(current.minute)
-            on_change(TimeValue(..current, minute: m))
-          }),
-        ],
+        list.flatten([
+          [
+            a.class("select time-picker-select"),
+            a.attribute("aria-label", "Minute"),
+            e.on_change(fn(v) {
+              let m = int.parse(v) |> result_unwrap(current.minute)
+              on_change(TimeValue(..current, minute: m))
+            }),
+          ],
+          disabled_attrs,
+        ]),
         list.map(minute_opts, fn(n) {
+          let selected_attrs = case n == current.minute {
+            True -> [a.selected(True)]
+            False -> []
+          }
           h.option(
-            [
-              a.value(int.to_string(n)),
-              case n == current.minute {
-                True -> a.selected(True)
-                False -> a.none()
-              },
-            ],
+            list.flatten([[a.value(int.to_string(n))], selected_attrs]),
             pad2(n),
           )
         }),
@@ -129,27 +128,24 @@ pub fn time_picker(
         h.div([a.class("time-picker-field")], [
           h.label([a.class("time-picker-label")], [h.text("SS")]),
           h.select(
-            [
-              a.class("select time-picker-select"),
-              a.attribute("aria-label", "Second"),
-              case attrs.disabled {
-                True -> a.disabled(True)
-                False -> a.none()
-              },
-              e.on_change(fn(v) {
-                let s = int.parse(v) |> result_unwrap(cur_sec)
-                on_change(TimeValue(..current, second: Some(s)))
-              }),
-            ],
+            list.flatten([
+              [
+                a.class("select time-picker-select"),
+                a.attribute("aria-label", "Second"),
+                e.on_change(fn(v) {
+                  let s = int.parse(v) |> result_unwrap(cur_sec)
+                  on_change(TimeValue(..current, second: Some(s)))
+                }),
+              ],
+              disabled_attrs,
+            ]),
             list.map(second_opts, fn(n) {
+              let selected_attrs = case n == cur_sec {
+                True -> [a.selected(True)]
+                False -> []
+              }
               h.option(
-                [
-                  a.value(int.to_string(n)),
-                  case n == cur_sec {
-                    True -> a.selected(True)
-                    False -> a.none()
-                  },
-                ],
+                list.flatten([[a.value(int.to_string(n))], selected_attrs]),
                 pad2(n),
               )
             }),

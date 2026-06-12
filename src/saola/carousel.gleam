@@ -49,28 +49,30 @@ pub fn carousel(
   let _ = current_index
   let _ = can_scroll_prev
   let _ = can_scroll_next
-  let extra_class = case attrs.class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case attrs.class {
+    "" -> []
+    c -> [a.class(c)]
   }
-  let loop_attr = case attrs.loop {
-    True -> a.attribute("loop", "")
-    False -> a.none()
+  let loop_attrs = case attrs.loop {
+    True -> [a.attribute("loop", "")]
+    False -> []
   }
   let slide_wrappers =
     list.map(slides, fn(s) { h.div([a.attribute("data-slot", "slide")], [s]) })
   element.element(
     "saola-carousel",
-    [
-      a.class("carousel-root"),
-      a.attribute("role", "region"),
-      a.attribute("aria-roledescription", "carousel"),
-      a.attribute("aria-label", "Carousel"),
-      a.attribute("orientation", orientation_str(attrs.orientation)),
-      loop_attr,
-      e.on("slide-change", decode_change(on_change)),
-      extra_class,
-    ],
+    list.flatten([
+      [
+        a.class("carousel-root"),
+        a.attribute("role", "region"),
+        a.attribute("aria-roledescription", "carousel"),
+        a.attribute("aria-label", "Carousel"),
+        a.attribute("orientation", orientation_str(attrs.orientation)),
+      ],
+      loop_attrs,
+      [e.on("slide-change", decode_change(on_change))],
+      extra_class_attrs,
+    ]),
     slide_wrappers,
   )
 }

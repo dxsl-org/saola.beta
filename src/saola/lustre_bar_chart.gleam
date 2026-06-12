@@ -38,16 +38,19 @@ pub fn bar_chart(
 ) -> Element(msg) {
   let BarChartAttrs(id:, title:, width:, height:, class:, aria_label:) = attrs
   let layout = chart.new_layout(width, height)
+  let id_attrs = case id {
+    "" -> []
+    value -> [a.id(value)]
+  }
   h.figure(
-    [
-      case id {
-        "" -> a.none()
-        value -> a.id(value)
-      },
-      a.class("saola-lustre-bar-chart " <> class),
-      a.role("img"),
-      a.aria_label(aria_label),
-    ],
+    list.flatten([
+      id_attrs,
+      [
+        a.class("saola-lustre-bar-chart " <> class),
+        a.role("img"),
+        a.aria_label(aria_label),
+      ],
+    ]),
     [
       case title {
         "" -> element.none()

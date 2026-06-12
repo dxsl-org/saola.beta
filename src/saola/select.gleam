@@ -55,41 +55,50 @@ pub fn select(
 ) -> Element(msg) {
   let SelectExtraAttrs(id:, name:, disabled:, required:, aria_invalid:, class:) =
     extra_attrs
+  let id_attrs = case id {
+    "" -> []
+    v -> [a.id(v)]
+  }
+  let name_attrs = case name {
+    "" -> []
+    n -> [a.name(n)]
+  }
+  let disabled_attrs = case disabled {
+    True -> [a.disabled(True)]
+    False -> []
+  }
+  let required_attrs = case required {
+    True -> [a.required(True)]
+    False -> []
+  }
+  let aria_invalid_attrs = case aria_invalid {
+    True -> [a.attribute("aria-invalid", "true")]
+    False -> []
+  }
   h.select(
-    [
-      a.class(
-        class_select
-        <> case class {
-          "" -> ""
-          c -> " " <> c
+    list.flatten([
+      [
+        a.class(
+          class_select
+          <> case class {
+            "" -> ""
+            c -> " " <> c
+          },
+        ),
+      ],
+      id_attrs,
+      name_attrs,
+      [
+        case value {
+          InitValue(v) -> a.default_value(v)
+          SyncValue(v) -> a.value(v)
         },
-      ),
-      case id {
-        "" -> a.none()
-        v -> a.id(v)
-      },
-      case name {
-        "" -> a.none()
-        n -> a.name(n)
-      },
-      case value {
-        InitValue(v) -> a.default_value(v)
-        SyncValue(v) -> a.value(v)
-      },
-      case disabled {
-        True -> a.disabled(True)
-        False -> a.none()
-      },
-      case required {
-        True -> a.required(True)
-        False -> a.none()
-      },
-      case aria_invalid {
-        True -> a.attribute("aria-invalid", "true")
-        False -> a.none()
-      },
-      e.on_input(on_change),
-    ],
+      ],
+      disabled_attrs,
+      required_attrs,
+      aria_invalid_attrs,
+      [e.on_input(on_change)],
+    ]),
     list.map(options, render_option),
   )
 }

@@ -1,3 +1,4 @@
+import gleam/list
 import gleam/option.{type Option, None, Some}
 import lustre/attribute as a
 import lustre/element.{type Element}
@@ -55,30 +56,34 @@ pub fn search(
     [a.class("input-wrapper" <> size_class <> extra_class), a.role("search")],
     [
       h.span([a.class("input-icon input-icon-left")], [h.text("🔍")]),
-      h.input([
-        a.type_("search"),
-        a.class(
-          "input has-icon-left"
-          <> case on_clear {
-            None -> ""
-            Some(_) -> " has-icon-right"
+      h.input(
+        list.flatten([
+          [
+            a.type_("search"),
+            a.class(
+              "input has-icon-left"
+              <> case on_clear {
+                None -> ""
+                Some(_) -> " has-icon-right"
+              },
+            ),
+            a.value(value),
+          ],
+          case attrs.placeholder {
+            "" -> []
+            p -> [a.placeholder(p)]
           },
-        ),
-        a.value(value),
-        case attrs.placeholder {
-          "" -> a.none()
-          p -> a.placeholder(p)
-        },
-        case attrs.name {
-          "" -> a.none()
-          n -> a.name(n)
-        },
-        case attrs.disabled {
-          True -> a.disabled(True)
-          False -> a.none()
-        },
-        e.on_input(on_input),
-      ]),
+          case attrs.name {
+            "" -> []
+            n -> [a.name(n)]
+          },
+          case attrs.disabled {
+            True -> [a.disabled(True)]
+            False -> []
+          },
+          [e.on_input(on_input)],
+        ]),
+      ),
       clear_btn,
     ],
   )

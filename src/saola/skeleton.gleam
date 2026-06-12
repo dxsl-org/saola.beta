@@ -1,3 +1,4 @@
+import gleam/list
 import lustre/attribute as a
 import lustre/element.{type Element}
 import lustre/element/html as h
@@ -14,18 +15,20 @@ import lustre/element/html as h
 /// skeleton_circle()    // circular avatar placeholder
 /// ```
 pub fn skeleton(class: String) -> Element(msg) {
-  let extra_class = case class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case class {
+    "" -> []
+    c -> [a.class(c)]
   }
   h.div(
-    [
-      a.class("skeleton"),
-      extra_class,
-      a.role("status"),
-      a.attribute("aria-busy", "true"),
-      a.attribute("aria-live", "polite"),
-    ],
+    list.flatten([
+      [
+        a.class("skeleton"),
+        a.role("status"),
+        a.attribute("aria-busy", "true"),
+        a.attribute("aria-live", "polite"),
+      ],
+      extra_class_attrs,
+    ]),
     [h.span([a.attribute("aria-hidden", "true")], [])],
   )
 }

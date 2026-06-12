@@ -28,12 +28,12 @@ pub fn menubar(
   on_close: fn() -> msg,
   attrs: MenubarAttrs,
 ) -> Element(msg) {
-  let extra_class = case attrs.class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case attrs.class {
+    "" -> []
+    c -> [a.class(c)]
   }
   h.div(
-    [a.class("menubar"), extra_class, a.role("menubar")],
+    list.flatten([[a.class("menubar"), a.role("menubar")], extra_class_attrs]),
     list.map(items, fn(item) {
       case item {
         MenubarItemDisabled(label) ->

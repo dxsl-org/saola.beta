@@ -19,12 +19,12 @@ pub fn breadcrumb(
   items: List(BreadcrumbItem(msg)),
   attrs: BreadcrumbAttrs,
 ) -> Element(msg) {
-  let extra_class = case attrs.class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case attrs.class {
+    "" -> []
+    c -> [a.class(c)]
   }
   let item_count = list.length(items)
-  h.nav([a.attribute("aria-label", "Breadcrumb"), extra_class], [
+  h.nav(list.flatten([[a.attribute("aria-label", "Breadcrumb")], extra_class_attrs]), [
     h.ol(
       [a.class("breadcrumb")],
       list.index_map(items, fn(item, idx) {

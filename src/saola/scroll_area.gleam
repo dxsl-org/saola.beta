@@ -1,3 +1,4 @@
+import gleam/list
 import lustre/attribute as a
 import lustre/element.{type Element}
 import lustre/element/html as h
@@ -8,18 +9,20 @@ pub fn scroll_area(
   width: String,
   class: String,
 ) -> Element(msg) {
-  let extra_class = case class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case class {
+    "" -> []
+    c -> [a.class(c)]
   }
   h.div(
-    [
-      a.class("scroll-area"),
-      extra_class,
-      a.style("height", height),
-      a.style("width", width),
-      a.attribute("data-radix-scroll-area-root", ""),
-    ],
+    list.flatten([
+      [a.class("scroll-area")],
+      extra_class_attrs,
+      [
+        a.style("height", height),
+        a.style("width", width),
+        a.attribute("data-radix-scroll-area-root", ""),
+      ],
+    ]),
     [
       h.div(
         [

@@ -1,3 +1,4 @@
+import gleam/list
 import lustre/attribute as a
 import lustre/element.{type Element}
 import lustre/element/html as h
@@ -24,11 +25,11 @@ pub fn popover(
     Left -> a.attribute("data-side", "left")
     Right -> a.attribute("data-side", "right")
   }
-  let extra_class = case class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case class {
+    "" -> []
+    c -> [a.class(c)]
   }
-  h.div([a.class("popover-wrapper"), extra_class], [
+  h.div(list.flatten([[a.class("popover-wrapper")], extra_class_attrs]), [
     trigger,
     case open {
       False -> h.text("")

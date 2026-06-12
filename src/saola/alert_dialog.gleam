@@ -1,3 +1,4 @@
+import gleam/list
 import lustre/attribute as a
 import lustre/element.{type Element}
 import lustre/element/html as h
@@ -22,9 +23,9 @@ pub fn alert_dialog(
   case open {
     False -> h.text("")
     True -> {
-      let extra_class = case attrs.class {
-        "" -> a.none()
-        c -> a.class(c)
+      let extra_class_attrs = case attrs.class {
+        "" -> []
+        c -> [a.class(c)]
       }
       h.div(
         [
@@ -35,7 +36,7 @@ pub fn alert_dialog(
           a.attribute("aria-describedby", "alert-dialog-desc"),
         ],
         [
-          h.div([a.class("dialog"), extra_class], [
+          h.div(list.flatten([[a.class("dialog")], extra_class_attrs]), [
             h.div([a.class("dialog-header")], [
               h.h2([a.class("dialog-title"), a.id("alert-dialog-title")], [
                 h.text(title),

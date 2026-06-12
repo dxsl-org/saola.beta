@@ -1,3 +1,4 @@
+import gleam/list
 import lustre/attribute as a
 import lustre/element.{type Element}
 import lustre/element/html as h
@@ -42,18 +43,16 @@ pub fn field(attrs: FieldAttrs, input: Element(msg)) -> Element(msg) {
   let FieldAttrs(label:, description:, error:, orientation:, required:, hint:) =
     attrs
   let is_invalid = error != ""
+  let invalid_attrs = case is_invalid {
+    True -> [a.attribute("data-invalid", "true")]
+    False -> []
+  }
+  let orientation_attrs = case orientation {
+    Vertical -> []
+    Horizontal -> [a.attribute("data-orientation", "horizontal")]
+  }
   h.div(
-    [
-      a.class(class_field),
-      case is_invalid {
-        True -> a.attribute("data-invalid", "true")
-        False -> a.none()
-      },
-      case orientation {
-        Vertical -> a.none()
-        Horizontal -> a.attribute("data-orientation", "horizontal")
-      },
-    ],
+    list.flatten([[a.class(class_field)], invalid_attrs, orientation_attrs]),
     [
       case label {
         "" -> element.none()

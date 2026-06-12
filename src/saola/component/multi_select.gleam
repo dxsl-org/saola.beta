@@ -266,17 +266,20 @@ fn render_popover(
 fn render_options(model: Model) -> List(Element(Message)) {
   list.index_map(model.choices, fn(item, i) {
     let is_focused = model.focused_index == Some(i)
+    let focused_attrs = case is_focused {
+      True -> [a.class("active")]
+      False -> []
+    }
     h.div(
-      [
-        a.role("option"),
-        a.attribute("data-value", item.value),
-        a.aria_selected(item.selected),
-        case is_focused {
-          True -> a.class("active")
-          False -> a.none()
-        },
-        ev.on_click(UserPickedChoice(item.value)),
-      ],
+      list.flatten([
+        [
+          a.role("option"),
+          a.attribute("data-value", item.value),
+          a.aria_selected(item.selected),
+        ],
+        focused_attrs,
+        [ev.on_click(UserPickedChoice(item.value))],
+      ]),
       [h.text(item.name)],
     )
   })

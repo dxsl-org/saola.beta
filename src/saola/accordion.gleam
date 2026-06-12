@@ -67,12 +67,12 @@ pub fn accordion(
   on_toggle on_toggle: fn(String) -> msg,
   attrs attrs: AccordionAttrs,
 ) -> Element(msg) {
-  let extra_class = case attrs.class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case attrs.class {
+    "" -> []
+    c -> [a.class(c)]
   }
   h.div(
-    [a.class("accordion"), extra_class],
+    list.flatten([[a.class("accordion")], extra_class_attrs]),
     list.map(items, fn(item) {
       render_item(item, list.contains(open_ids, item.id), on_toggle)
     }),

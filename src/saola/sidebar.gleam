@@ -82,11 +82,11 @@ pub fn sidebar_menu_item(
     True -> "sidebar-menu-button sidebar-menu-button-active"
     False -> "sidebar-menu-button"
   }
-  let extra_class = case attrs.class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case attrs.class {
+    "" -> []
+    c -> [a.class(c)]
   }
-  h.li([a.class("sidebar-menu-item"), extra_class], [
+  h.li(list.flatten([[a.class("sidebar-menu-item")], extra_class_attrs]), [
     h.a([a.href(href), a.class(btn_class)], [
       case icon {
         None -> h.text("")
@@ -143,14 +143,14 @@ pub fn sidebar(
     True -> " sidebar-open"
     False -> " sidebar-closed"
   }
-  let extra_class = case attrs.class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case attrs.class {
+    "" -> []
+    c -> [a.class(c)]
   }
   let full_class =
     "sidebar " <> side_class <> variant_class <> collapsible_class <> open_class
   h.aside(
-    [a.class(full_class), a.attribute("aria-label", "Sidebar"), extra_class],
+    list.flatten([[a.class(full_class), a.attribute("aria-label", "Sidebar")], extra_class_attrs]),
     list.flatten([
       [
         case header {

@@ -1,4 +1,5 @@
 import gleam/int
+import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/time/calendar.{type Date, type Month, month_to_int, month_to_string}
 import lustre/attribute as a
@@ -35,9 +36,13 @@ pub fn date_picker(
   on_open_change: fn(Bool) -> msg,
   attrs: DatePickerAttrs,
 ) -> Element(msg) {
-  let extra_class = case attrs.class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case attrs.class {
+    "" -> []
+    c -> [a.class(c)]
+  }
+  let disabled_attrs = case attrs.disabled {
+    True -> [a.disabled(True)]
+    False -> []
   }
   let display_text = case selected {
     None -> attrs.placeholder
@@ -45,25 +50,26 @@ pub fn date_picker(
   }
   let #(prev_year, prev_month) = prev_month_nav(view_year, view_month)
   let #(next_year, next_month) = next_month_nav(view_year, view_month)
-  h.div([a.class("date-picker"), extra_class], [
+  h.div(list.flatten([[a.class("date-picker")], extra_class_attrs]), [
     h.button(
-      [
-        a.type_("button"),
-        a.class(case selected {
-          None -> "date-picker-trigger date-picker-placeholder"
-          Some(_) -> "date-picker-trigger"
-        }),
-        case attrs.disabled {
-          True -> a.disabled(True)
-          False -> a.none()
-        },
-        a.attribute("aria-haspopup", "dialog"),
-        a.attribute("aria-expanded", case open {
-          True -> "true"
-          False -> "false"
-        }),
-        e.on_click(on_open_change(!open)),
-      ],
+      list.flatten([
+        [
+          a.type_("button"),
+          a.class(case selected {
+            None -> "date-picker-trigger date-picker-placeholder"
+            Some(_) -> "date-picker-trigger"
+          }),
+        ],
+        disabled_attrs,
+        [
+          a.attribute("aria-haspopup", "dialog"),
+          a.attribute("aria-expanded", case open {
+            True -> "true"
+            False -> "false"
+          }),
+          e.on_click(on_open_change(!open)),
+        ],
+      ]),
       [
         h.span([a.class("date-picker-icon")], [h.text("📅")]),
         h.text(display_text),

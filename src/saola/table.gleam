@@ -58,12 +58,12 @@ pub fn table_simple(
       [],
       headers |> list.map(fn(h_) { h.th([a.scope("col")], [h.text(h_)]) }),
     )
-  let extra_class = case class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case class {
+    "" -> []
+    c -> [a.class(c)]
   }
   h.div([a.class("overflow-auto")], [
-    h.table([a.class("table"), extra_class], [
+    h.table(list.flatten([[a.class("table")], extra_class_attrs]), [
       caption_el,
       h.thead([], [header_row]),
       h.tbody([], rows |> list.map(render_row)),

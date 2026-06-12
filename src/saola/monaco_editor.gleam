@@ -1,4 +1,5 @@
 import gleam/int
+import gleam/list
 import lustre/attribute as a
 import lustre/element.{type Element}
 
@@ -41,24 +42,27 @@ pub fn editor(attrs attrs: EditorAttrs) -> Element(msg) {
     class:,
     aria_label:,
   ) = attrs
+  let id_attrs = case id {
+    "" -> []
+    v -> [a.id(v)]
+  }
   element.element(
     "saola-monaco-editor",
-    [
-      case id {
-        "" -> a.none()
-        v -> a.id(v)
-      },
-      a.class("saola-monaco-editor " <> class),
-      a.attribute("value", value),
-      a.attribute("language", language),
-      a.attribute("theme", theme),
-      a.attribute("height", height |> int.to_string),
-      a.attribute("read-only", case read_only {
-        True -> "true"
-        False -> "false"
-      }),
-      a.aria_label(aria_label),
-    ],
+    list.flatten([
+      id_attrs,
+      [
+        a.class("saola-monaco-editor " <> class),
+        a.attribute("value", value),
+        a.attribute("language", language),
+        a.attribute("theme", theme),
+        a.attribute("height", height |> int.to_string),
+        a.attribute("read-only", case read_only {
+          True -> "true"
+          False -> "false"
+        }),
+        a.aria_label(aria_label),
+      ],
+    ]),
     [],
   )
 }

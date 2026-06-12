@@ -133,9 +133,9 @@ pub fn dropdown_menu(
     a.aria_expanded(False),
     a.aria_controls(menu_id),
   ]
-  let trigger_class = case trigger_attrs.class {
-    "" -> a.none()
-    c -> a.class(c)
+  let trigger_class_attrs = case trigger_attrs.class {
+    "" -> []
+    c -> [a.class(c)]
   }
   let trigger_icon = case trigger_attrs.icon {
     None -> element.none()
@@ -144,19 +144,19 @@ pub fn dropdown_menu(
   let trigger_label = h.text(trigger_attrs.label)
 
   let btn_trigger =
-    h.button(trigger_main_attrs |> list.append([trigger_class]), [
+    h.button(list.flatten([trigger_main_attrs, trigger_class_attrs]), [
       trigger_icon,
       trigger_label,
     ])
 
   // Build menu
-  let menu_class = case minor_attrs.menu_class {
-    "" -> a.none()
-    c -> a.class(c)
+  let menu_class_attrs = case minor_attrs.menu_class {
+    "" -> []
+    c -> [a.class(c)]
   }
   let menu =
     h.div(
-      [a.role("menu"), a.id(menu_id), a.aria_labelledby(trigger_id), menu_class],
+      list.flatten([[a.role("menu"), a.id(menu_id), a.aria_labelledby(trigger_id)], menu_class_attrs]),
       items |> list.map(render_menu_item),
     )
 

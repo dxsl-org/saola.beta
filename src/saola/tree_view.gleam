@@ -92,14 +92,19 @@ fn render_node(
       }),
       e.on_click(on_toggle(item.id)),
     ]
-    False -> [
-      a.class("tree-node-row"),
-      a.style("padding-left", calc_indent(depth)),
-      case on_select {
-        None -> a.none()
-        Some(f) -> e.on_click(f(item.id))
-      },
-    ]
+    False -> {
+      let on_select_attrs = case on_select {
+        None -> []
+        Some(f) -> [e.on_click(f(item.id))]
+      }
+      list.flatten([
+        [
+          a.class("tree-node-row"),
+          a.style("padding-left", calc_indent(depth)),
+        ],
+        on_select_attrs,
+      ])
+    }
   }
   h.li([a.class(node_class), a.role("treeitem")], [
     h.div(row_attrs, [

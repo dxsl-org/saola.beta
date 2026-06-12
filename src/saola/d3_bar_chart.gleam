@@ -1,5 +1,6 @@
 import gleam/int
 import gleam/json
+import gleam/list
 import lustre/attribute as a
 import lustre/element.{type Element}
 
@@ -34,19 +35,22 @@ pub fn bar_chart(
 ) -> Element(msg) {
   ensure_registered()
   let BarChartAttrs(id:, title:, height:, class:, aria_label:) = attrs
+  let id_attrs = case id {
+    "" -> []
+    value -> [a.id(value)]
+  }
   element.element(
     "saola-d3-bar-chart",
-    [
-      case id {
-        "" -> a.none()
-        value -> a.id(value)
-      },
-      a.class("saola-d3-bar-chart " <> class),
-      a.property("series", encode_points(data)),
-      a.attribute("chart-title", title),
-      a.attribute("height", height |> int.to_string),
-      a.aria_label(aria_label),
-    ],
+    list.flatten([
+      id_attrs,
+      [
+        a.class("saola-d3-bar-chart " <> class),
+        a.property("series", encode_points(data)),
+        a.attribute("chart-title", title),
+        a.attribute("height", height |> int.to_string),
+        a.aria_label(aria_label),
+      ],
+    ]),
     [],
   )
 }

@@ -1,3 +1,4 @@
+import gleam/list
 import lustre/attribute as a
 import lustre/element.{type Element}
 import lustre/element/html as h
@@ -12,15 +13,18 @@ pub const class_label = "label"
 /// label("Username", "username-input", "")
 /// ```
 pub fn label(text: String, for_: String, class: String) -> Element(msg) {
-  let for_attr = case for_ {
-    "" -> a.none()
-    v -> a.for(v)
+  let for_attrs = case for_ {
+    "" -> []
+    v -> [a.for(v)]
   }
-  let extra_class = case class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case class {
+    "" -> []
+    c -> [a.class(c)]
   }
-  h.label([a.class(class_label), for_attr, extra_class], [h.text(text)])
+  h.label(
+    list.flatten([[a.class(class_label)], for_attrs, extra_class_attrs]),
+    [h.text(text)],
+  )
 }
 
 /// Shortcut for a label associated with an input by ID.

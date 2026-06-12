@@ -34,28 +34,31 @@ pub fn pagination(
   on_change: fn(Int) -> msg,
   attrs: PaginationAttrs,
 ) -> Element(msg) {
-  let extra_class = case attrs.class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case attrs.class {
+    "" -> []
+    c -> [a.class(c)]
   }
   let page_buttons =
     pages_list(1, total_pages)
     |> list.map(fn(page) {
       let is_current = page == current_page
+      let aria_current_attrs = case is_current {
+        True -> [a.attribute("aria-current", "page")]
+        False -> []
+      }
       h.button(
-        [
-          a.type_("button"),
-          a.class(case is_current {
-            True -> "btn btn-sm btn-primary"
-            False -> "btn btn-sm btn-ghost"
-          }),
-          a.attribute("aria-label", "Page " <> int.to_string(page)),
-          case is_current {
-            True -> a.attribute("aria-current", "page")
-            False -> a.none()
-          },
-          e.on_click(on_change(page)),
-        ],
+        list.flatten([
+          [
+            a.type_("button"),
+            a.class(case is_current {
+              True -> "btn btn-sm btn-primary"
+              False -> "btn btn-sm btn-ghost"
+            }),
+            a.attribute("aria-label", "Page " <> int.to_string(page)),
+          ],
+          aria_current_attrs,
+          [e.on_click(on_change(page))],
+        ]),
         [h.text(int.to_string(page))],
       )
     })
@@ -63,16 +66,21 @@ pub fn pagination(
     False -> []
     True -> [
       h.button(
-        [
-          a.type_("button"),
-          a.class("btn btn-sm btn-ghost"),
-          a.attribute("aria-label", attrs.prev_label),
-          case current_page <= 1 {
-            True -> a.disabled(True)
-            False -> a.none()
-          },
-          e.on_click(on_change(current_page - 1)),
-        ],
+        {
+          let disabled_attrs = case current_page <= 1 {
+            True -> [a.disabled(True)]
+            False -> []
+          }
+          list.flatten([
+            [
+              a.type_("button"),
+              a.class("btn btn-sm btn-ghost"),
+              a.attribute("aria-label", attrs.prev_label),
+            ],
+            disabled_attrs,
+            [e.on_click(on_change(current_page - 1))],
+          ])
+        },
         [h.text(attrs.prev_label)],
       ),
     ]
@@ -81,27 +89,31 @@ pub fn pagination(
     False -> []
     True -> [
       h.button(
-        [
-          a.type_("button"),
-          a.class("btn btn-sm btn-ghost"),
-          a.attribute("aria-label", attrs.next_label),
-          case current_page >= total_pages {
-            True -> a.disabled(True)
-            False -> a.none()
-          },
-          e.on_click(on_change(current_page + 1)),
-        ],
+        {
+          let disabled_attrs = case current_page >= total_pages {
+            True -> [a.disabled(True)]
+            False -> []
+          }
+          list.flatten([
+            [
+              a.type_("button"),
+              a.class("btn btn-sm btn-ghost"),
+              a.attribute("aria-label", attrs.next_label),
+            ],
+            disabled_attrs,
+            [e.on_click(on_change(current_page + 1))],
+          ])
+        },
         [h.text(attrs.next_label)],
       ),
     ]
   }
   h.nav(
-    [
-      a.class("pagination"),
-      extra_class,
-      a.attribute("aria-label", "Pagination"),
-      a.role("navigation"),
-    ],
+    list.flatten([
+      [a.class("pagination")],
+      extra_class_attrs,
+      [a.attribute("aria-label", "Pagination"), a.role("navigation")],
+    ]),
     list.flatten([prev_btn, page_buttons, next_btn]),
   )
 }

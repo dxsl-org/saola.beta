@@ -43,41 +43,42 @@ pub fn input_otp(
   attrs: InputOtpAttrs,
 ) -> Element(msg) {
   let chars = string.to_graphemes(value)
-  let extra_class = case attrs.class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case attrs.class {
+    "" -> []
+    c -> [a.class(c)]
+  }
+  let disabled_attrs = case attrs.disabled {
+    True -> [a.disabled(True)]
+    False -> []
   }
   let slots =
     slot_indices(attrs.length)
     |> list.map(fn(idx) {
       let slot_val = char_at(chars, idx)
-      h.input([
-        a.type_("text"),
-        a.class("input input-otp-slot"),
-        a.id("otp-slot-" <> int.to_string(idx)),
-        a.value(slot_val),
-        a.attribute("maxlength", "1"),
-        a.attribute("inputmode", "numeric"),
-        a.attribute("autocomplete", "one-time-code"),
-        a.attribute("aria-label", "Digit " <> int.to_string(idx + 1)),
-        case attrs.disabled {
-          True -> a.disabled(True)
-          False -> a.none()
-        },
-        e.on_input(fn(new_char) {
-          let before = list.take(chars, idx)
-          let after = list.drop(chars, idx + 1)
-          let new_chars = list.flatten([before, [new_char], after])
-          on_change(string.join(new_chars, ""))
-        }),
-      ])
+      h.input(list.flatten([
+        [
+          a.type_("text"),
+          a.class("input input-otp-slot"),
+          a.id("otp-slot-" <> int.to_string(idx)),
+          a.value(slot_val),
+          a.attribute("maxlength", "1"),
+          a.attribute("inputmode", "numeric"),
+          a.attribute("autocomplete", "one-time-code"),
+          a.attribute("aria-label", "Digit " <> int.to_string(idx + 1)),
+        ],
+        disabled_attrs,
+        [
+          e.on_input(fn(new_char) {
+            let before = list.take(chars, idx)
+            let after = list.drop(chars, idx + 1)
+            let new_chars = list.flatten([before, [new_char], after])
+            on_change(string.join(new_chars, ""))
+          }),
+        ],
+      ]))
     })
   h.div(
-    [
-      a.class("input-otp"),
-      extra_class,
-      a.attribute("aria-label", "One-time password"),
-    ],
+    list.flatten([[a.class("input-otp"), a.attribute("aria-label", "One-time password")], extra_class_attrs]),
     slots,
   )
 }

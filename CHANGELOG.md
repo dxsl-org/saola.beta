@@ -14,6 +14,7 @@ Full per-batch history lives in [`docs/project-changelog.md`](docs/project-chang
 
 - All Saola CSS now lives under `@layer saola.*` — unlayered consumer CSS always wins; the global Tailwind preflight no longer leaks into host pages (scoped `:where(widget-roots)` reset replaces it; the global form is opt-in via `saola-preflight.css`). Class and CSS-variable names remain Basecoat/shadcn-compatible.
 - Demo loads CSS via `dev/dev-widgets.css` (generated aggregate) + slimmed `assets/app.css`; `assets/basecoat.css` is now pipeline input only.
+- All 50 widget modules now use `list.flatten` for conditional attribute assembly instead of `a.none()` sentinels — eliminates trailing spaces in generated `class` attributes (e.g. `class="btn    "` → `class="btn"`).
 
 ### Removed
 

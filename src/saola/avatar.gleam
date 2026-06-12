@@ -1,3 +1,4 @@
+import gleam/list
 import lustre/attribute as a
 import lustre/element.{type Element}
 import lustre/element/html as h
@@ -35,9 +36,9 @@ pub fn avatar(
   size: AvatarSize,
   class: String,
 ) -> Element(msg) {
-  let extra_class = case class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case class {
+    "" -> []
+    c -> [a.class(c)]
   }
   let inner = case source {
     ImageSrc(src:, alt:) ->
@@ -47,7 +48,7 @@ pub fn avatar(
         h.text(text),
       ])
   }
-  h.span([a.class("avatar " <> size_class(size)), extra_class], [inner])
+  h.span(list.flatten([[a.class("avatar " <> size_class(size))], extra_class_attrs]), [inner])
 }
 
 /// Avatar from an image URL.

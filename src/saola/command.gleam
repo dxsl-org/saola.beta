@@ -160,9 +160,9 @@ pub fn command(
   attrs: CommandAttrs,
 ) -> Element(msg) {
   let item_count = count_items(items)
-  let extra_class = case attrs.class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case attrs.class {
+    "" -> []
+    c -> [a.class(c)]
   }
   let #(rendered_items, _) = render_items(items, highlighted, 0)
   let list_content = case rendered_items {
@@ -170,12 +170,14 @@ pub fn command(
     _ -> rendered_items
   }
   h.div(
-    [
-      a.class("command"),
-      a.attribute("role", "combobox"),
-      a.attribute("aria-expanded", "true"),
-      extra_class,
-    ],
+    list.flatten([
+      [
+        a.class("command"),
+        a.attribute("role", "combobox"),
+        a.attribute("aria-expanded", "true"),
+      ],
+      extra_class_attrs,
+    ]),
     [
       h.div([a.class("command-input-wrapper")], [
         h.input([

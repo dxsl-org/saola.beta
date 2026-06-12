@@ -512,19 +512,22 @@ fn render_options(model: Model) -> List(#(String, Element(Message))) {
       None -> False
     }
     let is_focused = model.focused_index == Some(i)
+    let focused_attrs = case is_focused {
+      True -> [a.class("active")]
+      False -> []
+    }
     #(
       item.value,
       h.div(
-        [
-          a.role("option"),
-          a.attribute("data-value", item.value),
-          a.aria_selected(is_selected),
-          case is_focused {
-            True -> a.class("active")
-            False -> a.none()
-          },
-          ev.on_click(UserPickedChoice(item)),
-        ],
+        list.flatten([
+          [
+            a.role("option"),
+            a.attribute("data-value", item.value),
+            a.aria_selected(is_selected),
+          ],
+          focused_attrs,
+          [ev.on_click(UserPickedChoice(item))],
+        ]),
         [h.text(item.name)],
       ),
     )

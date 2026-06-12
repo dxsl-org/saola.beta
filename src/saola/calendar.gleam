@@ -162,31 +162,36 @@ fn render_day_cell(
   }
   case !is_current_month && !show_outside {
     True -> h.div([a.class("calendar-day calendar-day-empty")], [])
-    False ->
+    False -> {
+      let selected_attrs = case is_selected {
+        True -> [a.attribute("aria-selected", "true")]
+        False -> []
+      }
+      let disabled_attrs = case !is_current_month {
+        True -> [a.attribute("aria-disabled", "true")]
+        False -> []
+      }
       h.button(
-        [
-          a.type_("button"),
-          a.class(base_class),
-          a.attribute(
-            "aria-label",
-            month_to_string(date.month)
-              <> " "
-              <> int.to_string(date.day)
-              <> ", "
-              <> int.to_string(date.year),
-          ),
-          case is_selected {
-            True -> a.attribute("aria-selected", "true")
-            False -> a.none()
-          },
-          case !is_current_month {
-            True -> a.attribute("aria-disabled", "true")
-            False -> a.none()
-          },
-          e.on_click(on_select(date)),
-        ],
+        list.flatten([
+          [
+            a.type_("button"),
+            a.class(base_class),
+            a.attribute(
+              "aria-label",
+              month_to_string(date.month)
+                <> " "
+                <> int.to_string(date.day)
+                <> ", "
+                <> int.to_string(date.year),
+            ),
+            e.on_click(on_select(date)),
+          ],
+          selected_attrs,
+          disabled_attrs,
+        ]),
         [h.text(int.to_string(date.day))],
       )
+    }
   }
 }
 
@@ -201,9 +206,9 @@ pub fn calendar(
 ) -> Element(msg) {
   let dim = days_in_month(view_year, view_month)
   let first_dow = day_of_week(view_year, view_month)
-  let extra_class = case attrs.class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case attrs.class {
+    "" -> []
+    c -> [a.class(c)]
   }
   let day_headers =
     ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
@@ -222,7 +227,7 @@ pub fn calendar(
         on_select,
       )
     })
-  h.div([a.class("calendar"), extra_class], [
+  h.div(list.flatten([[a.class("calendar")], extra_class_attrs]), [
     h.div([a.class("calendar-header")], [
       h.button(
         [

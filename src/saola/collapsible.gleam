@@ -1,3 +1,4 @@
+import gleam/list
 import gleam/result
 import lustre/attribute as a
 import lustre/element.{type Element}
@@ -22,26 +23,29 @@ pub fn collapsible(
     typeid.new(prefix: "col")
     |> result.map(typeid.to_string)
     |> result.unwrap("collapsible-panel")
-  let extra_class = case attrs.class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case attrs.class {
+    "" -> []
+    c -> [a.class(c)]
   }
-  h.div([a.class("collapsible"), extra_class], [
+  let disabled_attrs = case attrs.disabled {
+    True -> [a.disabled(True)]
+    False -> []
+  }
+  h.div(list.flatten([[a.class("collapsible")], extra_class_attrs]), [
     h.button(
-      [
-        a.type_("button"),
-        a.class("collapsible-trigger"),
-        a.attribute("aria-expanded", case open {
-          True -> "true"
-          False -> "false"
-        }),
-        a.attribute("aria-controls", id),
-        case attrs.disabled {
-          True -> a.disabled(True)
-          False -> a.none()
-        },
-        e.on_click(on_toggle()),
-      ],
+      list.flatten([
+        [
+          a.type_("button"),
+          a.class("collapsible-trigger"),
+          a.attribute("aria-expanded", case open {
+            True -> "true"
+            False -> "false"
+          }),
+          a.attribute("aria-controls", id),
+        ],
+        disabled_attrs,
+        [e.on_click(on_toggle())],
+      ]),
       [trigger],
     ),
     h.div(

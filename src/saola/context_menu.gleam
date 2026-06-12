@@ -97,16 +97,16 @@ pub fn context_menu(
   on_close: fn() -> msg,
   attrs: ContextMenuAttrs,
 ) -> Element(msg) {
-  let extra_class = case attrs.class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case attrs.class {
+    "" -> []
+    c -> [a.class(c)]
   }
   h.div(
-    [
-      a.class("context-menu-trigger"),
-      extra_class,
-      e.on("contextmenu", decode_coords(on_context_menu)) |> e.prevent_default,
-    ],
+    list.flatten([
+      [a.class("context-menu-trigger")],
+      extra_class_attrs,
+      [e.on("contextmenu", decode_coords(on_context_menu)) |> e.prevent_default],
+    ]),
     [
       trigger,
       case open {

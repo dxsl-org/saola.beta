@@ -101,16 +101,19 @@ pub fn navigation_menu(
   on_open_change: fn(Option(String)) -> msg,
   attrs: NavMenuAttrs,
 ) -> Element(msg) {
-  let extra_class = case attrs.class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case attrs.class {
+    "" -> []
+    c -> [a.class(c)]
   }
-  h.nav([a.class("nav-menu"), a.attribute("aria-label", "Main"), extra_class], [
-    h.ul(
-      [a.class("nav-menu-list")],
-      list.map(items, fn(i) { render_item(i, open_id, on_open_change) }),
-    ),
-  ])
+  h.nav(
+    list.flatten([[a.class("nav-menu"), a.attribute("aria-label", "Main")], extra_class_attrs]),
+    [
+      h.ul(
+        [a.class("nav-menu-list")],
+        list.map(items, fn(i) { render_item(i, open_id, on_open_change) }),
+      ),
+    ],
+  )
 }
 
 pub fn navigation_menu_simple(

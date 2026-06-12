@@ -72,22 +72,24 @@ pub fn stepper(
         Error -> "✕"
         _ -> int.to_string(idx + 1)
       }
-      let click_attr = case on_step_click, status {
-        Some(f), Complete -> e.on_click(f(idx))
-        _, _ -> a.none()
+      let click_attrs = case on_step_click, status {
+        Some(f), Complete -> [e.on_click(f(idx))]
+        _, _ -> []
       }
       let is_last = idx == total - 1
       h.li([a.class(step_class)], [
         h.button(
-          [
-            a.type_("button"),
-            a.class("stepper-trigger"),
-            a.attribute("aria-current", case status {
-              Active -> "step"
-              _ -> "false"
-            }),
-            click_attr,
-          ],
+          list.flatten([
+            [
+              a.type_("button"),
+              a.class("stepper-trigger"),
+              a.attribute("aria-current", case status {
+                Active -> "step"
+                _ -> "false"
+              }),
+            ],
+            click_attrs,
+          ]),
           [
             h.span([a.class("stepper-indicator")], [h.text(indicator_text)]),
             h.span([a.class("stepper-content")], [

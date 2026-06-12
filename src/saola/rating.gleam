@@ -68,23 +68,25 @@ pub fn rating(
           a.attribute("aria-label", attrs.aria_label),
         ],
         list.map(stars, fn(n) {
-          let cb = case on_change {
-            None -> a.none()
-            Some(f) -> e.on_click(f(n))
+          let click_attrs = case on_change {
+            None -> []
+            Some(f) -> [e.on_click(f(n))]
           }
           h.button(
-            [
-              a.type_("button"),
-              a.class(case n <= value {
-                True -> "rating-star rating-star-filled"
-                False -> "rating-star"
-              }),
-              a.attribute(
-                "aria-label",
-                int.to_string(n) <> " out of " <> int.to_string(attrs.max),
-              ),
-              cb,
-            ],
+            list.flatten([
+              [
+                a.type_("button"),
+                a.class(case n <= value {
+                  True -> "rating-star rating-star-filled"
+                  False -> "rating-star"
+                }),
+                a.attribute(
+                  "aria-label",
+                  int.to_string(n) <> " out of " <> int.to_string(attrs.max),
+                ),
+              ],
+              click_attrs,
+            ]),
             [h.text("★")],
           )
         }),

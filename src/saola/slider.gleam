@@ -1,4 +1,5 @@
 import gleam/int
+import gleam/list
 import lustre/attribute as a
 import lustre/element.{type Element}
 import lustre/element/html as h
@@ -57,37 +58,43 @@ pub fn slider(
     SyncValue(v) -> v
   }
   let pct = fill_pct(raw_value, min, max)
-  h.input([
-    a.type_("range"),
-    a.class(
-      class_input
-      <> case class {
-        "" -> ""
-        c -> " " <> c
-      },
-    ),
-    a.min(int.to_string(min)),
-    a.max(int.to_string(max)),
-    a.step(int.to_string(step)),
-    case value {
-      InitValue(v) -> a.default_value(int.to_string(v))
-      SyncValue(v) -> a.value(int.to_string(v))
-    },
-    a.style("--slider-value", pct <> "%"),
-    case name {
-      "" -> a.none()
-      n -> a.name(n)
-    },
-    case disabled {
-      True -> a.disabled(True)
-      False -> a.none()
-    },
-    case aria_label {
-      "" -> a.none()
-      l -> a.aria_label(l)
-    },
-    e.on_input(on_input),
-  ])
+  let value_attr = case value {
+    InitValue(v) -> a.default_value(int.to_string(v))
+    SyncValue(v) -> a.value(int.to_string(v))
+  }
+  let name_attrs = case name {
+    "" -> []
+    n -> [a.name(n)]
+  }
+  let disabled_attrs = case disabled {
+    True -> [a.disabled(True)]
+    False -> []
+  }
+  let aria_label_attrs = case aria_label {
+    "" -> []
+    l -> [a.aria_label(l)]
+  }
+  h.input(list.flatten([
+    [
+      a.type_("range"),
+      a.class(
+        class_input
+        <> case class {
+          "" -> ""
+          c -> " " <> c
+        },
+      ),
+      a.min(int.to_string(min)),
+      a.max(int.to_string(max)),
+      a.step(int.to_string(step)),
+      value_attr,
+      a.style("--slider-value", pct <> "%"),
+    ],
+    name_attrs,
+    disabled_attrs,
+    aria_label_attrs,
+    [e.on_input(on_input)],
+  ]))
 }
 
 pub fn slider_simple(value: Int, on_input: fn(String) -> msg) -> Element(msg) {

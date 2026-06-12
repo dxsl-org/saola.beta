@@ -1,3 +1,4 @@
+import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/string
 import lustre/attribute as a
@@ -71,40 +72,42 @@ pub fn button(
     Small, Link -> "btn-sm-link"
     Small, Destructive -> "btn-sm-destructive"
   }
-  let event_handler =
-    click_message |> option.map(e.on_click) |> option.unwrap(a.none())
   let icon_el = option.unwrap(icon, element.none())
   let label_el = case string.trim(label) {
     "" -> element.none()
     text -> h.text(text)
   }
-  let disabled_attr = case extra_attrs.disabled {
-    True -> a.disabled(True)
-    False -> a.none()
+  let click_attrs = case click_message {
+    None -> []
+    Some(msg) -> [e.on_click(msg)]
   }
-  let type_attr = case extra_attrs.type_ {
-    None -> a.none()
-    Some(Regular) -> a.type_("button")
-    Some(Submit) -> a.type_("submit")
-    Some(Reset) -> a.type_("reset")
+  let disabled_attrs = case extra_attrs.disabled {
+    True -> [a.disabled(True)]
+    False -> []
   }
-  let aria_label_attr = case extra_attrs.aria.label {
-    "" -> a.none()
-    l -> a.aria_label(l)
+  let type_attrs = case extra_attrs.type_ {
+    None -> []
+    Some(Regular) -> [a.type_("button")]
+    Some(Submit) -> [a.type_("submit")]
+    Some(Reset) -> [a.type_("reset")]
   }
-  let aria_expanded_attr = case extra_attrs.aria.expanded {
-    None -> a.none()
-    Some(expanded) -> a.aria_expanded(expanded)
+  let aria_label_attrs = case extra_attrs.aria.label {
+    "" -> []
+    l -> [a.aria_label(l)]
+  }
+  let aria_expanded_attrs = case extra_attrs.aria.expanded {
+    None -> []
+    Some(expanded) -> [a.aria_expanded(expanded)]
   }
   h.button(
-    [
-      a.class(css_name),
-      event_handler,
-      disabled_attr,
-      type_attr,
-      aria_label_attr,
-      aria_expanded_attr,
-    ],
+    list.flatten([
+      [a.class(css_name)],
+      click_attrs,
+      disabled_attrs,
+      type_attrs,
+      aria_label_attrs,
+      aria_expanded_attrs,
+    ]),
     [icon_el, label_el],
   )
 }

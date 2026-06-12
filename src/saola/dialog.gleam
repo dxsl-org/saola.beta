@@ -1,3 +1,4 @@
+import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/result
 import lustre/attribute as a
@@ -56,13 +57,13 @@ pub fn dialog(
     typeid.new(prefix: "dlg")
     |> result.map(typeid.to_string)
     |> result.unwrap("dlg-title")
-  let open_attr = case is_open {
-    True -> a.attribute("open", "")
-    False -> a.none()
+  let open_attrs = case is_open {
+    True -> [a.attribute("open", "")]
+    False -> []
   }
-  let labelledby_attr = case title {
-    "" -> a.none()
-    _ -> a.aria_labelledby(title_id)
+  let labelledby_attrs = case title {
+    "" -> []
+    _ -> [a.aria_labelledby(title_id)]
   }
   let close_btn = case show_close_button {
     False -> element.none()
@@ -90,7 +91,7 @@ pub fn dialog(
     None -> element.none()
     Some(f) -> h.footer([], [f])
   }
-  h.dialog([a.class("dialog"), open_attr, a.aria_modal(True), labelledby_attr], [
+  h.dialog(list.flatten([[a.class("dialog")], open_attrs, [a.aria_modal(True)], labelledby_attrs]), [
     h.div([], [close_btn, header_el, content_el, footer_el]),
   ])
 }

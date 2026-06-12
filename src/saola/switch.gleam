@@ -1,3 +1,4 @@
+import gleam/list
 import gleam/result
 import lustre/attribute as a
 import lustre/element.{type Element}
@@ -45,26 +46,31 @@ pub fn switch(
     "" -> class_label
     c -> class_label <> " " <> c
   }
+  let name_attrs = case name {
+    "" -> []
+    n -> [a.name(n)]
+  }
+  let status_attr = case status {
+    InitChecked(v) -> a.default_checked(v)
+    SyncChecked(v) -> a.checked(v)
+  }
+  let disabled_attrs = case disabled {
+    True -> [a.disabled(True)]
+    False -> []
+  }
   h.label([a.class(label_class <> " gap-3 cursor-pointer")], [
-    h.input([
-      a.type_("checkbox"),
-      a.role("switch"),
-      a.class(class_input),
-      a.id(input_id),
-      case name {
-        "" -> a.none()
-        n -> a.name(n)
-      },
-      case status {
-        InitChecked(v) -> a.default_checked(v)
-        SyncChecked(v) -> a.checked(v)
-      },
-      case disabled {
-        True -> a.disabled(True)
-        False -> a.none()
-      },
-      e.on_check(on_change),
-    ]),
+    h.input(list.flatten([
+      [
+        a.type_("checkbox"),
+        a.role("switch"),
+        a.class(class_input),
+        a.id(input_id),
+      ],
+      name_attrs,
+      [status_attr],
+      disabled_attrs,
+      [e.on_check(on_change)],
+    ])),
     h.text(label),
   ])
 }

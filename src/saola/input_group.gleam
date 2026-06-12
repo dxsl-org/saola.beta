@@ -1,3 +1,4 @@
+import gleam/list
 import gleam/option.{type Option, None, Some}
 import lustre/attribute as a
 import lustre/element.{type Element}
@@ -15,25 +16,28 @@ pub fn input_group(
   suffix: Option(Element(msg)),
   attrs: InputGroupAttrs,
 ) -> Element(msg) {
-  let extra_class = case attrs.class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case attrs.class {
+    "" -> []
+    c -> [a.class(c)]
   }
-  let invalid_attr = case attrs.invalid {
-    True -> a.attribute("aria-invalid", "true")
-    False -> a.none()
+  let invalid_attrs = case attrs.invalid {
+    True -> [a.attribute("aria-invalid", "true")]
+    False -> []
   }
-  h.div([a.role("group"), a.class("input-group"), extra_class, invalid_attr], [
-    case prefix {
-      None -> h.text("")
-      Some(p) -> h.div([a.class("input-group-addon")], [p])
-    },
-    content,
-    case suffix {
-      None -> h.text("")
-      Some(s) -> h.div([a.class("input-group-addon")], [s])
-    },
-  ])
+  h.div(
+    list.flatten([[a.role("group"), a.class("input-group")], extra_class_attrs, invalid_attrs]),
+    [
+      case prefix {
+        None -> h.text("")
+        Some(p) -> h.div([a.class("input-group-addon")], [p])
+      },
+      content,
+      case suffix {
+        None -> h.text("")
+        Some(s) -> h.div([a.class("input-group-addon")], [s])
+      },
+    ],
+  )
 }
 
 pub fn input_group_simple(

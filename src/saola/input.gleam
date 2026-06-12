@@ -1,3 +1,4 @@
+import gleam/list
 import gleam/option.{type Option, None, Some}
 import lustre/attribute as a
 import lustre/element.{type Element}
@@ -63,51 +64,50 @@ pub fn input(
 ) -> Element(msg) {
   let InputExtraAttrs(id:, name:, placeholder:, disabled:, required:, class:) =
     extra_attrs
-  let value_attr = case value {
-    None -> a.none()
-    Some(InitValue(v)) -> a.default_value(v)
-    Some(SyncValue(v)) -> a.value(v)
+  let value_attrs = case value {
+    None -> []
+    Some(InitValue(v)) -> [a.default_value(v)]
+    Some(SyncValue(v)) -> [a.value(v)]
   }
-  let on_input_attr = case on_input {
-    None -> a.none()
-    Some(handler) -> e.on_input(handler)
+  let on_input_attrs = case on_input {
+    None -> []
+    Some(handler) -> [e.on_input(handler)]
   }
-  let id_attr = case id {
-    "" -> a.none()
-    v -> a.id(v)
+  let id_attrs = case id {
+    "" -> []
+    v -> [a.id(v)]
   }
-  let name_attr = case name {
-    "" -> a.none()
-    v -> a.name(v)
+  let name_attrs = case name {
+    "" -> []
+    v -> [a.name(v)]
   }
-  let placeholder_attr = case placeholder {
-    "" -> a.none()
-    v -> a.placeholder(v)
+  let placeholder_attrs = case placeholder {
+    "" -> []
+    v -> [a.placeholder(v)]
   }
-  let disabled_attr = case disabled {
-    False -> a.none()
-    True -> a.disabled(True)
+  let disabled_attrs = case disabled {
+    False -> []
+    True -> [a.disabled(True)]
   }
-  let required_attr = case required {
-    False -> a.none()
-    True -> a.required(True)
+  let required_attrs = case required {
+    False -> []
+    True -> [a.required(True)]
   }
-  let extra_class = case class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case class {
+    "" -> []
+    c -> [a.class(c)]
   }
-  h.input([
-    a.type_(type_string(type_)),
-    a.class(class_input),
-    value_attr,
-    on_input_attr,
-    id_attr,
-    name_attr,
-    placeholder_attr,
-    disabled_attr,
-    required_attr,
-    extra_class,
-  ])
+  h.input(list.flatten([
+    [a.type_(type_string(type_)), a.class(class_input)],
+    value_attrs,
+    on_input_attrs,
+    id_attrs,
+    name_attrs,
+    placeholder_attrs,
+    disabled_attrs,
+    required_attrs,
+    extra_class_attrs,
+  ]))
 }
 
 pub fn input_text(

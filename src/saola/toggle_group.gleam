@@ -21,12 +21,12 @@ pub fn toggle_group(
   group_type: ToggleGroupType,
   class: String,
 ) -> Element(msg) {
-  let extra_class = case class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case class {
+    "" -> []
+    c -> [a.class(c)]
   }
   h.div(
-    [a.class("button-group"), extra_class, a.role("group")],
+    list.flatten([[a.class("button-group")], extra_class_attrs, [a.role("group")]]),
     list.map(items, fn(item) {
       let #(value, label, is_disabled) = case item {
         ToggleGroupItem(v, l) -> #(v, l, False)
@@ -39,21 +39,24 @@ pub fn toggle_group(
         MultiSelect, True -> list.filter(selected, fn(s) { s != value })
         MultiSelect, False -> list.append(selected, [value])
       }
+      let disabled_attrs = case is_disabled {
+        True -> [a.disabled(True)]
+        False -> []
+      }
       h.button(
-        [
-          a.type_("button"),
-          a.class("btn btn-ghost"),
-          a.attribute("aria-pressed", case is_pressed {
-            True -> "true"
-            False -> "false"
-          }),
-          a.attribute("data-value", value),
-          case is_disabled {
-            True -> a.disabled(True)
-            False -> a.none()
-          },
-          e.on_click(on_change(new_selected)),
-        ],
+        list.flatten([
+          [
+            a.type_("button"),
+            a.class("btn btn-ghost"),
+            a.attribute("aria-pressed", case is_pressed {
+              True -> "true"
+              False -> "false"
+            }),
+            a.attribute("data-value", value),
+          ],
+          disabled_attrs,
+          [e.on_click(on_change(new_selected))],
+        ]),
         [h.text(label)],
       )
     }),

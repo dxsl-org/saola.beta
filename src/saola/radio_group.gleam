@@ -50,30 +50,38 @@ fn render_option(
     RadioOptionDisabled(v, l) -> #(v, l, True)
   }
   let input_id = group_id <> "-" <> value
+  let name_attrs = case attrs.name {
+    "" -> []
+    n -> [a.name(n)]
+  }
+  let checked_attrs = case selected_value == value {
+    True -> [a.checked(True)]
+    False -> []
+  }
+  let disabled_attrs = case is_disabled || attrs.disabled {
+    True -> [a.disabled(True)]
+    False -> []
+  }
+  let required_attrs = case attrs.required {
+    True -> [a.required(True)]
+    False -> []
+  }
   h.label([a.class(class_label <> " gap-2 cursor-pointer")], [
-    h.input([
-      a.type_("radio"),
-      a.class(class_input),
-      a.id(input_id),
-      case attrs.name {
-        "" -> a.none()
-        n -> a.name(n)
-      },
-      a.value(value),
-      case selected_value == value {
-        True -> a.checked(True)
-        False -> a.none()
-      },
-      case is_disabled || attrs.disabled {
-        True -> a.disabled(True)
-        False -> a.none()
-      },
-      case attrs.required {
-        True -> a.required(True)
-        False -> a.none()
-      },
-      e.on_check(fn(_) { on_change(value) }),
-    ]),
+    h.input(
+      list.flatten([
+        [
+          a.type_("radio"),
+          a.class(class_input),
+          a.id(input_id),
+        ],
+        name_attrs,
+        [a.value(value)],
+        checked_attrs,
+        disabled_attrs,
+        required_attrs,
+        [e.on_check(fn(_) { on_change(value) })],
+      ]),
+    ),
     h.text(label),
   ])
 }
@@ -99,21 +107,21 @@ pub fn radio_group(
     typeid.new(prefix: "rg")
     |> result.map(typeid.to_string)
     |> result.unwrap("radio-group")
-  let orientation_attr = case attrs.orientation {
-    Horizontal -> a.attribute("data-orientation", "horizontal")
-    Vertical -> a.none()
+  let orientation_attrs = case attrs.orientation {
+    Horizontal -> [a.attribute("data-orientation", "horizontal")]
+    Vertical -> []
   }
-  let extra_class = case attrs.class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case attrs.class {
+    "" -> []
+    c -> [a.class(c)]
   }
   h.div(
-    [
-      a.class("radio-group"),
-      extra_class,
-      a.role("radiogroup"),
-      orientation_attr,
-    ],
+    list.flatten([
+      [a.class("radio-group")],
+      extra_class_attrs,
+      [a.role("radiogroup")],
+      orientation_attrs,
+    ]),
     list.map(options, fn(opt) {
       render_option(opt, value, attrs, on_change, group_id)
     }),

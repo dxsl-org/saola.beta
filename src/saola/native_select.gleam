@@ -50,27 +50,31 @@ pub fn native_select(
     Default -> "native-select"
     Small -> "native-select native-select-sm"
   }
-  let extra_class = case attrs.class {
-    "" -> a.none()
-    c -> a.class(c)
+  let extra_class_attrs = case attrs.class {
+    "" -> []
+    c -> [a.class(c)]
   }
-  h.div([a.class("native-select-wrapper"), extra_class], [
-    h.select(
-      [
-        a.class(size_class),
-        a.name(name),
-        case attrs.disabled {
-          True -> a.disabled(True)
-          False -> a.none()
-        },
-        e.on_input(on_change),
-      ],
-      list.map(options, fn(o) { render_option(o, value) }),
-    ),
-    h.span([a.class("native-select-icon"), a.attribute("aria-hidden", "true")], [
-      h.text("▾"),
-    ]),
-  ])
+  let disabled_attrs = case attrs.disabled {
+    True -> [a.disabled(True)]
+    False -> []
+  }
+  h.div(
+    list.flatten([[a.class("native-select-wrapper")], extra_class_attrs]),
+    [
+      h.select(
+        list.flatten([
+          [a.class(size_class), a.name(name)],
+          disabled_attrs,
+          [e.on_input(on_change)],
+        ]),
+        list.map(options, fn(o) { render_option(o, value) }),
+      ),
+      h.span(
+        [a.class("native-select-icon"), a.attribute("aria-hidden", "true")],
+        [h.text("▾")],
+      ),
+    ],
+  )
 }
 
 pub fn native_select_simple(
