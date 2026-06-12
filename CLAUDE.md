@@ -257,3 +257,12 @@ assert string.contains(html, "chart-title=\"Revenue\"")
 // WRONG: property "series" will never appear in to_string output
 assert string.contains(html, "series=")
 ```
+
+---
+
+## Widget Documentation DoD
+
+A widget addition or public-API change is NOT complete until:
+1. Every public function/type has a `///` doc comment (params, return, errors) — `gleam docs build` must pass.
+2. Its preview page in `dev/saola/preview/` uses the `doc_page` scaffold with at least Demo and Usage (snippet) sections.
+3. The sidebar entry exists in the correct category group.

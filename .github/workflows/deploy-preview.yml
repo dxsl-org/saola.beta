@@ -35,6 +35,10 @@ jobs:
 
       - run: bun run vite build --base /saola.beta/
 
+      - run: gleam docs build
+
+      - run: cp -r build/dev/docs/saola dist/api
+
       - uses: actions/upload-pages-artifact@v5.0.0
         with:
           path: dist

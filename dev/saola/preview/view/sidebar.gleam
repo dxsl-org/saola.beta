@@ -7,6 +7,10 @@ import lustre/event as ev
 import saola/preview/model.{type Message, ThemeSelected}
 import saola/theme.{type Theme}
 
+/// Absolute path to the generated API reference.
+/// Matches the GitHub Pages base /saola.beta/ — local dev has no /api/, which is acceptable.
+const api_path = "/saola.beta/api/"
+
 pub fn view(
   current_route: model.Route,
   current_theme: Theme,
@@ -22,6 +26,9 @@ pub fn view(
     section("Navigation", navigation_links(), current_route),
     section("Charts & Canvas", chart_links(), current_route),
     section("Demos & Examples", demo_links(), current_route),
+    h.a([a.href(api_path), a.rel("external"), a.class("nav-link")], [
+      element.text("API Reference"),
+    ]),
   ])
 }
 
