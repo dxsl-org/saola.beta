@@ -4,12 +4,9 @@ import lustre/element.{type Element}
 import lustre/element/html as h
 import lustre/event as ev
 
+import saola/preview/base_path
 import saola/preview/model.{type Message, ThemeSelected}
 import saola/theme.{type Theme}
-
-/// Absolute path to the generated API reference.
-/// Matches the GitHub Pages base /saola.beta/ — local dev has no /api/, which is acceptable.
-const api_path = "/saola.beta/api/"
 
 pub fn view(
   current_route: model.Route,
@@ -26,9 +23,15 @@ pub fn view(
     section("Navigation", navigation_links(), current_route),
     section("Charts & Canvas", chart_links(), current_route),
     section("Demos & Examples", demo_links(), current_route),
-    h.a([a.href(api_path), a.rel("external"), a.class("nav-link")], [
-      element.text("API Reference"),
-    ]),
+    h.a(
+      [
+        // Static gleam-docs site next to the SPA; local dev has no /api/.
+        a.href(base_path.href("/api/")),
+        a.rel("external"),
+        a.class("nav-link"),
+      ],
+      [element.text("API Reference")],
+    ),
   ])
 }
 
@@ -155,9 +158,13 @@ fn section(
 }
 
 fn nav_link(path: String, label: String, is_active: Bool) -> Element(Message) {
-  h.a([a.href(path), a.classes([#("nav-link", True), #("active", is_active)])], [
-    element.text(label),
-  ])
+  h.a(
+    [
+      a.href(base_path.href(path)),
+      a.classes([#("nav-link", True), #("active", is_active)]),
+    ],
+    [element.text(label)],
+  )
 }
 
 fn theme_switcher(current_theme: Theme) -> Element(Message) {

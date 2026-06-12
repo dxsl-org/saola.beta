@@ -19,6 +19,7 @@ import saola/component/multi_select as ms
 import saola/component/resizable_split
 import saola/graph_layout
 import saola/lustre_heatmap
+import saola/preview/base_path
 import saola/preview/threat_intel_data
 import saola/theme
 import saola/toast
@@ -203,7 +204,9 @@ fn init(_args) -> #(Model, Effect(Message)) {
 }
 
 fn on_url_change(uri: Uri) -> Message {
-  let route = case uri.path {
+  // On GitHub Pages the app lives under /saola.beta/ — match routes on the
+  // base-independent path so the same code works in dev and deployed.
+  let route = case base_path.strip(uri.path) {
     "/alerts" -> Alerts
     "/badges" -> Badges
     "/cards" -> Cards

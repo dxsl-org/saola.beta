@@ -11,3 +11,14 @@ export function isOutside(selector, event) {
   if (!target) return true
   return !target.closest(selector)
 }
+
+/**
+ * App base path set by dev/main.mjs from Vite's BASE_URL.
+ * Normalized: no trailing slash; empty string when served from the root.
+ *
+ * @returns {string}
+ */
+export function appBase() {
+  const raw = globalThis.__SAOLA_BASE__ ?? '/'
+  return raw === '/' ? '' : raw.replace(/\/$/, '')
+}
