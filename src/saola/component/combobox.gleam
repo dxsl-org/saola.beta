@@ -104,8 +104,6 @@ type Model {
     focused_index: Option(Int),
     // Preselected item value (used when choices arrive later)
     preselect_value: Option(String),
-    // Track if we've registered the outside-click listener already
-    has_outside_listener: Bool,
   )
 }
 
@@ -239,7 +237,6 @@ fn init(_) -> #(Model, effect.Effect(Message)) {
       selected_item: None,
       focused_index: None,
       preselect_value: None,
-      has_outside_listener: False,
     ),
     effect.none(),
   )
@@ -252,16 +249,16 @@ fn update(model: Model, message: Message) -> #(Model, effect.Effect(Message)) {
         Model(
           ..model,
           is_open: True,
-          has_outside_listener: True,
           filter_text: "",
           filtered_choices: iv.from_list(model.choices),
           focused_index: None,
         )
-      let listener_eff = case model.has_outside_listener {
-        True -> effect.none()
-        False -> register_outside_click_listener()
-      }
-      #(new_model, effect.batch([emit(Focused), listener_eff]))
+      // Registered on every open: the FFI helper replaces any previous
+      // listener for this host, so this never stacks handlers.
+      #(
+        new_model,
+        effect.batch([emit(Focused), register_outside_click_listener()]),
+      )
     }
     UserClickedOutside -> {
       #(Model(..model, is_open: False, focused_index: None), effect.none())

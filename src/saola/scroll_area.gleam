@@ -24,6 +24,8 @@ pub fn scroll_area(
       h.div(
         [
           a.class("scroll-area-viewport"),
+          a.attribute("role", "region"),
+          a.attribute("aria-label", "Scrollable content"),
           a.attribute("tabindex", "0"),
         ],
         [content],
@@ -32,9 +34,6 @@ pub fn scroll_area(
   )
 }
 
-pub fn scroll_area_simple(
-  content: Element(msg),
-  height: String,
-) -> Element(msg) {
+pub fn scroll_area_simple(content: Element(msg), height: String) -> Element(msg) {
   scroll_area(content, height, "100%", "")
 }

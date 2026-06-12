@@ -399,6 +399,90 @@ pub fn context_menu_has_backdrop_when_open_test() {
   assert string.contains(html, "context-menu-backdrop")
 }
 
+pub fn context_menu_popup_has_role_menu_test() {
+  let html =
+    context_menu.context_menu_simple(
+      h.div([], []),
+      [context_menu.ContextMenuAction("Copy", Nil)],
+      True,
+      0,
+      0,
+      fn(_, _) { Nil },
+      fn() { Nil },
+    )
+    |> element.to_string
+  assert string.contains(html, "role=\"menu\"")
+}
+
+pub fn context_menu_action_has_role_menuitem_test() {
+  let html =
+    context_menu.context_menu_simple(
+      h.div([], []),
+      [context_menu.ContextMenuAction("Cut", Nil)],
+      True,
+      0,
+      0,
+      fn(_, _) { Nil },
+      fn() { Nil },
+    )
+    |> element.to_string
+  assert string.contains(html, "role=\"menuitem\"")
+}
+
+pub fn context_menu_disabled_has_aria_disabled_test() {
+  let html =
+    context_menu.context_menu_simple(
+      h.div([], []),
+      [context_menu.ContextMenuDisabled("Locked")],
+      True,
+      0,
+      0,
+      fn(_, _) { Nil },
+      fn() { Nil },
+    )
+    |> element.to_string
+  assert string.contains(html, "aria-disabled=\"true\"")
+}
+
+pub fn context_menu_separator_has_role_separator_test() {
+  let html =
+    context_menu.context_menu_simple(
+      h.div([], []),
+      [
+        context_menu.ContextMenuAction("A", Nil),
+        context_menu.ContextMenuSeparator,
+        context_menu.ContextMenuAction("B", Nil),
+      ],
+      True,
+      0,
+      0,
+      fn(_, _) { Nil },
+      fn() { Nil },
+    )
+    |> element.to_string
+  assert string.contains(html, "role=\"separator\"")
+}
+
+pub fn context_menu_group_has_role_group_test() {
+  let html =
+    context_menu.context_menu_simple(
+      h.div([], []),
+      [
+        context_menu.ContextMenuGroup("Actions", [
+          context_menu.ContextMenuAction("Run", Nil),
+        ]),
+      ],
+      True,
+      0,
+      0,
+      fn(_, _) { Nil },
+      fn() { Nil },
+    )
+    |> element.to_string
+  assert string.contains(html, "role=\"group\"")
+  assert string.contains(html, "aria-label=\"Actions\"")
+}
+
 // --- drawer ---
 
 pub fn drawer_closed_renders_empty_test() {

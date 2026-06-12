@@ -45,7 +45,6 @@ type Model {
     // Index of the item to focus when navigating with keyboard.
     focused_index: Option(Int),
     is_open: Bool,
-    has_outside_listener: Bool,
   )
 }
 
@@ -136,7 +135,7 @@ fn init(_) -> #(Model, Effect(Message)) {
     typeid.new(prefix: "mselect")
     |> result.map(typeid.to_string)
     |> result.unwrap("mselect-fallback")
-  let model = Model(id, [], set.new(), None, False, False)
+  let model = Model(id, [], set.new(), None, False)
   #(model, effect.none())
 }
 
@@ -144,12 +143,10 @@ fn update(model: Model, message: Message) -> #(Model, Effect(Message)) {
   case message {
     UserClickedTrigger -> {
       let is_open = !model.is_open
-      let listener_eff = case model.has_outside_listener {
-        True -> effect.none()
-        False -> register_outside_click_listener()
-      }
-      #(Model(..model, is_open:, has_outside_listener: True), case is_open {
-        True -> listener_eff
+      // Registered on every open: the FFI helper replaces any previous
+      // listener for this host, so this never stacks handlers.
+      #(Model(..model, is_open:), case is_open {
+        True -> register_outside_click_listener()
         False -> effect.none()
       })
     }

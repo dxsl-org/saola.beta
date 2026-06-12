@@ -63,6 +63,9 @@ pub fn carousel(
     "saola-carousel",
     [
       a.class("carousel-root"),
+      a.attribute("role", "region"),
+      a.attribute("aria-roledescription", "carousel"),
+      a.attribute("aria-label", "Carousel"),
       a.attribute("orientation", orientation_str(attrs.orientation)),
       loop_attr,
       e.on("slide-change", decode_change(on_change)),

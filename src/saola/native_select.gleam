@@ -24,10 +24,7 @@ pub const default_attrs = NativeSelectAttrs(
   class: "",
 )
 
-fn render_option(
-  opt: NativeSelectOption,
-  current_value: String,
-) -> Element(msg) {
+fn render_option(opt: NativeSelectOption, current_value: String) -> Element(msg) {
   case opt {
     NativeSelectOption(value, label) ->
       h.option([a.value(value), a.selected(value == current_value)], label)

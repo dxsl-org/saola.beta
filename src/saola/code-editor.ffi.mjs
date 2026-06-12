@@ -96,5 +96,9 @@ export function ensure_registered() {
     if (!customElements.get('saola-codemirror-editor')) {
       customElements.define('saola-codemirror-editor', SaolaCodemirrorEditor)
     }
+  }).catch((err) => {
+    // Reset so a later ensure_registered() call can retry the import.
+    defined = false
+    console.error('[saola] code-editor: failed to load CodeMirror', err)
   })
 }

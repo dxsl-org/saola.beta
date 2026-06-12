@@ -440,10 +440,7 @@ fn info_panel(model: Model) -> Element(Message) {
   )
 }
 
-fn info_col(
-  label: String,
-  children: List(Element(Message)),
-) -> Element(Message) {
+fn info_col(label: String, children: List(Element(Message))) -> Element(Message) {
   h.div([a.class("grid gap-1 content-start")], [
     h.p(
       [

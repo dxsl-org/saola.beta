@@ -45,10 +45,7 @@ pub fn cell_display_value(row: Int, col: Int, seed: Int) -> Int {
 // SVG renderer — one <rect> element per cell
 // ---------------------------------------------------------------------------
 
-pub fn heatmap_svg(
-  data: List(HeatmapCell),
-  attrs: HeatmapAttrs,
-) -> Element(msg) {
+pub fn heatmap_svg(data: List(HeatmapCell), attrs: HeatmapAttrs) -> Element(msg) {
   let HeatmapAttrs(cols:, rows:, cell_size:, color_scheme:) = attrs
   let cs = int.to_string(cell_size)
   let w = int.to_string(cols * cell_size)

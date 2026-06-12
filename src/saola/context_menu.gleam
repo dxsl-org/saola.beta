@@ -31,12 +31,22 @@ fn render_item(item: ContextMenuItem(msg)) -> Element(msg) {
   case item {
     ContextMenuAction(label, on_click) ->
       h.button(
-        [a.type_("button"), a.class("context-menu-item"), e.on_click(on_click)],
+        [
+          a.type_("button"),
+          a.class("context-menu-item"),
+          a.attribute("role", "menuitem"),
+          e.on_click(on_click),
+        ],
         [h.text(label)],
       )
     ContextMenuActionShortcut(label, shortcut, on_click) ->
       h.button(
-        [a.type_("button"), a.class("context-menu-item"), e.on_click(on_click)],
+        [
+          a.type_("button"),
+          a.class("context-menu-item"),
+          a.attribute("role", "menuitem"),
+          e.on_click(on_click),
+        ],
         [
           h.text(label),
           h.span([a.class("context-menu-shortcut")], [h.text(shortcut)]),
@@ -47,20 +57,33 @@ fn render_item(item: ContextMenuItem(msg)) -> Element(msg) {
         [
           a.type_("button"),
           a.class("context-menu-item context-menu-item-destructive"),
+          a.attribute("role", "menuitem"),
           e.on_click(on_click),
         ],
         [h.text(label)],
       )
     ContextMenuDisabled(label) ->
-      h.div([a.class("context-menu-item context-menu-item-disabled")], [
-        h.text(label),
-      ])
-    ContextMenuSeparator -> h.div([a.class("context-menu-separator")], [])
+      h.div(
+        [
+          a.class("context-menu-item context-menu-item-disabled"),
+          a.attribute("role", "menuitem"),
+          a.attribute("aria-disabled", "true"),
+        ],
+        [h.text(label)],
+      )
+    ContextMenuSeparator ->
+      h.div(
+        [a.class("context-menu-separator"), a.attribute("role", "separator")],
+        [],
+      )
     ContextMenuGroup(group_label, group_items) ->
-      h.div([], [
-        h.div([a.class("context-menu-group-label")], [h.text(group_label)]),
-        ..list.map(group_items, render_item)
-      ])
+      h.div(
+        [a.attribute("role", "group"), a.attribute("aria-label", group_label)],
+        [
+          h.div([a.class("context-menu-group-label")], [h.text(group_label)]),
+          ..list.map(group_items, render_item)
+        ],
+      )
   }
 }
 
@@ -97,6 +120,7 @@ pub fn context_menu(
             h.div(
               [
                 a.class("context-menu-popup"),
+                a.attribute("role", "menu"),
                 a.style("left", int.to_string(x) <> "px"),
                 a.style("top", int.to_string(y) <> "px"),
               ],

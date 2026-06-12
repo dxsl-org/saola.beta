@@ -197,6 +197,20 @@ pub fn scroll_area_renders_test() {
   assert string.contains(html, "content")
 }
 
+pub fn scroll_area_viewport_has_role_region_test() {
+  let html =
+    scroll_area.scroll_area_simple(h.p([], [h.text("data")]), "300px")
+    |> element.to_string
+  assert string.contains(html, "role=\"region\"")
+}
+
+pub fn scroll_area_viewport_has_aria_label_test() {
+  let html =
+    scroll_area.scroll_area_simple(h.p([], [h.text("data")]), "300px")
+    |> element.to_string
+  assert string.contains(html, "aria-label=\"Scrollable content\"")
+}
+
 // --- aspect_ratio ---
 
 pub fn aspect_ratio_renders_test() {

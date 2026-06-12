@@ -31,15 +31,36 @@ export function isOutOfView(element, container) {
  * Registers a document-level click listener that fires when a click
  * lands outside the host element.
  *
+ * Self-cleaning: Lustre components expose no disconnect hook to Gleam,
+ * so the handler unregisters itself on the first click that arrives
+ * while the host is no longer connected — otherwise the closure keeps
+ * the unmounted component's runtime alive forever.
+ *
+ * Idempotent per host: re-registering replaces the previous listener,
+ * so callers may register on every open without stacking handlers —
+ * this also revives dismissal after a disconnect→reconnect DOM move.
+ *
  * @param {ShadowRoot|Element} root
  * @param {() => void} callback
  * @returns {void}
  */
 export function addOutsideClickListener(root, callback) {
   const host = root instanceof ShadowRoot ? root.host : root
-  document.addEventListener('click', (event) => {
+  if (host.__saolaOutsideClick) {
+    document.removeEventListener('click', host.__saolaOutsideClick)
+  }
+  const handler = (event) => {
+    if (!host.isConnected) {
+      document.removeEventListener('click', handler)
+      if (host.__saolaOutsideClick === handler) {
+        host.__saolaOutsideClick = null
+      }
+      return
+    }
     if (!event.composedPath().includes(host)) {
       callback()
     }
-  })
+  }
+  host.__saolaOutsideClick = handler
+  document.addEventListener('click', handler)
 }

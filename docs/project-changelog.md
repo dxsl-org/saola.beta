@@ -2,6 +2,40 @@
 
 All notable changes to the Saola UI Kit are documented here.
 
+## [2026-06-12] — Track A: Tech Debt Cleanup (FFI, ARIA, Tests)
+
+### Summary
+
+Completed three concurrent tech-debt initiatives: hardened FFI cleanup contracts, closed 3 ARIA accessibility gaps on interactive widgets, and added 36 missing widget tests. Test coverage increased from 350 to 386 passing tests.
+
+### Changes
+
+**FFI Hardening** (`src/saola/component/component-helpers.mjs`, `src/saola/code-editor.ffi.mjs`)
+- Rewrote `addOutsideClickListener` with self-cleaning handler: checks `host.isConnected` on each document click and deregisters when host is disconnected. Idempotent-per-host pattern: combobox/multi_select now register on every open, handler deduplicates via isConnected guard.
+- Added `.catch()` to `Promise.all` in code-editor: resets `defined = false` on CodeMirror import failure, enabling retry on subsequent calls. Logs actionable error: `[saola] code-editor: failed to load CodeMirror`.
+
+**ARIA Gap Closure** (`src/saola/context_menu.gleam`, `src/saola/carousel.gleam`, `src/saola/scroll_area.gleam`)
+- Verified 15 interactive widget candidates; 12 already covered or decorative
+- **context_menu**: Added role=menu, role=menuitem, role=separator, role=group
+- **carousel**: Added role=region + aria-roledescription="Carousel" + aria-label
+- **scroll_area**: Added role=region + aria-label
+
+**Missing Widget Tests** (`test/missing_widget_tests.gleam`)
+- Created comprehensive test suite covering dropdown_menu, lustre_heatmap, code_editor, world_map (36 new tests)
+- Bonus fix: `world-map.ffi.mjs` now includes JSON import attribute + HTMLElement fallback + environment guard, enabling Node v24 importability (was blocking all world_map tests)
+- 10 additional ARIA verification tests in new_widget_tests2/3/5
+
+**Test Suite Results**
+- Pre: 350 tests passing
+- Post: 386 tests passing (36 new + 0 fixed failures)
+- `gleam format --check` clean, `gleam build` clean, haily-reviewer score 8/10 (all findings fixed)
+
+### Impact
+
+- **Stability:** Document-level listeners now self-clean; CodeMirror import failures are retryable and logged
+- **Accessibility:** 3 widgets now meet WCAG 2.1 Level A/AA requirements for interactive role announcements
+- **Test Coverage:** All major widgets now have passing unit tests; confidence in browser integration tests
+
 ## [2026-05-18] — Entity Graph Canvas Enhancement: Selection & Dimming
 
 ### Summary

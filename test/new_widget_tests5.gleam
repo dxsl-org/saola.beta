@@ -64,6 +64,24 @@ pub fn carousel_horizontal_default_test() {
   assert string.contains(html, "orientation=\"horizontal\"")
 }
 
+pub fn carousel_has_role_region_test() {
+  let html =
+    carousel.carousel_simple([h.div([], [h.text("Slide 1")])], 0, fn(i, p, n) {
+      #(i, p, n)
+    })
+    |> element.to_string
+  assert string.contains(html, "role=\"region\"")
+}
+
+pub fn carousel_has_aria_roledescription_test() {
+  let html =
+    carousel.carousel_simple([h.div([], [h.text("Slide 1")])], 0, fn(i, p, n) {
+      #(i, p, n)
+    })
+    |> element.to_string
+  assert string.contains(html, "aria-roledescription=\"carousel\"")
+}
+
 // --- combobox ---
 
 pub fn combobox_element_renders_tag_test() {

@@ -464,9 +464,7 @@ fn timeline_panel(model: Model) -> Element(Message) {
 // Helpers
 // ---------------------------------------------------------------------------
 
-fn severity_badge_variant(
-  sev: threat_intel_data.Severity,
-) -> badge.BadgeVariant {
+fn severity_badge_variant(sev: threat_intel_data.Severity) -> badge.BadgeVariant {
   case sev {
     threat_intel_data.Critical -> badge.Destructive
     threat_intel_data.High -> badge.Default

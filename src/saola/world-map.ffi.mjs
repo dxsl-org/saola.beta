@@ -1,6 +1,6 @@
 import * as d3 from 'd3'
 import * as topojson from 'topojson-client'
-import worldData from 'world-atlas/countries-110m.json'
+import worldData from 'world-atlas/countries-110m.json' with { type: 'json' }
 
 // ISO 3166-1 numeric → country name for the countries in our demo
 const COUNTRY_NAMES = {
@@ -41,7 +41,9 @@ const SEVERITY_MARKER_COLORS = {
   low:      '#6b7280',
 }
 
-class SaolaWorldMap extends HTMLElement {
+// Fallback base keeps this module importable under Node (tests); the class
+// is only instantiated in browsers, where HTMLElement exists.
+class SaolaWorldMap extends (globalThis.HTMLElement ?? class {}) {
   constructor() {
     super()
     this._markers = []
@@ -357,6 +359,7 @@ function _countryMatchesName(marker, name) {
 }
 
 export function ensure_registered() {
+  if (typeof globalThis.HTMLElement === 'undefined') return
   if (!customElements.get('saola-world-map')) {
     customElements.define('saola-world-map', SaolaWorldMap)
   }
