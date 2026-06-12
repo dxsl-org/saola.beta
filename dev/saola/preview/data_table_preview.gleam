@@ -7,6 +7,7 @@ import saola/preview/model.{
   type Message, type Model, DataTableFilterChanged, DataTablePageChanged,
   DataTableSelectChanged, DataTableSortChanged,
 }
+import saola/preview/view/doc_page.{DocSection}
 
 type Person {
   Person(id: String, name: String, email: String, role: String, status: String)
@@ -81,16 +82,11 @@ fn simple_columns() -> List(data_table.DataTableColumn(Person, Message)) {
 }
 
 pub fn view(model: Model) -> Element(Message) {
-  h.div([], [
-    h.h1([a.class("page-title")], [text("Data Table")]),
-    h.p([a.class("page-description")], [
-      text(
-        "Sortable, filterable table with pagination and row selection. Click a row to select it.",
-      ),
-    ]),
-    h.div([a.class("grid gap-8")], [
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("Full-featured table")]),
+  doc_page.doc_page(
+    "Data Table",
+    "Sortable, filterable table with pagination and row selection. Click a row to select it.",
+    [
+      DocSection("full-featured", "Full-featured Table", [
         data_table.data_table(
           full_columns(),
           sample_rows(),
@@ -103,8 +99,7 @@ pub fn view(model: Model) -> Element(Message) {
           data_table.default_attrs,
         ),
       ]),
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("Simple read-only")]),
+      DocSection("simple", "Simple Read-only", [
         data_table.data_table_simple(simple_columns(), [
           Person("1", "Alice Chen", "alice@example.com", "Engineer", "Active"),
           Person("2", "Bob Smith", "bob@example.com", "Designer", "Active"),
@@ -112,6 +107,24 @@ pub fn view(model: Model) -> Element(Message) {
           Person("4", "Dan Brown", "dan@example.com", "Engineer", "Active"),
         ]),
       ]),
-    ]),
-  ])
+      DocSection("usage", "Usage", [
+        doc_page.snippet([
+          "import saola/data_table",
+          "",
+          "data_table.data_table_simple(columns, rows)",
+          "",
+          "// Full-featured:",
+          "data_table.data_table(",
+          "  columns, rows, model.data_table_state,",
+          "  fn(key) { DataTableSortChanged(key) },",
+          "  fn(q) { DataTableFilterChanged(q) },",
+          "  fn(p) { DataTablePageChanged(p) },",
+          "  fn(ids) { DataTableSelectChanged(ids) },",
+          "  fn(row) { row.id },",
+          "  data_table.default_attrs,",
+          ")",
+        ]),
+      ]),
+    ],
+  )
 }

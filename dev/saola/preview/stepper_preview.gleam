@@ -1,8 +1,9 @@
 import gleam/option.{Some}
 import lustre/attribute as a
-import lustre/element.{type Element, text}
+import lustre/element.{type Element}
 import lustre/element/html as h
 import saola/preview/model.{type Message, type Model, StepperStepClicked}
+import saola/preview/view/doc_page.{DocSection}
 import saola/stepper
 
 pub fn view(model: Model) -> Element(Message) {
@@ -28,57 +29,72 @@ pub fn view(model: Model) -> Element(Message) {
       status: stepper.Pending,
     ),
   ]
-  h.div([], [
-    h.h1([a.class("page-title")], [text("Stepper")]),
-    h.p([a.class("page-description")], [
-      text(
-        "A multi-step progress indicator with horizontal and vertical modes.",
-      ),
-    ]),
-    h.div([a.class("grid gap-8")], [
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("Horizontal")]),
-        stepper.stepper(
-          stepper.Horizontal,
-          steps,
-          model.stepper_step,
-          Some(StepperStepClicked),
+  doc_page.doc_page(
+    "Stepper",
+    "A multi-step progress indicator with horizontal and vertical modes.",
+    [
+      DocSection("demo", "Demo", [
+        h.div([a.class("grid gap-8")], [
+          h.div([a.class("grid gap-4")], [
+            h.h2([], [h.text("Horizontal")]),
+            stepper.stepper(
+              stepper.Horizontal,
+              steps,
+              model.stepper_step,
+              Some(StepperStepClicked),
+              "",
+            ),
+          ]),
+          h.div([a.class("grid gap-4")], [
+            h.h2([], [h.text("Vertical")]),
+            stepper.stepper(
+              stepper.Vertical,
+              steps,
+              model.stepper_step,
+              Some(StepperStepClicked),
+              "",
+            ),
+          ]),
+          h.div([a.class("grid gap-4")], [
+            h.h2([], [h.text("With error state")]),
+            stepper.stepper_simple(
+              [
+                stepper.StepItem(
+                  label: "Account",
+                  description: "",
+                  status: stepper.Complete,
+                ),
+                stepper.StepItem(
+                  label: "Verification",
+                  description: "Email not verified",
+                  status: stepper.Error,
+                ),
+                stepper.StepItem(
+                  label: "Done",
+                  description: "",
+                  status: stepper.Pending,
+                ),
+              ],
+              1,
+            ),
+          ]),
+        ]),
+      ]),
+      DocSection("usage", "Usage", [
+        doc_page.snippet([
+          "import saola/stepper",
+          "import gleam/option.{Some}",
           "",
-        ),
+          "// model.stepper_step : Int",
+          "stepper.stepper(",
+          "  stepper.Horizontal,",
+          "  steps,",
+          "  model.stepper_step,",
+          "  Some(StepperStepClicked),",
+          "  \"\",",
+          ")",
+        ]),
       ]),
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("Vertical")]),
-        stepper.stepper(
-          stepper.Vertical,
-          steps,
-          model.stepper_step,
-          Some(StepperStepClicked),
-          "",
-        ),
-      ]),
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("With error state")]),
-        stepper.stepper_simple(
-          [
-            stepper.StepItem(
-              label: "Account",
-              description: "",
-              status: stepper.Complete,
-            ),
-            stepper.StepItem(
-              label: "Verification",
-              description: "Email not verified",
-              status: stepper.Error,
-            ),
-            stepper.StepItem(
-              label: "Done",
-              description: "",
-              status: stepper.Pending,
-            ),
-          ],
-          1,
-        ),
-      ]),
-    ]),
-  ])
+    ],
+  )
 }

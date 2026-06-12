@@ -1,7 +1,7 @@
-import lustre/attribute as a
 import lustre/element.{type Element, text}
 import lustre/element/html as h
 import saola/preview/model.{type Message, type Model, TabChanged}
+import saola/preview/view/doc_page.{DocSection}
 import saola/tabs
 
 pub fn view(model: Model) -> Element(Message) {
@@ -28,17 +28,27 @@ pub fn view(model: Model) -> Element(Message) {
       ]),
     ),
   ]
-  h.div([], [
-    h.h1([a.class("page-title")], [text("Tabs")]),
-    h.p([a.class("page-description")], [
-      text("Organize content into tabbed panels."),
-    ]),
-    h.div([a.class("mt-4")], [
+
+  doc_page.doc_page("Tabs", "Organize content into tabbed panels.", [
+    DocSection("demo", "Demo", [
       tabs.tabs_simple(
         items: demo_tabs,
         active_id: model.active_tab,
         on_tab_change: TabChanged,
       ),
+    ]),
+    DocSection("usage", "Usage", [
+      doc_page.snippet([
+        "import saola/tabs",
+        "",
+        "tabs.tabs_simple(",
+        "  items: [",
+        "    tabs.Tab(\"account\", \"Account\", h.p([], [text(\"Content\")])),",
+        "  ],",
+        "  active_id: model.active_tab,",
+        "  on_tab_change: TabChanged,",
+        ")",
+      ]),
     ]),
   ])
 }

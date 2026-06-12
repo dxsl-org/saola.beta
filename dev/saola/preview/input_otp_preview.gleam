@@ -3,16 +3,12 @@ import lustre/element.{type Element, text}
 import lustre/element/html as h
 import saola/input_otp
 import saola/preview/model.{type Message, type Model, InputOtpChanged}
+import saola/preview/view/doc_page.{DocSection}
 
 pub fn view(model: Model) -> Element(Message) {
-  h.div([], [
-    h.h1([a.class("page-title")], [text("Input OTP")]),
-    h.p([a.class("page-description")], [
-      text("An accessible one-time password input."),
-    ]),
-    h.div([a.class("grid gap-8")], [
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("6-digit OTP")]),
+  doc_page.doc_page("Input OTP", "An accessible one-time password input.", [
+    DocSection("six-digit", "6-digit OTP", [
+      h.div([a.class("grid gap-4 mt-4")], [
         input_otp.input_otp_simple(model.input_otp_value, InputOtpChanged),
         h.p(
           [
@@ -24,13 +20,29 @@ pub fn view(model: Model) -> Element(Message) {
           ],
         ),
       ]),
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("4-digit PIN")]),
+    ]),
+    DocSection("four-digit", "4-digit PIN", [
+      h.div([a.class("grid gap-4 mt-4")], [
         input_otp.input_otp(
           model.input_otp_value,
           InputOtpChanged,
           input_otp.InputOtpAttrs(..input_otp.default_attrs, length: 4),
         ),
+      ]),
+    ]),
+    DocSection("usage", "Usage", [
+      doc_page.snippet([
+        "import saola/input_otp",
+        "",
+        "// 6-digit (default)",
+        "input_otp.input_otp_simple(model.input_otp_value, InputOtpChanged)",
+        "",
+        "// 4-digit PIN",
+        "input_otp.input_otp(",
+        "  model.input_otp_value,",
+        "  InputOtpChanged,",
+        "  input_otp.InputOtpAttrs(..input_otp.default_attrs, length: 4),",
+        ")",
       ]),
     ]),
   ])

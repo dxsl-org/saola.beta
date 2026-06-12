@@ -1,8 +1,9 @@
 import gleam/option.{None, Some}
 import lustre/attribute as a
-import lustre/element.{type Element, text}
+import lustre/element.{type Element}
 import lustre/element/html as h
 import saola/preview/model.{type Message, type Model, TreeNodeToggled}
+import saola/preview/view/doc_page.{DocSection}
 import saola/tree_view
 
 pub fn view(model: Model) -> Element(Message) {
@@ -45,16 +46,11 @@ pub fn view(model: Model) -> Element(Message) {
     ),
   ]
 
-  h.div([], [
-    h.h1([a.class("page-title")], [text("Tree View")]),
-    h.p([a.class("page-description")], [
-      text(
-        "A collapsible tree widget for hierarchical data. Click folders to expand/collapse.",
-      ),
-    ]),
-    h.div([a.class("grid gap-8")], [
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("File tree")]),
+  doc_page.doc_page(
+    "Tree View",
+    "A collapsible tree widget for hierarchical data. Click folders to expand/collapse.",
+    [
+      DocSection("file-tree", "File Tree", [
         h.div([a.class("max-w-xs border rounded-md p-2")], [
           tree_view.tree_view_simple(
             items,
@@ -63,8 +59,7 @@ pub fn view(model: Model) -> Element(Message) {
           ),
         ]),
       ]),
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("With select callback")]),
+      DocSection("with-select", "With Select Callback", [
         h.div([a.class("max-w-xs border rounded-md p-2")], [
           tree_view.tree_view(
             items,
@@ -75,6 +70,17 @@ pub fn view(model: Model) -> Element(Message) {
           ),
         ]),
       ]),
-    ]),
-  ])
+      DocSection("usage", "Usage", [
+        doc_page.snippet([
+          "import saola/tree_view",
+          "",
+          "tree_view.tree_view_simple(",
+          "  items,",
+          "  model.tree_open_ids,",
+          "  TreeNodeToggled,",
+          ")",
+        ]),
+      ]),
+    ],
+  )
 }

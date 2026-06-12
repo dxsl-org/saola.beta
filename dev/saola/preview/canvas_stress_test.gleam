@@ -13,6 +13,7 @@ import saola/preview/model.{
   type Message, type Model, StressBarClicked, StressOffsetChanged,
   StressZoomChanged,
 }
+import saola/preview/view/doc_page.{DocSection}
 
 // ---------------------------------------------------------------------------
 // Synthetic dataset — 2 000 ChartPoints computed on demand
@@ -85,67 +86,70 @@ pub fn view(model: Model) -> Element(Message) {
       }),
     )
 
-  h.div([a.class("grid gap-6")], [
-    h.header([a.class("grid gap-2")], [
-      h.h1([a.class("page-title")], [text("Canvas Stress Test")]),
-      h.p([a.class("page-description")], [
-        text(
-          "Gleam generates 2 000 ChartPoints and computes all bar geometry into a "
-          <> "CanvasCommand list on every render. The JS executor draws them in a single "
-          <> "rAF pass — no virtual-DOM diffing per bar.",
-        ),
-      ]),
-    ]),
-    // ---- Controls -----------------------------------------------------------
-    h.div([a.class("flex flex-wrap gap-8 items-end rounded-lg border p-4")], [
-      h.label([a.class("grid gap-1 text-sm font-medium")], [
-        text(
-          "Scroll offset: "
-          <> int.to_string(offset)
-          <> " / "
-          <> int.to_string(int.max(0, max_offset)),
-        ),
-        h.input([
-          a.type_("range"),
-          a.attribute("min", "0"),
-          a.attribute("max", int.to_string(int.max(0, max_offset))),
-          a.value(int.to_string(offset)),
-          e.on_input(fn(v) { StressOffsetChanged(parse_int(v, 0)) }),
-          a.class("w-64"),
+  doc_page.doc_page(
+    "Canvas Stress Test",
+    "Gleam generates 2 000 ChartPoints and computes all bar geometry into a "
+      <> "CanvasCommand list on every render. The JS executor draws them in a single "
+      <> "rAF pass — no virtual-DOM diffing per bar.",
+    [
+      DocSection("demo", "Demo", [
+        h.div([a.class("grid gap-6")], [
+          // ---- Controls -----------------------------------------------------------
+          h.div(
+            [a.class("flex flex-wrap gap-8 items-end rounded-lg border p-4")],
+            [
+              h.label([a.class("grid gap-1 text-sm font-medium")], [
+                text(
+                  "Scroll offset: "
+                  <> int.to_string(offset)
+                  <> " / "
+                  <> int.to_string(int.max(0, max_offset)),
+                ),
+                h.input([
+                  a.type_("range"),
+                  a.attribute("min", "0"),
+                  a.attribute("max", int.to_string(int.max(0, max_offset))),
+                  a.value(int.to_string(offset)),
+                  e.on_input(fn(v) { StressOffsetChanged(parse_int(v, 0)) }),
+                  a.class("w-64"),
+                ]),
+              ]),
+              h.label([a.class("grid gap-1 text-sm font-medium")], [
+                text("Bars in view: " <> int.to_string(model.stress_zoom)),
+                h.input([
+                  a.type_("range"),
+                  a.attribute("min", "10"),
+                  a.attribute("max", "500"),
+                  a.value(int.to_string(model.stress_zoom)),
+                  e.on_input(fn(v) { StressZoomChanged(parse_int(v, 50)) }),
+                  a.class("w-48"),
+                ]),
+              ]),
+            ],
+          ),
+          // ---- Chart --------------------------------------------------------------
+          canvas.canvas_element(output, fn(_, _) { StressBarClicked("") }),
+          // ---- Selection info -----------------------------------------------------
+          selected_info(model.stress_selected),
+          // ---- Architecture note --------------------------------------------------
+          h.details([a.class("text-sm rounded-lg border p-4 grid gap-2")], [
+            h.summary([a.class("font-medium cursor-pointer")], [
+              text("How it works"),
+            ]),
+            h.p([a.class("text-muted-foreground")], [
+              text(
+                "gen_data() produces a List(ChartPoint) of length 2 000 in pure Gleam. "
+                <> "list.drop + list.take slice the viewport. bar_chart_canvas() maps each "
+                <> "point to FillRect + RectHit commands — no DOM nodes per bar. "
+                <> "canvas_element() serialises the command list to JSON and sets it as a "
+                <> "property on <saola-canvas>; the web component replays in requestAnimationFrame.",
+              ),
+            ]),
+          ]),
         ]),
       ]),
-      h.label([a.class("grid gap-1 text-sm font-medium")], [
-        text("Bars in view: " <> int.to_string(model.stress_zoom)),
-        h.input([
-          a.type_("range"),
-          a.attribute("min", "10"),
-          a.attribute("max", "500"),
-          a.value(int.to_string(model.stress_zoom)),
-          e.on_input(fn(v) { StressZoomChanged(parse_int(v, 50)) }),
-          a.class("w-48"),
-        ]),
-      ]),
-    ]),
-    // ---- Chart --------------------------------------------------------------
-    canvas.canvas_element(output, fn(_, _) { StressBarClicked("") }),
-    // ---- Selection info -----------------------------------------------------
-    selected_info(model.stress_selected),
-    // ---- Architecture note --------------------------------------------------
-    h.details([a.class("text-sm rounded-lg border p-4 grid gap-2")], [
-      h.summary([a.class("font-medium cursor-pointer")], [
-        text("How it works"),
-      ]),
-      h.p([a.class("text-muted-foreground")], [
-        text(
-          "gen_data() produces a List(ChartPoint) of length 2 000 in pure Gleam. "
-          <> "list.drop + list.take slice the viewport. bar_chart_canvas() maps each "
-          <> "point to FillRect + RectHit commands — no DOM nodes per bar. "
-          <> "canvas_element() serialises the command list to JSON and sets it as a "
-          <> "property on <saola-canvas>; the web component replays in requestAnimationFrame.",
-        ),
-      ]),
-    ]),
-  ])
+    ],
+  )
 }
 
 fn selected_info(sel: Option(String)) -> Element(Message) {

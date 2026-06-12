@@ -1,8 +1,7 @@
 import gleam/option.{None}
-import lustre/attribute as a
-import lustre/element.{type Element, text}
-import lustre/element/html as h
+import lustre/element.{type Element}
 import saola/preview/model.{type Message}
+import saola/preview/view/doc_page.{DocSection}
 import saola/timeline
 
 pub fn view() -> Element(Message) {
@@ -44,20 +43,14 @@ pub fn view() -> Element(Message) {
     ),
   ]
 
-  h.div([], [
-    h.h1([a.class("page-title")], [text("Timeline")]),
-    h.p([a.class("page-description")], [
-      text(
-        "A vertical timeline widget for displaying ordered events with status variants.",
-      ),
-    ]),
-    h.div([a.class("grid gap-8")], [
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("Basic")]),
+  doc_page.doc_page(
+    "Timeline",
+    "A vertical timeline widget for displaying ordered events with status variants.",
+    [
+      DocSection("basic", "Basic", [
         timeline.timeline_simple(basic_items),
       ]),
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("No timestamps")]),
+      DocSection("no-timestamps", "No Timestamps", [
         timeline.timeline_simple([
           timeline.TimelineItem(
             time: "",
@@ -82,6 +75,21 @@ pub fn view() -> Element(Message) {
           ),
         ]),
       ]),
-    ]),
-  ])
+      DocSection("usage", "Usage", [
+        doc_page.snippet([
+          "import saola/timeline",
+          "",
+          "timeline.timeline_simple([",
+          "  timeline.TimelineItem(",
+          "    time: \"09:00\",",
+          "    title: \"Project kickoff\",",
+          "    description: \"Initial planning session.\",",
+          "    icon: None,",
+          "    variant: timeline.Default,",
+          "  ),",
+          "])",
+        ]),
+      ]),
+    ],
+  )
 }

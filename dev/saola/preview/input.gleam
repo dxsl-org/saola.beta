@@ -1,10 +1,11 @@
 import gleam/option
 import lustre/attribute as a
-import lustre/element.{type Element, text}
+import lustre/element.{type Element}
 import lustre/element/html as h
 import saola/checkbox
 import saola/input
 import saola/preview/model.{type Message}
+import saola/preview/view/doc_page.{DocSection}
 import saola/textarea
 
 fn checkbox_examples() -> List(Element(Message)) {
@@ -88,16 +89,32 @@ fn textarea_examples() -> List(Element(Message)) {
 }
 
 pub fn view() -> Element(Message) {
-  h.div([], [
-    h.h1([a.class("page-title")], [text("Inputs")]),
-    h.p([a.class("page-description")], [
-      text("Showcase of text inputs, checkboxes, and textareas."),
-    ]),
-    h.h2([], [text("Text Inputs")]),
-    h.div([a.class("grid gap-4")], input_examples()),
-    h.h2([a.class("mt-4")], [text("Textareas")]),
-    h.div([a.class("grid gap-4")], textarea_examples()),
-    h.h2([a.class("mt-4")], [text("Checkboxes")]),
-    h.div([a.class("grid gap-4")], checkbox_examples()),
-  ])
+  doc_page.doc_page(
+    "Inputs",
+    "Showcase of text inputs, checkboxes, and textareas.",
+    [
+      DocSection("text-inputs", "Text Inputs", [
+        h.div([a.class("grid gap-4 mt-4")], input_examples()),
+      ]),
+      DocSection("textareas", "Textareas", [
+        h.div([a.class("grid gap-4 mt-4")], textarea_examples()),
+      ]),
+      DocSection("checkboxes", "Checkboxes", [
+        h.div([a.class("grid gap-4 mt-4")], checkbox_examples()),
+      ]),
+      DocSection("usage", "Usage", [
+        doc_page.snippet([
+          "import saola/input",
+          "import saola/textarea",
+          "import saola/checkbox",
+          "",
+          "input.input_text(\"Enter text...\", on_input_msg)",
+          "input.input_email(\"you@example.com\", on_input_msg)",
+          "input.input_password(\"Password\", on_input_msg)",
+          "textarea.textarea_simple(\"Write something...\", on_input_msg)",
+          "checkbox.checkbox_basic(\"Basic Checkbox\")",
+        ]),
+      ]),
+    ],
+  )
 }

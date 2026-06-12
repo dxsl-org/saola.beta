@@ -2,6 +2,54 @@
 
 All notable changes to the Saola UI Kit are documented here.
 
+## [2026-06-12] — Docs Site: 3-Column Layout + API Reference
+
+### Summary
+
+Deployed integrated documentation site upgrade: 3-column responsive layout (sidebar | content | TOC), per-widget usage snippets in static `<pre><code>` blocks, auto-generated API reference at `/api/` via `gleam docs build`, CI integration, and widget Documentation Definition-of-Done rule.
+
+### Changes
+
+**Phase 1: Layout Shell + Scaffold** (commit 0b03567)
+- Created `dev/saola/preview/view/doc_page.gleam` with `DocSection(id, heading, body)` ADT and `doc_page(title, description, sections)` function
+- `snippet(code: String) -> Element(msg)` helper for static code blocks (`<pre class="doc-snippet"><code>`)
+- Added 3-column CSS grid to `assets/app.css`: content column (720–900px) + TOC column (200px, hidden <1280px) with smooth scroll behavior
+- Pilot page: badge converted to scaffold with Demo, Usage (snippet), Variants sections
+- 4 render tests added to verify section IDs and TOC anchor links generate correctly
+- Total test suite: 390 passing tests
+
+**Phase 2: API Reference Pipeline + DoD** (commit 0b03567)
+- Updated `.github/workflows/deploy-preview.yml`: `gleam docs build` → copy `build/dev/docs/saola/` to `dist/api/` before upload
+- Updated `.github/workflows/test.yml`: `gleam docs build` as gate step (catches malformed doc comments early)
+- Added "API Reference" link in sidebar → base-aware href (works in dev + deployed site)
+- Added `## Widget Documentation DoD` section to CLAUDE.md: every widget addition requires `///` doc comments, `doc_page` preview with Demo + Usage sections, sidebar entry
+- Deployed `/api/` verified live (HTTP 200, module list renders)
+
+**Phase 3: Widget Page Migration** (64/66 pages)
+- Migrated 64 standard widget pages (Forms & Input, Buttons & Menus, Layout, Feedback, Overlays, Navigation, Charts)
+- Executed via 4 parallel batches by orchestrator agent + manual finalization for canvas_stress_test and widget_dashboard
+- Interim fix (commit fc2fadc): base-aware SPA routing via `base_path.gleam` + BASE_URL FFI constant + 404.html fallback — deep links now work on deployed site
+- Intentional exceptions: site_example.gleam and threat_intel.gleam NOT converted (full-bleed multi-panel demos incompatible with 3-column grid; continue using custom layouts)
+- Review finding fixed: `date_picker_preview` on_click_outside handler moved back to page-root wrapper
+- Format clean, `gleam test` 390/390 passing, `gleam docs build` OK, `vite build` OK
+- Reviewed by haily-reviewer: PASS_WITH_RISK (1 MED finding fixed)
+
+### Impact
+
+- **User Experience:** Docs site now shows usage patterns inline with interactive demos; API reference provides accurate type signatures and doc comments
+- **Developer Experience:** DoD rule prevents shipping undocumented widgets; `gleam docs build` gate catches doc comment syntax errors before merge
+- **Site Structure:** Single dogfooded site uses Saola itself; no separate docs framework; TOC anchors work across deployed + dev environments
+- **Deployment:** CI pipeline auto-generates and deploys API docs; no manual step needed
+
+### Scope Notes
+
+Deferred to future phases (per plan Out-of-Scope):
+- Scrollspy / active-heading highlight
+- Copy-to-clipboard button on snippets
+- Syntax highlighting for snippets (CSS-only styling first)
+- Backfilling `///` doc comments in 30 widget files that lack them (DoD rule covers new code; backfill is separate mechanical pass)
+- Rendering `docs/*.md` guides into the site
+
 ## [2026-06-12] — Track A: Tech Debt Cleanup (FFI, ARIA, Tests)
 
 ### Summary

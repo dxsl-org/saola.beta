@@ -1,68 +1,70 @@
 import lustre/attribute as a
-import lustre/element.{type Element, text}
+import lustre/element.{type Element}
 import lustre/element/html as h
 import saola/preview/model.{
   type Message, type Model, ToggleBoldChanged, ToggleItalicChanged,
 }
+import saola/preview/view/doc_page.{DocSection}
 import saola/toggle
 
 pub fn view(model: Model) -> Element(Message) {
-  h.div([], [
-    h.h1([a.class("page-title")], [text("Toggle")]),
-    h.p([a.class("page-description")], [
-      text("A two-state button that can be on or off."),
+  doc_page.doc_page("Toggle", "A two-state button that can be on or off.", [
+    DocSection("default", "Default", [
+      h.div([a.class("flex gap-2 mt-4")], [
+        toggle.toggle_simple(model.toggle_bold, "Bold", ToggleBoldChanged),
+        toggle.toggle_simple(model.toggle_italic, "Italic", ToggleItalicChanged),
+      ]),
     ]),
-    h.div([a.class("grid gap-8")], [
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("Default")]),
-        h.div([a.class("flex gap-2")], [
-          toggle.toggle_simple(model.toggle_bold, "Bold", ToggleBoldChanged),
-          toggle.toggle_simple(
-            model.toggle_italic,
-            "Italic",
-            ToggleItalicChanged,
-          ),
-        ]),
+    DocSection("outline", "Outline variant", [
+      h.div([a.class("flex gap-2 mt-4")], [
+        toggle.toggle(
+          model.toggle_bold,
+          "Bold",
+          ToggleBoldChanged,
+          toggle.ToggleAttrs(..toggle.default_attrs, variant: toggle.Outline),
+        ),
+        toggle.toggle(
+          model.toggle_italic,
+          "Italic",
+          ToggleItalicChanged,
+          toggle.ToggleAttrs(..toggle.default_attrs, variant: toggle.Outline),
+        ),
       ]),
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("Outline variant")]),
-        h.div([a.class("flex gap-2")], [
-          toggle.toggle(
-            model.toggle_bold,
-            "Bold",
-            ToggleBoldChanged,
-            toggle.ToggleAttrs(..toggle.default_attrs, variant: toggle.Outline),
-          ),
-          toggle.toggle(
-            model.toggle_italic,
-            "Italic",
-            ToggleItalicChanged,
-            toggle.ToggleAttrs(..toggle.default_attrs, variant: toggle.Outline),
-          ),
-        ]),
+    ]),
+    DocSection("sizes", "Sizes", [
+      h.div([a.class("flex gap-2 items-center mt-4")], [
+        toggle.toggle(
+          False,
+          "Small",
+          fn(_) { ToggleBoldChanged(model.toggle_bold) },
+          toggle.ToggleAttrs(..toggle.default_attrs, size: toggle.Small),
+        ),
+        toggle.toggle(
+          True,
+          "Medium",
+          fn(_) { ToggleBoldChanged(model.toggle_bold) },
+          toggle.default_attrs,
+        ),
+        toggle.toggle(
+          False,
+          "Large",
+          fn(_) { ToggleBoldChanged(model.toggle_bold) },
+          toggle.ToggleAttrs(..toggle.default_attrs, size: toggle.Large),
+        ),
       ]),
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("Sizes")]),
-        h.div([a.class("flex gap-2 items-center")], [
-          toggle.toggle(
-            False,
-            "Small",
-            fn(_) { ToggleBoldChanged(model.toggle_bold) },
-            toggle.ToggleAttrs(..toggle.default_attrs, size: toggle.Small),
-          ),
-          toggle.toggle(
-            True,
-            "Medium",
-            fn(_) { ToggleBoldChanged(model.toggle_bold) },
-            toggle.default_attrs,
-          ),
-          toggle.toggle(
-            False,
-            "Large",
-            fn(_) { ToggleBoldChanged(model.toggle_bold) },
-            toggle.ToggleAttrs(..toggle.default_attrs, size: toggle.Large),
-          ),
-        ]),
+    ]),
+    DocSection("usage", "Usage", [
+      doc_page.snippet([
+        "import saola/toggle",
+        "",
+        "// Simple",
+        "toggle.toggle_simple(model.toggle_bold, \"Bold\", ToggleBoldChanged)",
+        "",
+        "// With variant/size",
+        "toggle.toggle(",
+        "  model.toggle_bold, \"Bold\", ToggleBoldChanged,",
+        "  toggle.ToggleAttrs(..toggle.default_attrs, variant: toggle.Outline),",
+        ")",
       ]),
     ]),
   ])

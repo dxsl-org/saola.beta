@@ -1,22 +1,18 @@
 import gleam/option.{None, Some}
-import lustre/attribute as a
 import lustre/element.{type Element, text}
-import lustre/element/html as h
 import saola/button
 import saola/empty
 import saola/icon/li
 import saola/icon/ls
 import saola/preview/model.{type Message, StartedTrial}
+import saola/preview/view/doc_page.{DocSection}
 
 pub fn view() -> Element(Message) {
-  h.div([], [
-    h.h1([a.class("page-title")], [text("Empty")]),
-    h.p([a.class("page-description")], [
-      text("Empty-state panels for no-results and onboarding screens."),
-    ]),
-    h.div([a.class("grid gap-8")], [
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("Simple (no icon, no action)")]),
+  doc_page.doc_page(
+    "Empty",
+    "Empty-state panels for no-results and onboarding screens.",
+    [
+      DocSection("simple", "Simple", [
         empty.empty_simple(
           None,
           "Nothing here yet",
@@ -24,8 +20,7 @@ pub fn view() -> Element(Message) {
           None,
         ),
       ]),
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("With icon + action")]),
+      DocSection("with-icon-action", "With Icon + Action", [
         empty.empty_simple(
           Some(li.inbox([])),
           "No messages",
@@ -33,8 +28,7 @@ pub fn view() -> Element(Message) {
           Some(button.button_primary("Refresh", StartedTrial)),
         ),
       ]),
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("Custom (empty_full)")]),
+      DocSection("custom", "Custom (empty_full)", [
         empty.empty(
           media: Some(ls.search_x([])),
           media_variant: empty.Icon,
@@ -44,8 +38,7 @@ pub fn view() -> Element(Message) {
           class: "",
         ),
       ]),
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("Bare (no header)")]),
+      DocSection("bare", "Bare (no header)", [
         empty.empty(
           media: None,
           media_variant: empty.Default,
@@ -55,6 +48,18 @@ pub fn view() -> Element(Message) {
           class: "",
         ),
       ]),
-    ]),
-  ])
+      DocSection("usage", "Usage", [
+        doc_page.snippet([
+          "import saola/empty",
+          "",
+          "empty.empty_simple(",
+          "  Some(li.inbox([])),",
+          "  \"No messages\",",
+          "  \"You're all caught up.\",",
+          "  Some(button.button_primary(\"Refresh\", OnRefresh)),",
+          ")",
+        ]),
+      ]),
+    ],
+  )
 }

@@ -3,16 +3,12 @@ import lustre/element.{type Element, text}
 import lustre/element/html as h
 import saola/native_select
 import saola/preview/model.{type Message, type Model, NativeSelectChanged}
+import saola/preview/view/doc_page.{DocSection}
 
 pub fn view(model: Model) -> Element(Message) {
-  h.div([], [
-    h.h1([a.class("page-title")], [text("Native Select")]),
-    h.p([a.class("page-description")], [
-      text("A styled native <select> element."),
-    ]),
-    h.div([a.class("grid gap-8")], [
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("Default")]),
+  doc_page.doc_page("Native Select", "A styled native <select> element.", [
+    DocSection("default", "Default", [
+      h.div([a.class("grid gap-4 mt-4")], [
         native_select.native_select_simple(
           [
             native_select.NativeSelectOption("apple", "Apple"),
@@ -24,8 +20,9 @@ pub fn view(model: Model) -> Element(Message) {
           fn(v) { NativeSelectChanged(v) },
         ),
       ]),
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("With opt groups")]),
+    ]),
+    DocSection("opt-groups", "With opt groups", [
+      h.div([a.class("grid gap-4 mt-4")], [
         native_select.native_select_simple(
           [
             native_select.NativeSelectOptGroup("Fruits", [
@@ -42,8 +39,9 @@ pub fn view(model: Model) -> Element(Message) {
           fn(v) { NativeSelectChanged(v) },
         ),
       ]),
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("Small")]),
+    ]),
+    DocSection("small", "Small", [
+      h.div([a.class("grid gap-4 mt-4")], [
         native_select.native_select(
           [
             native_select.NativeSelectOption("xs", "Extra Small"),
@@ -60,8 +58,9 @@ pub fn view(model: Model) -> Element(Message) {
           ),
         ),
       ]),
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("Disabled")]),
+    ]),
+    DocSection("disabled", "Disabled", [
+      h.div([a.class("grid gap-4 mt-4")], [
         native_select.native_select(
           [
             native_select.NativeSelectOption("a", "Option A"),
@@ -76,6 +75,18 @@ pub fn view(model: Model) -> Element(Message) {
             class: "",
           ),
         ),
+      ]),
+    ]),
+    DocSection("usage", "Usage", [
+      doc_page.snippet([
+        "import saola/native_select",
+        "",
+        "native_select.native_select_simple(",
+        "  [native_select.NativeSelectOption(\"apple\", \"Apple\"), ...],",
+        "  model.native_select_value,",
+        "  \"fruit\",",
+        "  fn(v) { NativeSelectChanged(v) },",
+        ")",
       ]),
     ]),
   ])

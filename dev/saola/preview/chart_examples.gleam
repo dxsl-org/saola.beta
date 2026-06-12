@@ -1,42 +1,89 @@
 import gleam/option.{None}
-import lustre/attribute as a
 import lustre/element.{type Element}
-import lustre/element/html as h
 import saola/card
 import saola/code_editor
 import saola/d3_bar_chart
 import saola/lustre_bar_chart
 import saola/monaco_editor
 import saola/preview/model.{type Message}
+import saola/preview/view/doc_page.{DocSection}
 
 pub fn d3_charts() -> Element(Message) {
-  h.div([a.class("grid gap-6")], [
-    h.header([a.class("grid gap-2")], [
-      h.h1([a.class("page-title")], [h.text("D3 Charts")]),
-      h.p([a.class("page-description")], [
-        h.text(
-          "A blackbox Saola widget beside a pure Lustre SVG implementation.",
-        ),
+  doc_page.doc_page(
+    "D3 Charts",
+    "A blackbox Saola widget beside a pure Lustre SVG implementation.",
+    [
+      DocSection("demo", "Demo", [
+        d3_card(),
+        lustre_card(),
       ]),
-    ]),
-    d3_card(),
-    lustre_card(),
-  ])
+      DocSection("usage", "Usage", [
+        doc_page.snippet([
+          "import saola/d3_bar_chart",
+          "import saola/lustre_bar_chart",
+          "",
+          "// D3 blackbox — rendered by D3 via a custom element",
+          "d3_bar_chart.bar_chart(",
+          "  [d3_bar_chart.ChartPoint(\"Q1\", 32.0), ...],",
+          "  attrs: d3_bar_chart.BarChartAttrs(",
+          "    ..d3_bar_chart.default_bar_chart_attrs,",
+          "    title: \"Revenue\",",
+          "    height: 320,",
+          "  ),",
+          ")",
+          "",
+          "// Pure Lustre SVG — no D3 runtime",
+          "lustre_bar_chart.bar_chart(",
+          "  [lustre_bar_chart.ChartPoint(\"Q1\", 32.0), ...],",
+          "  attrs: lustre_bar_chart.BarChartAttrs(",
+          "    ..lustre_bar_chart.default_bar_chart_attrs,",
+          "    title: \"Revenue\",",
+          "    height: 320,",
+          "  ),",
+          ")",
+        ]),
+      ]),
+    ],
+  )
 }
 
 pub fn monaco_editor() -> Element(Message) {
-  h.div([a.class("grid gap-6")], [
-    h.header([a.class("grid gap-2")], [
-      h.h1([a.class("page-title")], [h.text("Code Editor")]),
-      h.p([a.class("page-description")], [
-        h.text(
-          "Blackbox editor widgets. Saola renders a single custom element; the editor runtime owns keyboard interaction and text model.",
-        ),
+  doc_page.doc_page(
+    "Code Editor",
+    "Blackbox editor widgets. Saola renders a single custom element; the editor runtime owns keyboard interaction and text model.",
+    [
+      DocSection("demo", "Demo", [
+        codemirror_card(),
+        monaco_card(),
       ]),
-    ]),
-    codemirror_card(),
-    monaco_card(),
-  ])
+      DocSection("usage", "Usage", [
+        doc_page.snippet([
+          "import saola/code_editor",
+          "import saola/monaco_editor",
+          "",
+          "// CodeMirror 6 — lightweight, fast startup",
+          "code_editor.editor(",
+          "  attrs: code_editor.EditorAttrs(",
+          "    ..code_editor.default_editor_attrs,",
+          "    value: \"pub fn main() { ... }\",",
+          "    language: \"javascript\",",
+          "    height: 300,",
+          "  ),",
+          ")",
+          "",
+          "// Monaco — VS Code engine with IntelliSense",
+          "monaco_editor.editor(",
+          "  attrs: monaco_editor.EditorAttrs(",
+          "    ..monaco_editor.default_editor_attrs,",
+          "    value: \"pub fn main() { ... }\",",
+          "    language: \"javascript\",",
+          "    height: 300,",
+          "  ),",
+          ")",
+        ]),
+      ]),
+    ],
+  )
 }
 
 fn codemirror_card() -> Element(Message) {

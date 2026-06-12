@@ -1,8 +1,7 @@
-import lustre/attribute as a
-import lustre/element.{type Element, text}
-import lustre/element/html as h
+import lustre/element.{type Element}
 import saola/badge
 import saola/preview/model.{type Message}
+import saola/preview/view/doc_page.{DocSection}
 import saola/table
 
 pub fn view() -> Element(Message) {
@@ -27,17 +26,34 @@ pub fn view() -> Element(Message) {
       table.TextCell("Member"),
     ]),
   ]
-  h.div([], [
-    h.h1([a.class("page-title")], [text("Tables")]),
-    h.p([a.class("page-description")], [
-      text("Data tables with typed cells and optional captions."),
-    ]),
-    h.div([a.class("mt-4")], [
-      table.table_simple(
-        headers: headers,
-        rows: rows,
-        extra_attrs: table.TableExtraAttrs("Team members", ""),
-      ),
-    ]),
-  ])
+
+  doc_page.doc_page(
+    "Tables",
+    "Data tables with typed cells and optional captions.",
+    [
+      DocSection("demo", "Demo", [
+        table.table_simple(
+          headers: headers,
+          rows: rows,
+          extra_attrs: table.TableExtraAttrs("Team members", ""),
+        ),
+      ]),
+      DocSection("usage", "Usage", [
+        doc_page.snippet([
+          "import saola/table",
+          "",
+          "table.table_simple(",
+          "  headers: [\"Name\", \"Status\"],",
+          "  rows: [",
+          "    table.TableRow([",
+          "      table.TextCell(\"Alice\"),",
+          "      table.ElementCell(badge.badge_default(\"Active\")),",
+          "    ]),",
+          "  ],",
+          "  extra_attrs: table.TableExtraAttrs(\"Caption\", \"\"),",
+          ")",
+        ]),
+      ]),
+    ],
+  )
 }

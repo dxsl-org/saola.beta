@@ -10,6 +10,8 @@ import saola/badge
 import saola/canvas_command as canvas
 import saola/drawer
 import saola/lustre_bar_chart
+import saola/preview/view/doc_page.{DocSection}
+
 import saola/preview/model.{
   type Message, type Model, DashDrawerClosed, DashPageChanged, DashRowClicked,
   DashSearchChanged,
@@ -99,76 +101,86 @@ pub fn view(model: Model) -> Element(Message) {
     Some(id) -> list.find(all, fn(emp) { emp.id == id }) |> result_to_option
   }
 
-  h.div([a.class("grid gap-6")], [
-    h.header([a.class("grid gap-2")], [
-      h.h1([a.class("page-title")], [text("Widget Dashboard")]),
-      h.p([a.class("page-description")], [
-        text(
-          "Multiple widgets share a single Lustre Model. "
-          <> "The search box, badge, progress bar, table, and score chart all "
-          <> "react to the same state — no side-channel subscriptions.",
-        ),
-      ]),
-    ]),
-    // ---- Search + summary stats ---------------------------------------------
-    h.div([a.class("flex flex-wrap gap-4 items-center")], [
-      h.div([a.class("flex-1 max-w-sm")], [
-        search.search_clearable(
-          model.dash_search,
-          DashSearchChanged,
-          DashSearchChanged(""),
-        ),
-      ]),
-      h.div([a.class("flex gap-2 items-center")], [
-        h.span([a.class("text-sm text-muted-foreground")], [text("Showing")]),
-        badge.badge_secondary(
-          int.to_string(matched) <> " / " <> int.to_string(total),
-        ),
-        h.span([a.class("text-sm text-muted-foreground")], [text("employees")]),
-      ]),
-    ]),
-    // ---- Match ratio progress bar ------------------------------------------
-    h.div([a.class("grid gap-1")], [
-      h.div([a.class("flex justify-between text-xs text-muted-foreground")], [
-        text("Match ratio"),
-        text(int.to_string(matched * 100 / int.max(total, 1)) <> "%"),
-      ]),
-      progress.progress(
-        matched * 100 / int.max(total, 1),
-        progress.ProgressAttrs(..progress.default_attrs, label: "Match ratio"),
-      ),
-    ]),
-    // ---- Table + score distribution chart ----------------------------------
-    h.div([a.class("grid gap-6 lg:grid-cols-3")], [
-      h.div([a.class("lg:col-span-2 grid gap-2")], [
-        employee_table(page_employees, model.dash_selected_id),
-        pagination_controls(page, max_page),
-      ]),
-      h.div([a.class("grid gap-2")], [
-        h.p([a.class("text-sm font-medium")], [text("Score Distribution")]),
-        h.p([a.class("text-xs text-muted-foreground")], [
-          text("Filtered employees · canvas-rendered"),
+  doc_page.doc_page(
+    "Widget Dashboard",
+    "Multiple widgets share a single Lustre Model. "
+      <> "The search box, badge, progress bar, table, and score chart all "
+      <> "react to the same state — no side-channel subscriptions.",
+    [
+      DocSection("demo", "Demo", [
+        h.div([a.class("grid gap-6")], [
+          // ---- Search + summary stats ---------------------------------------------
+          h.div([a.class("flex flex-wrap gap-4 items-center")], [
+            h.div([a.class("flex-1 max-w-sm")], [
+              search.search_clearable(
+                model.dash_search,
+                DashSearchChanged,
+                DashSearchChanged(""),
+              ),
+            ]),
+            h.div([a.class("flex gap-2 items-center")], [
+              h.span([a.class("text-sm text-muted-foreground")], [
+                text("Showing"),
+              ]),
+              badge.badge_secondary(
+                int.to_string(matched) <> " / " <> int.to_string(total),
+              ),
+              h.span([a.class("text-sm text-muted-foreground")], [
+                text("employees"),
+              ]),
+            ]),
+          ]),
+          // ---- Match ratio progress bar ------------------------------------------
+          h.div([a.class("grid gap-1")], [
+            h.div(
+              [a.class("flex justify-between text-xs text-muted-foreground")],
+              [
+                text("Match ratio"),
+                text(int.to_string(matched * 100 / int.max(total, 1)) <> "%"),
+              ],
+            ),
+            progress.progress(
+              matched * 100 / int.max(total, 1),
+              progress.ProgressAttrs(
+                ..progress.default_attrs,
+                label: "Match ratio",
+              ),
+            ),
+          ]),
+          // ---- Table + score distribution chart ----------------------------------
+          h.div([a.class("grid gap-6 lg:grid-cols-3")], [
+            h.div([a.class("lg:col-span-2 grid gap-2")], [
+              employee_table(page_employees, model.dash_selected_id),
+              pagination_controls(page, max_page),
+            ]),
+            h.div([a.class("grid gap-2")], [
+              h.p([a.class("text-sm font-medium")], [text("Score Distribution")]),
+              h.p([a.class("text-xs text-muted-foreground")], [
+                text("Filtered employees · canvas-rendered"),
+              ]),
+              score_chart(filtered, DashPageChanged(page)),
+            ]),
+          ]),
+          // ---- Row detail drawer -------------------------------------------------
+          drawer.drawer(
+            model.dash_drawer_open,
+            case selected_employee {
+              None -> "Employee Details"
+              Some(emp) -> emp.name
+            },
+            None,
+            case selected_employee {
+              None -> h.text("")
+              Some(emp) -> employee_detail(emp)
+            },
+            None,
+            fn() { DashDrawerClosed },
+            drawer.DrawerAttrs(side: drawer.Right, class: ""),
+          ),
         ]),
-        score_chart(filtered, DashPageChanged(page)),
       ]),
-    ]),
-    // ---- Row detail drawer -------------------------------------------------
-    drawer.drawer(
-      model.dash_drawer_open,
-      case selected_employee {
-        None -> "Employee Details"
-        Some(emp) -> emp.name
-      },
-      None,
-      case selected_employee {
-        None -> h.text("")
-        Some(emp) -> employee_detail(emp)
-      },
-      None,
-      fn() { DashDrawerClosed },
-      drawer.DrawerAttrs(side: drawer.Right, class: ""),
-    ),
-  ])
+    ],
+  )
 }
 
 // ---------------------------------------------------------------------------

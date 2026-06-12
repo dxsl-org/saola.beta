@@ -8,20 +8,16 @@ import saola/calendar as cal
 import saola/preview/model.{
   type Message, type Model, CalendarDateSelected, CalendarMonthChanged,
 }
+import saola/preview/view/doc_page.{DocSection}
 
 pub fn view(model: Model) -> Element(Message) {
   let #(prev_y, prev_m) =
     cal.prev_month(model.calendar_view_year, model.calendar_view_month)
   let #(next_y, next_m) =
     cal.next_month(model.calendar_view_year, model.calendar_view_month)
-  h.div([], [
-    h.h1([a.class("page-title")], [text("Calendar")]),
-    h.p([a.class("page-description")], [
-      text("A month-based date grid for selecting dates."),
-    ]),
-    h.div([a.class("grid gap-8")], [
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("Default")]),
+  doc_page.doc_page("Calendar", "A month-based date grid for selecting dates.", [
+    DocSection("default", "Default", [
+      h.div([a.class("grid gap-4 mt-4")], [
         cal.calendar_simple(
           model.calendar_selected,
           model.calendar_view_year,
@@ -49,8 +45,9 @@ pub fn view(model: Model) -> Element(Message) {
           ],
         ),
       ]),
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("With today highlighted")]),
+    ]),
+    DocSection("today-highlighted", "With today highlighted", [
+      h.div([a.class("grid gap-4 mt-4")], [
         cal.calendar(
           model.calendar_selected,
           model.calendar_view_year,
@@ -60,6 +57,20 @@ pub fn view(model: Model) -> Element(Message) {
           CalendarMonthChanged(next_y, next_m),
           cal.CalendarAttrs(..cal.default_attrs, today: Some(cal.today())),
         ),
+      ]),
+    ]),
+    DocSection("usage", "Usage", [
+      doc_page.snippet([
+        "import saola/calendar as cal",
+        "",
+        "cal.calendar_simple(",
+        "  model.calendar_selected,",
+        "  model.calendar_view_year,",
+        "  model.calendar_view_month,",
+        "  CalendarDateSelected,",
+        "  CalendarMonthChanged(prev_y, prev_m),",
+        "  CalendarMonthChanged(next_y, next_m),",
+        ")",
       ]),
     ]),
   ])

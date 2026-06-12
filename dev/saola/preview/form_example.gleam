@@ -13,86 +13,112 @@ import saola/preview/model.{
   type Message, type Model, FormEmailChanged, FormMessageChanged,
   FormNameChanged, FormSubmitted,
 }
+import saola/preview/view/doc_page.{DocSection}
 import saola/textarea
 
 pub fn view(model: Model) -> Element(Message) {
-  card.card(card.CardAttrs(
-    title: "Contact form",
-    description: "A small Saola form wired with Lustre messages.",
-    content: [
-      h.form([a.class("grid gap-4"), e.on_submit(FormSubmitted)], [
-        field("name", "Name", [
-          input.input(
-            input.Text,
-            Some(input.SyncValue(model.form_name)),
-            on_input: Some(FormNameChanged),
-            extra_attrs: input.InputExtraAttrs(
-              "name",
-              "name",
-              "Nguyen Van A",
-              False,
-              True,
-              "",
-            ),
-          ),
-        ]),
-        field("email", "Email", [
-          input.input(
-            input.Email,
-            Some(input.SyncValue(model.form_email)),
-            on_input: Some(FormEmailChanged),
-            extra_attrs: input.InputExtraAttrs(
-              "email",
-              "email",
-              "you@example.com",
-              False,
-              True,
-              "",
-            ),
-          ),
-        ]),
-        field("message", "Message", [
-          textarea.textarea(
-            Some(textarea.SyncValue(model.form_message)),
-            on_input: Some(FormMessageChanged),
-            extra_attrs: textarea.TextareaExtraAttrs(
-              "message",
-              "message",
-              "How can we help?",
-              Some(4),
-              False,
-              True,
-              "",
-            ),
-          ),
-        ]),
-        checkbox.checkbox(
-          "Send me product updates",
-          checkbox.InitChecked(True),
-          checkbox.ExtraAttrs(
-            checkbox.FormAttr("updates", checkbox.InitValue("yes")),
-            "updates",
-            "",
-          ),
-          "This checkbox submits a normal form value.",
-        ),
-        button.button(
-          button.Primary,
-          "Send",
-          button.Large,
-          None,
-          None,
-          button.ButtonExtraAttrs(
-            False,
-            Some(button.Submit),
-            button.default_aria,
-          ),
-        ),
+  doc_page.doc_page(
+    "Form Example",
+    "A small Saola form wired with Lustre messages.",
+    [
+      DocSection("demo", "Demo", [
+        card.card(card.CardAttrs(
+          title: "Contact form",
+          description: "A small Saola form wired with Lustre messages.",
+          content: [
+            h.form([a.class("grid gap-4"), e.on_submit(FormSubmitted)], [
+              field("name", "Name", [
+                input.input(
+                  input.Text,
+                  Some(input.SyncValue(model.form_name)),
+                  on_input: Some(FormNameChanged),
+                  extra_attrs: input.InputExtraAttrs(
+                    "name",
+                    "name",
+                    "Nguyen Van A",
+                    False,
+                    True,
+                    "",
+                  ),
+                ),
+              ]),
+              field("email", "Email", [
+                input.input(
+                  input.Email,
+                  Some(input.SyncValue(model.form_email)),
+                  on_input: Some(FormEmailChanged),
+                  extra_attrs: input.InputExtraAttrs(
+                    "email",
+                    "email",
+                    "you@example.com",
+                    False,
+                    True,
+                    "",
+                  ),
+                ),
+              ]),
+              field("message", "Message", [
+                textarea.textarea(
+                  Some(textarea.SyncValue(model.form_message)),
+                  on_input: Some(FormMessageChanged),
+                  extra_attrs: textarea.TextareaExtraAttrs(
+                    "message",
+                    "message",
+                    "How can we help?",
+                    Some(4),
+                    False,
+                    True,
+                    "",
+                  ),
+                ),
+              ]),
+              checkbox.checkbox(
+                "Send me product updates",
+                checkbox.InitChecked(True),
+                checkbox.ExtraAttrs(
+                  checkbox.FormAttr("updates", checkbox.InitValue("yes")),
+                  "updates",
+                  "",
+                ),
+                "This checkbox submits a normal form value.",
+              ),
+              button.button(
+                button.Primary,
+                "Send",
+                button.Large,
+                None,
+                None,
+                button.ButtonExtraAttrs(
+                  False,
+                  Some(button.Submit),
+                  button.default_aria,
+                ),
+              ),
+            ]),
+            submitted_summary(model.form_submitted_values),
+          ],
+          footer: None,
+        )),
       ]),
-      submitted_summary(model.form_submitted_values),
+      DocSection("usage", "Usage", [
+        doc_page.snippet([
+          "import saola/input",
+          "import saola/textarea",
+          "import saola/button",
+          "import saola/checkbox",
+          "import lustre/event as e",
+          "",
+          "h.form([a.class(\"grid gap-4\"), e.on_submit(FormSubmitted)], [",
+          "  input.input(input.Text, Some(input.SyncValue(model.form_name)),",
+          "    on_input: Some(FormNameChanged),",
+          "    extra_attrs: input.InputExtraAttrs(\"name\", \"name\", \"Nguyen Van A\", False, True, \"\"),",
+          "  ),",
+          "  button.button(button.Primary, \"Send\", button.Large, None, None, ...),",
+          "])",
+        ]),
+      ]),
     ],
-    footer: None,
-  ))
+  )
 }
 
 fn field(

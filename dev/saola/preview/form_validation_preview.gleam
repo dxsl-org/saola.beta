@@ -11,22 +11,42 @@ import saola/preview/model.{
   type Message, type Model, SignupConfirmChanged, SignupEmailChanged,
   SignupNameChanged, SignupPasswordChanged, SignupReset, SignupSubmitted,
 }
+import saola/preview/view/doc_page.{DocSection}
 
 pub fn view(model: Model) -> Element(Message) {
-  h.div([], [
-    h.h1([a.class("page-title")], [text("Form Validation")]),
-    h.p([a.class("page-description")], [
-      text(
-        "Real-time signup form powered by the formal library and saola/form bridge.",
-      ),
-    ]),
-    h.div([a.class("mt-6 max-w-md")], [
-      case model.signup_success {
-        True -> success_banner(model)
-        False -> signup_form(model)
-      },
-    ]),
-  ])
+  doc_page.doc_page(
+    "Form Validation",
+    "Real-time signup form powered by the formal library and saola/form bridge.",
+    [
+      DocSection("demo", "Demo", [
+        h.div([a.class("mt-6 max-w-md")], [
+          case model.signup_success {
+            True -> success_banner(model)
+            False -> signup_form(model)
+          },
+        ]),
+      ]),
+      DocSection("usage", "Usage", [
+        doc_page.snippet([
+          "import saola/field",
+          "import saola/input",
+          "",
+          "field.field(",
+          "  field.FieldAttrs(",
+          "    ..field.default_attrs,",
+          "    label: \"Full name\",",
+          "    required: True,",
+          "    error: err(\"name\"),",
+          "  ),",
+          "  input.input(input.Text, Some(input.SyncValue(model.signup_name)),",
+          "    on_input: Some(SignupNameChanged),",
+          "    extra_attrs: input.InputExtraAttrs(..input.default_extra_attrs, name: \"name\"),",
+          "  ),",
+          ")",
+        ]),
+      ]),
+    ],
+  )
 }
 
 fn signup_form(model: Model) -> Element(Message) {

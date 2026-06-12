@@ -3,24 +3,21 @@ import lustre/attribute as a
 import lustre/element.{type Element, text}
 import lustre/element/html as h
 import saola/preview/model.{type Message, type Model, SearchQueryChanged}
+import saola/preview/view/doc_page.{DocSection}
 import saola/search
 
 pub fn view(model: Model) -> Element(Message) {
-  h.div([], [
-    h.h1([a.class("page-title")], [text("Search")]),
-    h.p([a.class("page-description")], [
-      text("A search input with icon prefix and optional clear button."),
-    ]),
-    h.div([a.class("grid gap-8")], [
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("Simple")]),
-        h.div([a.class("max-w-sm")], [
+  doc_page.doc_page(
+    "Search",
+    "A search input with icon prefix and optional clear button.",
+    [
+      DocSection("simple", "Simple", [
+        h.div([a.class("max-w-sm mt-4")], [
           search.search_simple(model.search_query, SearchQueryChanged),
         ]),
       ]),
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("Clearable")]),
-        h.div([a.class("max-w-sm")], [
+      DocSection("clearable", "Clearable", [
+        h.div([a.class("max-w-sm mt-4")], [
           search.search_clearable(
             model.search_query,
             SearchQueryChanged,
@@ -28,9 +25,8 @@ pub fn view(model: Model) -> Element(Message) {
           ),
         ]),
       ]),
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("Small size")]),
-        h.div([a.class("max-w-sm")], [
+      DocSection("small", "Small size", [
+        h.div([a.class("max-w-sm mt-4")], [
           search.search(
             search.Small,
             model.search_query,
@@ -40,9 +36,8 @@ pub fn view(model: Model) -> Element(Message) {
           ),
         ]),
       ]),
-      h.div([a.class("grid gap-4")], [
-        h.h2([], [text("Disabled")]),
-        h.div([a.class("max-w-sm")], [
+      DocSection("disabled", "Disabled", [
+        h.div([a.class("max-w-sm mt-4")], [
           search.search(
             search.Large,
             "",
@@ -51,12 +46,29 @@ pub fn view(model: Model) -> Element(Message) {
             search.SearchAttrs(..search.default_attrs, disabled: True),
           ),
         ]),
-      ]),
-      h.div([a.class("mt-4")], [
-        h.p([a.class("text-muted-foreground text-sm")], [
-          text("Current value: \"" <> model.search_query <> "\""),
+        h.div([a.class("mt-4")], [
+          h.p([a.class("text-muted-foreground text-sm")], [
+            text("Current value: \"" <> model.search_query <> "\""),
+          ]),
         ]),
       ]),
-    ]),
-  ])
+      DocSection("usage", "Usage", [
+        doc_page.snippet([
+          "import saola/search",
+          "",
+          "// Simple",
+          "search.search_simple(model.search_query, SearchQueryChanged)",
+          "",
+          "// Clearable",
+          "search.search_clearable(model.search_query, SearchQueryChanged, SearchQueryChanged(\"\"))",
+          "",
+          "// Disabled",
+          "search.search(",
+          "  search.Large, \"\", SearchQueryChanged, None,",
+          "  search.SearchAttrs(..search.default_attrs, disabled: True),",
+          ")",
+        ]),
+      ]),
+    ],
+  )
 }

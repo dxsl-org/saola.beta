@@ -17,6 +17,7 @@ import saola/preview/model.{
   HeatmapSizeChanged, HeatmapSvgCellClicked, HeatmapSvgHoverLeft,
   HeatmapSvgHovered,
 }
+import saola/preview/view/doc_page.{DocSection}
 
 // ---------------------------------------------------------------------------
 // View
@@ -70,171 +71,170 @@ pub fn view(model: Model) -> Element(Message) {
     HeatmapPaintStarted(row, col)
   }
 
-  h.div([a.class("grid gap-6")], [
-    ripple_style(),
-    // ---- Header -------------------------------------------------------------
-    h.header([a.class("grid gap-2")], [
-      h.h1([a.class("page-title")], [text("Heatmap: SVG vs Canvas")]),
-      h.p([a.class("page-description")], [
-        text(
-          "Same data, same Gleam color math, two renderers. "
-          <> "SVG materialises every cell as a DOM node; the Canvas Display List "
-          <> "serialises commands as a single JSON property. "
-          <> "Try 120 × 120 and press Randomize to feel the difference.",
+  doc_page.doc_page(
+    "Heatmap: SVG vs Canvas",
+    "Same data, same Gleam color math, two renderers. SVG materialises every cell as a DOM node; the Canvas Display List serialises commands as a single JSON property. Try 120 × 120 and press Randomize to feel the difference.",
+    [
+      DocSection("demo", "Demo", [
+        ripple_style(),
+        // ---- Controls -------------------------------------------------------
+        h.div(
+          [a.class("flex flex-wrap gap-6 items-end rounded-lg border p-4")],
+          [
+            // Grid size
+            h.div([a.class("grid gap-1")], [
+              h.p(
+                [
+                  a.class(
+                    "text-xs font-medium text-muted-foreground uppercase tracking-wide",
+                  ),
+                ],
+                [text("Grid")],
+              ),
+              h.div([a.class("flex gap-1")], [
+                size_btn(40, size),
+                size_btn(80, size),
+                size_btn(120, size),
+              ]),
+            ]),
+            // Cell size
+            h.label([a.class("grid gap-1 text-sm font-medium")], [
+              text("Cell size: " <> int.to_string(cell_px) <> " px"),
+              h.input([
+                a.type_("range"),
+                a.attribute("min", "2"),
+                a.attribute("max", "14"),
+                a.value(int.to_string(cell_px)),
+                e.on_input(fn(v) { HeatmapCellPxChanged(parse_int(v, 6)) }),
+                a.class("w-32"),
+              ]),
+            ]),
+            // Color scheme
+            h.div([a.class("grid gap-1")], [
+              h.p(
+                [
+                  a.class(
+                    "text-xs font-medium text-muted-foreground uppercase tracking-wide",
+                  ),
+                ],
+                [text("Scheme")],
+              ),
+              h.div([a.class("flex gap-1")], [
+                scheme_btn("blues", scheme),
+                scheme_btn("reds", scheme),
+                scheme_btn("greens", scheme),
+                scheme_btn("warm", scheme),
+                scheme_btn("purples", scheme),
+              ]),
+            ]),
+            // Randomize button
+            button.button_outline("Randomize", HeatmapRandomize),
+          ],
         ),
-      ]),
-    ]),
-    // ---- Controls -----------------------------------------------------------
-    h.div([a.class("flex flex-wrap gap-6 items-end rounded-lg border p-4")], [
-      // Grid size
-      h.div([a.class("grid gap-1")], [
-        h.p(
+        // ---- Stats bar ------------------------------------------------------
+        h.div(
           [
             a.class(
-              "text-xs font-medium text-muted-foreground uppercase tracking-wide",
+              "flex flex-wrap gap-4 items-center text-sm text-muted-foreground",
             ),
           ],
           [
-            text("Grid"),
-          ],
-        ),
-        h.div([a.class("flex gap-1")], [
-          size_btn(40, size),
-          size_btn(80, size),
-          size_btn(120, size),
-        ]),
-      ]),
-      // Cell size
-      h.label([a.class("grid gap-1 text-sm font-medium")], [
-        text("Cell size: " <> int.to_string(cell_px) <> " px"),
-        h.input([
-          a.type_("range"),
-          a.attribute("min", "2"),
-          a.attribute("max", "14"),
-          a.value(int.to_string(cell_px)),
-          e.on_input(fn(v) { HeatmapCellPxChanged(parse_int(v, 6)) }),
-          a.class("w-32"),
-        ]),
-      ]),
-      // Color scheme
-      h.div([a.class("grid gap-1")], [
-        h.p(
-          [
-            a.class(
-              "text-xs font-medium text-muted-foreground uppercase tracking-wide",
+            stat_pill(int.to_string(cell_count) <> " cells"),
+            stat_pill("SVG: " <> int.to_string(cell_count) <> " DOM nodes"),
+            stat_pill(
+              "Canvas: "
+              <> int.to_string(cell_count * 2)
+              <> " commands → 1 draw pass",
             ),
-          ],
-          [
-            text("Scheme"),
+            stat_pill(dim_px <> " × " <> dim_px),
           ],
         ),
-        h.div([a.class("flex gap-1")], [
-          scheme_btn("blues", scheme),
-          scheme_btn("reds", scheme),
-          scheme_btn("greens", scheme),
-          scheme_btn("warm", scheme),
-          scheme_btn("purples", scheme),
+        // ---- Side-by-side panels --------------------------------------------
+        h.div([a.class("grid gap-6 grid-cols-2")], [
+          renderer_panel(
+            "SVG",
+            "One <rect> per cell — Lustre diffs the full child list on every update",
+            [
+              h.div(
+                [a.attribute("style", "position:relative; overflow:auto;")],
+                [
+                  lustre_heatmap.heatmap_svg_interactive(
+                    data,
+                    attrs,
+                    model.heatmap_painted,
+                    on_svg_click,
+                    HeatmapSvgHovered,
+                    HeatmapSvgHoverLeft,
+                    on_paint_start,
+                    HeatmapPaintEnded,
+                  ),
+                  hover_tooltip(model.heatmap_svg_hover),
+                  ripple_overlay(model.heatmap_svg_ripple, cell_px),
+                ],
+              ),
+            ],
+          ),
+          renderer_panel(
+            "Canvas",
+            "CanvasCommand list — one JSON property update, single rAF paint",
+            [
+              h.div(
+                [a.attribute("style", "position:relative; overflow:auto;")],
+                [
+                  h.div([a.attribute("style", canvas_style)], [
+                    canvas.canvas_element_interactive(
+                      lustre_heatmap.heatmap_canvas(
+                        data,
+                        attrs,
+                        model.heatmap_painted,
+                      ),
+                      on_canvas_click,
+                      HeatmapCanvasHovered,
+                      HeatmapCanvasHoverLeft,
+                      on_paint_start,
+                      HeatmapPaintEnded,
+                    ),
+                  ]),
+                  hover_tooltip(model.heatmap_canvas_hover),
+                  ripple_overlay(model.heatmap_canvas_ripple, cell_px),
+                ],
+              ),
+            ],
+          ),
         ]),
-      ]),
-      // Randomize button
-      button.button_outline("Randomize", HeatmapRandomize),
-    ]),
-    // ---- Stats bar ----------------------------------------------------------
-    h.div(
-      [
-        a.class(
-          "flex flex-wrap gap-4 items-center text-sm text-muted-foreground",
-        ),
-      ],
-      [
-        stat_pill(int.to_string(cell_count) <> " cells"),
-        stat_pill("SVG: " <> int.to_string(cell_count) <> " DOM nodes"),
-        stat_pill(
-          "Canvas: "
-          <> int.to_string(cell_count * 2)
-          <> " commands → 1 draw pass",
-        ),
-        stat_pill(dim_px <> " × " <> dim_px),
-      ],
-    ),
-    // ---- Side-by-side panels ------------------------------------------------
-    h.div([a.class("grid gap-6 grid-cols-2")], [
-      renderer_panel(
-        "SVG",
-        "One <rect> per cell — Lustre diffs the full child list on every update",
-        [
-          h.div([a.attribute("style", "position:relative; overflow:auto;")], [
-            lustre_heatmap.heatmap_svg_interactive(
-              data,
-              attrs,
-              model.heatmap_painted,
-              on_svg_click,
-              HeatmapSvgHovered,
-              HeatmapSvgHoverLeft,
-              on_paint_start,
-              HeatmapPaintEnded,
-            ),
-            hover_tooltip(model.heatmap_svg_hover),
-            ripple_overlay(model.heatmap_svg_ripple, cell_px),
+        // ---- Info panel -----------------------------------------------------
+        info_panel(model),
+        // ---- Architecture callout -------------------------------------------
+        h.details([a.class("rounded-lg border p-4 text-sm grid gap-3")], [
+          h.summary([a.class("font-medium cursor-pointer")], [
+            text("Why Canvas wins at scale"),
           ]),
-        ],
-      ),
-      renderer_panel(
-        "Canvas",
-        "CanvasCommand list — one JSON property update, single rAF paint",
-        [
-          h.div([a.attribute("style", "position:relative; overflow:auto;")], [
-            h.div([a.attribute("style", canvas_style)], [
-              canvas.canvas_element_interactive(
-                lustre_heatmap.heatmap_canvas(
-                  data,
-                  attrs,
-                  model.heatmap_painted,
-                ),
-                on_canvas_click,
-                HeatmapCanvasHovered,
-                HeatmapCanvasHoverLeft,
-                on_paint_start,
-                HeatmapPaintEnded,
+          h.div([a.class("grid gap-2 text-muted-foreground")], [
+            h.p([], [
+              text(
+                "SVG path: Gleam generates List(HeatmapCell) → Lustre renders N <rect> elements "
+                <> "into the real DOM → browser lays out N nodes → Lustre diffs N nodes on every update.",
               ),
             ]),
-            hover_tooltip(model.heatmap_canvas_hover),
-            ripple_overlay(model.heatmap_canvas_ripple, cell_px),
+            h.p([], [
+              text(
+                "Canvas path: Gleam generates List(CanvasCommand) → encode_commands() serialises "
+                <> "to a single JSON array → element.commands = value (one JS property set) "
+                <> "→ web component iterates the array in requestAnimationFrame → all cells painted "
+                <> "in one synchronous loop. No DOM nodes exist for cells; only one custom element.",
+              ),
+            ]),
+            h.p([], [
+              text(
+                "The break-even point is ~500–1 000 cells. Beyond that, the Canvas path "
+                <> "stays roughly constant-time while SVG update cost grows linearly with N.",
+              ),
+            ]),
           ]),
-        ],
-      ),
-    ]),
-    // ---- Info panel ---------------------------------------------------------
-    info_panel(model),
-    // ---- Architecture callout -----------------------------------------------
-    h.details([a.class("rounded-lg border p-4 text-sm grid gap-3")], [
-      h.summary([a.class("font-medium cursor-pointer")], [
-        text("Why Canvas wins at scale"),
-      ]),
-      h.div([a.class("grid gap-2 text-muted-foreground")], [
-        h.p([], [
-          text(
-            "SVG path: Gleam generates List(HeatmapCell) → Lustre renders N <rect> elements "
-            <> "into the real DOM → browser lays out N nodes → Lustre diffs N nodes on every update.",
-          ),
-        ]),
-        h.p([], [
-          text(
-            "Canvas path: Gleam generates List(CanvasCommand) → encode_commands() serialises "
-            <> "to a single JSON array → element.commands = value (one JS property set) "
-            <> "→ web component iterates the array in requestAnimationFrame → all cells painted "
-            <> "in one synchronous loop. No DOM nodes exist for cells; only one custom element.",
-          ),
-        ]),
-        h.p([], [
-          text(
-            "The break-even point is ~500–1 000 cells. Beyond that, the Canvas path "
-            <> "stays roughly constant-time while SVG update cost grows linearly with N.",
-          ),
         ]),
       ]),
-    ]),
-  ])
+    ],
+  )
 }
 
 // ---------------------------------------------------------------------------
