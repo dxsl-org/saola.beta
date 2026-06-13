@@ -21,6 +21,27 @@
 //// Render-as is decided by the terminal call, never by config:
 //// `view` renders `<button>` (requires `Option(msg)`),
 //// `view_anchor` renders `<a>` (requires `href`).
+////
+//// ## Customizing styles
+////
+//// `src/saola/button.css` is `@generated` from Basecoat — do not edit it
+//// (`just build-css` overwrites it). Customize from your own CSS in one of
+//// three layers, least to most invasive:
+////
+//// 1. **Theme tokens** — recolor/reshape every widget at once:
+////    ```css
+////    :root { --color-primary: oklch(0.55 0.22 263); --radius-md: 0.25rem; }
+////    ```
+//// 2. **Per-widget override** — target the Basecoat class. All Saola CSS lives
+////    in `@layer saola.*`, so any unlayered rule of yours wins — no
+////    `!important`, no specificity battle:
+////    ```css
+////    .btn-lg-primary { background: #ff5722; text-transform: uppercase; }
+////    ```
+//// 3. **One-off** — `add_class` appends a class after the variant class:
+////    ```gleam
+////    button.new() |> button.add_class("w-full") |> button.view("Save", Some(Msg))
+////    ```
 
 import gleam/list
 import gleam/option.{type Option, None, Some}

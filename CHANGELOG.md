@@ -9,6 +9,7 @@ Full per-batch history lives in [`docs/project-changelog.md`](docs/project-chang
 
 - **Modular CSS distribution** — per-widget colocated stylesheets (`src/saola/<widget>.css`, 25 generated from Basecoat + 29 authored) and five bundles in `priv/static/`: `saola.css` (full), `saola-base.css`, `saola-components.css`, `saola-charts.css`, `saola-preflight.css` (opt-in global reset). Consumers import the full bundle, a group bundle, or a single widget file (self-sufficient via `@import "./base.css"`).
 - **CSS build pipeline** — `scripts/build-css.mjs` (selector-set slicer with fail-loud guards, `@generated`/`saola:custom` region contract) + `scripts/bundle-css.mjs` (ordered-manifest concatenation), runnable via `just build-css`; idempotent and re-runnable after Basecoat submodule syncs.
+- **Button styling guide** — the button preview page (a "Customizing Styles" section) and the `saola/button` module docs now spell out the three CSS customization layers: theme tokens (`--color-*`/`--radius-*`), per-widget override (unlayered rules beat `@layer saola.*` without `!important`), and `add_class` for one-offs. Clarifies that `@generated` only forbids editing the sliced `src/saola/*.css`, not customizing from your own stylesheet.
 
 ### Changed
 

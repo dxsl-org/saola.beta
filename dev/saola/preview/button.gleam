@@ -135,6 +135,50 @@ pub fn view() -> Element(Message) {
           ")",
         ]),
       ]),
+      DocSection("customizing", "Customizing Styles", [
+        h.p([a.class("text-muted-foreground text-sm")], [
+          element.text(
+            "src/saola/button.css is @generated from Basecoat — do not edit it "
+            <> "(just build-css overwrites it). Customize from your own CSS "
+            <> "instead, in one of three layers:",
+          ),
+        ]),
+        h.p([a.class("text-muted-foreground text-sm")], [
+          element.text("1. Theme tokens — recolor/reshape every widget at once:"),
+        ]),
+        doc_page.snippet([
+          "/* your app.css */",
+          ":root {",
+          "  --color-primary: oklch(0.55 0.22 263);  /* primary across all widgets */",
+          "  --radius-md: 0.25rem;                    /* corner radius */",
+          "}",
+        ]),
+        h.p([a.class("text-muted-foreground text-sm")], [
+          element.text(
+            "2. Per-widget override — target the Basecoat class directly. "
+            <> "All Saola CSS lives in @layer saola.*, so any unlayered rule of "
+            <> "yours wins — no !important, no specificity battle:",
+          ),
+        ]),
+        doc_page.snippet([
+          "/* your app.css — beats @layer saola.components automatically */",
+          ".btn-lg-primary {",
+          "  background: #ff5722;",
+          "  text-transform: uppercase;",
+          "}",
+        ]),
+        h.p([a.class("text-muted-foreground text-sm")], [
+          element.text(
+            "3. One-off, no CSS file — add_class appends a utility/custom class "
+            <> "after the variant class:",
+          ),
+        ]),
+        doc_page.snippet([
+          "button.new()",
+          "|> button.add_class(\"w-full shadow-lg\")",
+          "|> button.view(\"Save\", Some(SaveClicked))",
+        ]),
+      ]),
     ],
   )
 }
