@@ -189,14 +189,14 @@ pub fn view() -> Element(Message) {
           saolabutton.render(saolabutton.ButtonConfig(
             button_type: saolabutton.HtmlButton,
             text: "Gửi biểu mẫu",
-            class_names: "btn btn-lg-primary",
+            class_names: "btn-lg-primary",
           )),
 
           // Nút loại 2: Thẻ <a> (Link) dẫn sang trang khác
           saolabutton.render(saolabutton.ButtonConfig(
             button_type: saolabutton.HtmlLink(href: "https://gleam.run"),
             text: "Đọc tài liệu",
-            class_names: "btn btn-lg-link",
+            class_names: "btn-lg-ghost",
           ))
         ])
       ]),
