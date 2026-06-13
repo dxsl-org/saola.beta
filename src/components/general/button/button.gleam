@@ -1,43 +1,18 @@
+import components/general/button/button_default
+import components/general/button/button_link
 import lustre/element.{type Element}
-import lustre/attribute
-import lustre/element/html
 
-pub type ButtonType {
-  HtmlButton
-  HtmlLink(href: String) // Link thì cần có thêm thuộc tính href
+pub fn button_default(
+  text text: String,
+  class_names class_names: String,
+) -> Element(msg) {
+  button_default.button_default(text: text, class_names: class_names)
 }
 
-pub type ButtonConfig {
-  ButtonConfig(
-    button_type: ButtonType,
-    text: String,
-    class_names: String,
-  )
-}
-
-pub fn render_button(config: ButtonConfig) -> Element(msg) {
-  case config.button_type {
-    HtmlButton ->
-      html.button(
-        [attribute.class(config.class_names)], 
-        [element.text(config.text)]
-      )
-
-    HtmlLink(href) ->
-      html.a(
-        [
-          attribute.class(config.class_names),
-          attribute.href(href)
-        ],
-        [element.text(config.text)]
-      )
-  }
-}
-
-pub fn render(config: ButtonConfig) -> Element(msg) {
-  render_button(ButtonConfig(
-    button_type: config.button_type,
-    text: config.text,
-    class_names: config.class_names,
-  ))
+pub fn button_link(
+  text text: String,
+  href href: String,
+  class_names class_names: String,
+) -> Element(msg) {
+  button_link.button_link(text: text, href: href, class_names: class_names)
 }

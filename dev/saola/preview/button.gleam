@@ -8,7 +8,7 @@ import saola/icon/lc
 import saola/preview/model.{type Message, Home, OnRouteChange}
 import saola/preview/view/doc_page.{DocSection}
 
-import components/general/button/button as saolabutton
+import components/general/button/button.{button_default, button_link} as saola_button
 
 pub fn view() -> Element(Message) {
   doc_page.doc_page(
@@ -106,8 +106,8 @@ pub fn view() -> Element(Message) {
       DocSection("accessibility", "Accessibility (ARIA)", [
         h.div([a.class("button-grid")], [
           button.new()
-            |> button.aria(button.ButtonAria("Save changes", None))
-            |> button.view("Save", None),
+          |> button.aria(button.ButtonAria("Save changes", None))
+          |> button.view("Save", None),
         ]),
       ]),
       DocSection("usage", "Usage", [
@@ -139,19 +139,18 @@ pub fn view() -> Element(Message) {
       ]),
       DocSection("Test", "Test", [
         element.fragment([
-          saolabutton.render(saolabutton.ButtonConfig(
-            button_type: saolabutton.HtmlButton,
-            text: "Gửi biểu mẫu",
+          saola_button.button_default(
             class_names: "btn-lg-primary",
-          )),
+            text: "Gửi biểu mẫu",
+          ),
 
           // Nút loại 2: Thẻ <a> (Link) dẫn sang trang khác
-          saolabutton.render(saolabutton.ButtonConfig(
-            button_type: saolabutton.HtmlLink(href: "https://gleam.run"),
+          saola_button.button_link(
+            href: "https://gleam.run",
             text: "Đọc tài liệu",
             class_names: "btn-lg-ghost",
-          ))
-        ])
+          ),
+        ]),
       ]),
     ],
   )
