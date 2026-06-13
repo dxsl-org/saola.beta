@@ -142,12 +142,10 @@ pub fn view() -> Element(Message) {
         element.fragment([
           saola_button.new()
             |> saola_button.text("Test")
-            |> saola_button.variant(button_base.Primary)
             |> saola_button.class_names("btn-lg-primary")
             |> saola_button.render(),
           saola_button.new()
             |> saola_button.text("Trang chủ")
-            |> saola_button.variant(button_base.Link)
             |> saola_button.href("/home")
             |> saola_button.class_names("btn-lg-primary")
             |> saola_button.render(),
