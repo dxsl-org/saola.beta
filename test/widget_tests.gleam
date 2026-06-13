@@ -188,6 +188,65 @@ pub fn button_anchor_disabled_uses_aria_test() {
     |> element.to_string
   assert string.contains(html, "aria-disabled=\"true\"")
   assert string.contains(html, "tabindex=\"-1\"")
+  // Disabled link must NOT keep href — aria-disabled is advisory, an <a> with
+  // href stays mouse-clickable and would still navigate.
+  assert !string.contains(html, "href=")
+}
+
+pub fn button_icon_only_uses_icon_variant_test() {
+  // Empty label + lead element (icon) => Basecoat square icon class.
+  let close = button.button_close(Nil) |> element.to_string
+  assert string.contains(close, "btn-sm-icon-outline")
+  // A button WITH a label keeps the text-padded variant, not the icon one.
+  let labeled =
+    button.new()
+    |> button.icon_start(element.text("I"))
+    |> button.view("Save", None)
+    |> element.to_string
+  assert string.contains(labeled, "btn-lg-primary")
+  assert !string.contains(labeled, "btn-lg-icon")
+}
+
+pub fn button_icon_end_only_uses_icon_variant_test() {
+  // Empty label with only icon_end is still icon-only → square variant.
+  let html =
+    button.new()
+    |> button.icon_end(element.text("X"))
+    |> button.view("", None)
+    |> element.to_string
+  assert string.contains(html, "btn-lg-icon-primary")
+}
+
+pub fn button_loading_icon_only_uses_icon_variant_test() {
+  // Loading spinner counts as a lead element for icon-only detection.
+  let html =
+    button.new()
+    |> button.size(button.Small)
+    |> button.loading(True)
+    |> button.view("", None)
+    |> element.to_string
+  assert string.contains(html, "btn-sm-icon-primary")
+}
+
+pub fn button_link_shortcut_renders_test() {
+  let html = button.button_link("More", Nil) |> element.to_string
+  assert string.contains(html, "btn-lg-link")
+  assert string.contains(html, "<button")
+}
+
+pub fn button_destructive_anchor_renders_test() {
+  let html =
+    button.button_destructive_anchor("Delete", "/delete") |> element.to_string
+  assert string.contains(html, "btn-lg-destructive")
+  assert string.contains(html, "<a")
+  assert string.contains(html, "href=\"/delete\"")
+}
+
+pub fn button_link_anchor_renders_test() {
+  let html = button.button_link_anchor("Home", "/") |> element.to_string
+  assert string.contains(html, "btn-lg-link")
+  assert string.contains(html, "<a")
+  assert string.contains(html, "href=\"/\"")
 }
 
 // --- card ---

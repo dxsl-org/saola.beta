@@ -8,8 +8,6 @@ import saola/icon/lc
 import saola/preview/model.{type Message, Home, OnRouteChange}
 import saola/preview/view/doc_page.{DocSection}
 
-import components/general/button/button as saola_button
-
 pub fn view() -> Element(Message) {
   doc_page.doc_page(
     "Buttons",
@@ -91,10 +89,6 @@ pub fn view() -> Element(Message) {
       DocSection("anchor", "Anchor (Navigation)", [
         h.div([a.class("button-grid")], [
           button.button_primary_anchor("Primary Link", "#"),
-          button.new()
-            |> button.variant(button.Primary)
-            |> button.add_class("no-underline hover:text-primary")
-            |> button.view_anchor("Primary Link Without Underline", "#"),
           button.button_secondary_anchor("Secondary Link", "#"),
           button.button_outline_anchor("Outline Link", "#"),
           button.button_ghost_anchor("Ghost Link", "#"),
@@ -110,8 +104,8 @@ pub fn view() -> Element(Message) {
       DocSection("accessibility", "Accessibility (ARIA)", [
         h.div([a.class("button-grid")], [
           button.new()
-          |> button.aria(button.ButtonAria("Save changes", None))
-          |> button.view("Save", None),
+            |> button.aria(button.ButtonAria("Save changes", None))
+            |> button.view("Save", None),
         ]),
       ]),
       DocSection("usage", "Usage", [
@@ -141,17 +135,48 @@ pub fn view() -> Element(Message) {
           ")",
         ]),
       ]),
-      DocSection("Test", "Test", [
-        element.fragment([
-          saola_button.new()
-            |> saola_button.text("Test")
-            |> saola_button.class_names("btn-lg-primary")
-            |> saola_button.render(),
-          saola_button.new()
-            |> saola_button.text("Trang chủ")
-            |> saola_button.href("/home")
-            |> saola_button.class_names("btn-lg-primary")
-            |> saola_button.render(),
+      DocSection("customizing", "Customizing Styles", [
+        h.p([a.class("text-muted-foreground text-sm")], [
+          element.text(
+            "src/saola/button.css is @generated from Basecoat — do not edit it "
+            <> "(just build-css overwrites it). Customize from your own CSS "
+            <> "instead, in one of three layers:",
+          ),
+        ]),
+        h.p([a.class("text-muted-foreground text-sm")], [
+          element.text("1. Theme tokens — recolor/reshape every widget at once:"),
+        ]),
+        doc_page.snippet([
+          "/* your app.css */",
+          ":root {",
+          "  --color-primary: oklch(0.55 0.22 263);  /* primary across all widgets */",
+          "  --radius-md: 0.25rem;                    /* corner radius */",
+          "}",
+        ]),
+        h.p([a.class("text-muted-foreground text-sm")], [
+          element.text(
+            "2. Per-widget override — target the Basecoat class directly. "
+            <> "All Saola CSS lives in @layer saola.*, so any unlayered rule of "
+            <> "yours wins — no !important, no specificity battle:",
+          ),
+        ]),
+        doc_page.snippet([
+          "/* your app.css — beats @layer saola.components automatically */",
+          ".btn-lg-primary {",
+          "  background: #ff5722;",
+          "  text-transform: uppercase;",
+          "}",
+        ]),
+        h.p([a.class("text-muted-foreground text-sm")], [
+          element.text(
+            "3. One-off, no CSS file — add_class appends a utility/custom class "
+            <> "after the variant class:",
+          ),
+        ]),
+        doc_page.snippet([
+          "button.new()",
+          "|> button.add_class(\"w-full shadow-lg\")",
+          "|> button.view(\"Save\", Some(SaveClicked))",
         ]),
       ]),
     ],

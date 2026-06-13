@@ -9,6 +9,14 @@ Full per-batch history lives in [`docs/project-changelog.md`](docs/project-chang
 
 - **Modular CSS distribution** — per-widget colocated stylesheets (`src/saola/<widget>.css`, 25 generated from Basecoat + 29 authored) and five bundles in `priv/static/`: `saola.css` (full), `saola-base.css`, `saola-components.css`, `saola-charts.css`, `saola-preflight.css` (opt-in global reset). Consumers import the full bundle, a group bundle, or a single widget file (self-sufficient via `@import "./base.css"`).
 - **CSS build pipeline** — `scripts/build-css.mjs` (selector-set slicer with fail-loud guards, `@generated`/`saola:custom` region contract) + `scripts/bundle-css.mjs` (ordered-manifest concatenation), runnable via `just build-css`; idempotent and re-runnable after Basecoat submodule syncs.
+- **Button styling guide** — the button preview page (a "Customizing Styles" section) and the `saola/button` module docs now spell out the three CSS customization layers: theme tokens (`--color-*`/`--radius-*`), per-widget override (unlayered rules beat `@layer saola.*` without `!important`), and `add_class` for one-offs. Clarifies that `@generated` only forbids editing the sliced `src/saola/*.css`, not customizing from your own stylesheet.
+- **Button shortcut symmetry** — `button_link` (Link-variant `<button>`), `button_destructive_anchor` and `button_link_anchor` complete full 6-variant coverage across both the `<button>` and `<a href>` shortcut families.
+
+### Fixed
+
+- **Icon-only buttons use the square Basecoat class** — an empty label with an icon (or loading spinner) now emits `btn-{sm,lg}-icon-{variant}` instead of the text-padded `btn-{sm,lg}-{variant}`, so `button_close` and other icon-only buttons render as proper squares rather than mis-shapen narrow buttons.
+- **Disabled/loading anchors are genuinely inert** — `view_anchor` now omits `href` while `disabled`/`loading` (keeping `aria-disabled` + `tabindex="-1"`). Previously the link kept its `href` and stayed mouse-clickable since `aria-disabled` is advisory only.
+- **Loading & aria-disabled states are visually dimmed** — buttons/anchors using `aria-busy`/`aria-disabled` (loading buttons, disabled anchors) now get `opacity: 50%` + `pointer-events: none`, mirroring Basecoat's native `:disabled` visual that those aria-state elements never matched.
 
 ### Changed
 
