@@ -9,20 +9,6 @@ import saola/preview/model.{type Message, Home, OnRouteChange}
 import saola/preview/view/doc_page.{DocSection}
 
 pub fn view() -> Element(Message) {
-  let attrs_disabled = button.ButtonExtraAttrs(True, None, button.default_aria)
-  let attrs_aria_label =
-    button.ButtonExtraAttrs(
-      False,
-      None,
-      button.ButtonAria("Save changes", None),
-    )
-  let attrs_aria_expanded =
-    button.ButtonExtraAttrs(
-      False,
-      None,
-      button.ButtonAria("Expand menu", Some(True)),
-    )
-
   doc_page.doc_page(
     "Buttons",
     "Showcase of different button styles and sizes.",
@@ -34,112 +20,70 @@ pub fn view() -> Element(Message) {
           button.button_outline("Outline", OnRouteChange(Home)),
           button.button_ghost("Ghost", OnRouteChange(Home)),
           button.button_destructive("Destructive", OnRouteChange(Home)),
-          button.button(
-            button.Link,
-            "Link",
-            button.Large,
-            None,
-            Some(OnRouteChange(Home)),
-            button.default_extra_attrs,
-          ),
+          button.new()
+            |> button.variant(button.Link)
+            |> button.view("Link", Some(OnRouteChange(Home))),
         ]),
       ]),
       DocSection("with-icon", "With Icon", [
         h.div([a.class("button-grid")], [
-          button.button(
-            button.Outline,
-            "Check",
-            button.Large,
-            Some(lc.check([])),
-            Some(OnRouteChange(Home)),
-            button.default_extra_attrs,
-          ),
-          button.button(
-            button.Secondary,
-            "Menu",
-            button.Large,
-            Some(lc.chevron_down([])),
-            Some(OnRouteChange(Home)),
-            attrs_aria_expanded,
-          ),
+          button.new()
+            |> button.variant(button.Outline)
+            |> button.icon_start(lc.check([]))
+            |> button.view("Check", Some(OnRouteChange(Home))),
+          button.new()
+            |> button.variant(button.Secondary)
+            |> button.icon_end(lc.chevron_down([]))
+            |> button.aria(button.ButtonAria("Expand menu", Some(True)))
+            |> button.view("Menu", Some(OnRouteChange(Home))),
+          button.new()
+            |> button.variant(button.Primary)
+            |> button.icon_end(lc.circle_arrow_right([]))
+            |> button.view("Continue", Some(OnRouteChange(Home))),
           button.button_close(OnRouteChange(Home)),
         ]),
       ]),
       DocSection("sizes", "Sizes", [
         h.div([a.class("button-grid")], [
-          button.button(
-            button.Primary,
-            "Large",
-            button.Large,
-            None,
-            None,
-            button.default_extra_attrs,
-          ),
-          button.button(
-            button.Primary,
-            "Small",
-            button.Small,
-            None,
-            None,
-            button.default_extra_attrs,
-          ),
+          button.new() |> button.view("Large", None),
+          button.new()
+            |> button.size(button.Small)
+            |> button.view("Small", None),
+        ]),
+      ]),
+      DocSection("loading", "Loading", [
+        h.div([a.class("button-grid")], [
+          button.new()
+            |> button.loading(True)
+            |> button.view("Saving", Some(OnRouteChange(Home))),
+          button.new()
+            |> button.variant(button.Outline)
+            |> button.loading(True)
+            |> button.view("Loading", None),
         ]),
       ]),
       DocSection("disabled", "Disabled", [
         h.div([a.class("button-grid")], [
-          button.button(
-            button.Primary,
-            "Disabled Primary",
-            button.Large,
-            None,
-            None,
-            attrs_disabled,
-          ),
-          button.button(
-            button.Secondary,
-            "Disabled Secondary",
-            button.Large,
-            None,
-            None,
-            attrs_disabled,
-          ),
-          button.button(
-            button.Outline,
-            "Disabled Icon",
-            button.Large,
-            Some(lc.check([])),
-            None,
-            attrs_disabled,
-          ),
+          button.new()
+            |> button.disabled(True)
+            |> button.view("Disabled Primary", None),
+          button.new()
+            |> button.variant(button.Secondary)
+            |> button.disabled(True)
+            |> button.view("Disabled Secondary", None),
+          button.new()
+            |> button.variant(button.Outline)
+            |> button.icon_start(lc.check([]))
+            |> button.disabled(True)
+            |> button.view("Disabled Icon", None),
         ]),
       ]),
       DocSection("form-types", "Form Types", [
         h.div([a.class("button-grid")], [
           button.button_submit("Submit"),
-          button.button(
-            button.Primary,
-            "Reset",
-            button.Large,
-            None,
-            None,
-            button.ButtonExtraAttrs(
-              False,
-              Some(button.Reset),
-              button.default_aria,
-            ),
-          ),
-        ]),
-      ]),
-      DocSection("accessibility", "Accessibility (ARIA)", [
-        h.div([a.class("button-grid")], [
-          button.button(
-            button.Primary,
-            "Save",
-            button.Large,
-            None,
-            None,
-            attrs_aria_label,
-          ),
+          button.new()
+            |> button.type_(button.Reset)
+            |> button.view("Reset", None),
         ]),
       ]),
       DocSection("anchor", "Anchor (Navigation)", [
@@ -148,38 +92,47 @@ pub fn view() -> Element(Message) {
           button.button_secondary_anchor("Secondary Link", "#"),
           button.button_outline_anchor("Outline Link", "#"),
           button.button_ghost_anchor("Ghost Link", "#"),
-          button.button_anchor(
-            button.Primary,
-            "With Icon",
-            button.Large,
-            Some(lc.circle_arrow_right([])),
-            "#",
-            button.default_extra_attrs,
-          ),
-          button.button_anchor(
-            button.Outline,
-            "Disabled",
-            button.Large,
-            None,
-            "#",
-            button.ButtonExtraAttrs(True, None, button.default_aria),
-          ),
+          button.new()
+            |> button.icon_end(lc.circle_arrow_right([]))
+            |> button.view_anchor("With Icon", "#"),
+          button.new()
+            |> button.variant(button.Outline)
+            |> button.disabled(True)
+            |> button.view_anchor("Disabled", "#"),
+        ]),
+      ]),
+      DocSection("accessibility", "Accessibility (ARIA)", [
+        h.div([a.class("button-grid")], [
+          button.new()
+            |> button.aria(button.ButtonAria("Save changes", None))
+            |> button.view("Save", None),
         ]),
       ]),
       DocSection("usage", "Usage", [
         doc_page.snippet([
           "import saola/button",
           "",
-          "// Action buttons — use <button>",
+          "// Shortcuts — 80% of cases",
           "button.button_primary(\"Save\", UserClickSave)",
-          "button.button_outline(\"Cancel\", UserClickCancel)",
           "button.button_submit(\"Submit\")",
           "button.button_close(UserClickClose)",
           "",
-          "// Navigation — use <a href>",
-          "button.button_primary_anchor(\"Docs\", \"/docs\")",
-          "button.button_outline_anchor(\"GitHub\", \"https://github.com/...\")",
-          "button.button_anchor(Primary, \"Read more\", Large, None, \"/blog\", button.default_extra_attrs)",
+          "// Builder style — pipe setters, terminal decides <button> vs <a>",
+          "button.new()",
+          "|> button.variant(button.Outline)",
+          "|> button.icon_end(lc.arrow_right([]))",
+          "|> button.loading(model.saving)",
+          "|> button.view(\"Save\", Some(SaveClicked))",
+          "",
+          "button.new()",
+          "|> button.view_anchor(\"Docs\", \"/docs\")  // <a href> — navigation",
+          "",
+          "// Config style — record update",
+          "button.view(",
+          "  button.ButtonConfig(..button.default_config(), loading: model.saving),",
+          "  \"Save\",",
+          "  Some(SaveClicked),",
+          ")",
         ]),
       ]),
     ],

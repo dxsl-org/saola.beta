@@ -25,76 +25,46 @@ pub fn view(model: Model) -> Element(Message) {
                 toast.Default,
               )),
             ),
-            button.button(
-              button.Secondary,
+            button.button_secondary(
               "Destructive",
-              button.Large,
-              option.None,
-              option.Some(
-                AddToast(toast.new_toast_simple(
-                  "Error",
-                  "Could not save changes.",
-                  toast.Destructive,
-                )),
-              ),
-              button.default_extra_attrs,
+              AddToast(toast.new_toast_simple(
+                "Error",
+                "Could not save changes.",
+                toast.Destructive,
+              )),
             ),
-            button.button(
-              button.Secondary,
+            button.button_secondary(
               "Success",
-              button.Large,
-              option.None,
-              option.Some(
-                AddToast(toast.new_toast_simple(
-                  "Success",
-                  "Operation completed.",
-                  toast.Success,
-                )),
-              ),
-              button.default_extra_attrs,
+              AddToast(toast.new_toast_simple(
+                "Success",
+                "Operation completed.",
+                toast.Success,
+              )),
             ),
-            button.button(
-              button.Secondary,
+            button.button_secondary(
               "Warning",
-              button.Large,
-              option.None,
-              option.Some(
-                AddToast(toast.new_toast_simple(
-                  "Warning",
-                  "This action may have side effects.",
-                  toast.Warning,
-                )),
-              ),
-              button.default_extra_attrs,
+              AddToast(toast.new_toast_simple(
+                "Warning",
+                "This action may have side effects.",
+                toast.Warning,
+              )),
             ),
-            button.button(
-              button.Secondary,
+            button.button_secondary(
               "Info",
-              button.Large,
-              option.None,
-              option.Some(
-                AddToast(toast.new_toast_simple(
-                  "Info",
-                  "Here is some useful information.",
-                  toast.Info,
-                )),
-              ),
-              button.default_extra_attrs,
+              AddToast(toast.new_toast_simple(
+                "Info",
+                "Here is some useful information.",
+                toast.Info,
+              )),
             ),
-            button.button(
-              button.Secondary,
+            button.button_secondary(
               "With Action",
-              button.Large,
-              option.None,
-              option.Some(
-                AddToast(toast.new_toast(
-                  "Start your trial",
-                  "Get 14 days of Pro features free.",
-                  toast.Default,
-                  option.Some(toast.ToastAction("Start trial", StartedTrial)),
-                )),
-              ),
-              button.default_extra_attrs,
+              AddToast(toast.new_toast(
+                "Start your trial",
+                "Get 14 days of Pro features free.",
+                toast.Default,
+                option.Some(toast.ToastAction("Start trial", StartedTrial)),
+              )),
             ),
           ]),
           toast.toaster(model.toasts, DismissToast),

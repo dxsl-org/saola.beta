@@ -95,52 +95,99 @@ pub fn button_submit_has_type_submit_test() {
 
 pub fn button_disabled_renders_test() {
   let html =
-    button.button(
-      button.Primary,
-      "Save",
-      button.Large,
-      None,
-      None,
-      button.ButtonExtraAttrs(
-        disabled: True,
-        type_: None,
-        aria: button.default_aria,
-      ),
-    )
+    button.new()
+    |> button.disabled(True)
+    |> button.view("Save", None)
     |> element.to_string
   assert string.contains(html, "disabled")
 }
 
 pub fn button_with_aria_label_renders_test() {
   let html =
-    button.button(
-      button.Ghost,
-      "",
-      button.Small,
-      None,
-      None,
-      button.ButtonExtraAttrs(
-        disabled: False,
-        type_: None,
-        aria: button.ButtonAria("Close dialog", None),
-      ),
-    )
+    button.new()
+    |> button.variant(button.Ghost)
+    |> button.size(button.Small)
+    |> button.aria(button.ButtonAria("Close dialog", None))
+    |> button.view("", None)
     |> element.to_string
   assert string.contains(html, "aria-label=\"Close dialog\"")
 }
 
 pub fn button_small_renders_test() {
   let html =
-    button.button(
-      button.Secondary,
-      "Edit",
-      button.Small,
-      None,
-      Some(Nil),
-      button.default_extra_attrs,
-    )
+    button.new()
+    |> button.variant(button.Secondary)
+    |> button.size(button.Small)
+    |> button.view("Edit", Some(Nil))
     |> element.to_string
   assert string.contains(html, "btn-sm-secondary")
+}
+
+pub fn button_config_style_renders_test() {
+  let html =
+    button.view(
+      button.ButtonConfig(..button.default_config(), disabled: True),
+      "Save",
+      None,
+    )
+    |> element.to_string
+  assert string.contains(html, "btn-lg-primary")
+  assert string.contains(html, "disabled")
+}
+
+pub fn button_loading_renders_spinner_and_busy_test() {
+  let html =
+    button.new()
+    |> button.loading(True)
+    |> button.view("Saving", Some(Nil))
+    |> element.to_string
+  assert string.contains(html, "aria-busy=\"true\"")
+  assert string.contains(html, "spinner")
+  // Loading stays in the a11y tree: aria-disabled, NOT native disabled.
+  assert string.contains(html, "aria-disabled=\"true\"")
+  let without_aria = string.replace(html, "aria-disabled", "")
+  assert !string.contains(without_aria, "disabled")
+}
+
+pub fn button_loading_replaces_icon_start_test() {
+  let html =
+    button.new()
+    |> button.icon_start(element.text("ICONMARK"))
+    |> button.loading(True)
+    |> button.view("Saving", None)
+    |> element.to_string
+  assert string.contains(html, "spinner")
+  assert !string.contains(html, "ICONMARK")
+}
+
+pub fn button_add_class_appends_test() {
+  let html =
+    button.new()
+    |> button.add_class("w-full")
+    |> button.view("Save", None)
+    |> element.to_string
+  assert string.contains(html, "btn-lg-primary w-full")
+}
+
+pub fn button_anchor_renders_href_test() {
+  let html =
+    button.new()
+    |> button.variant(button.Outline)
+    |> button.view_anchor("Docs", "/docs")
+    |> element.to_string
+  assert string.contains(html, "<a")
+  assert string.contains(html, "href=\"/docs\"")
+  assert string.contains(html, "btn-lg-outline")
+}
+
+pub fn button_anchor_disabled_uses_aria_test() {
+  let html =
+    button.new()
+    |> button.disabled(True)
+    |> button.view_anchor("Docs", "/docs")
+    |> element.to_string
+  assert string.contains(html, "aria-disabled=\"true\"")
+  assert string.contains(html, "tabindex=\"-1\"")
 }
 
 // --- card ---
