@@ -276,7 +276,7 @@ Basic UI building blocks:
 - Badge, Alert, Card
 - Checkbox, Radio, Switch
 
-**Pattern:** Flat API, no compounds, ARIA-accessible, CSS-only styling.
+**Pattern:** Flat API (simple widgets) or dual-style `Config` + terminal `view` functions (complex widgets — see code-standards §3b; button is the reference), ARIA-accessible, CSS-only styling.
 
 ### Phase 2: Advanced Widgets (100% Complete — 12 widgets)
 

@@ -67,14 +67,9 @@ fn hero() -> Element(Msg) {
     ]),
     h.div([a.class("flex gap-3")], [
       button.button_primary("Start trial", StartedTrial),
-      button.button(
-        button.Secondary,
-        "Read docs",
-        button.Large,
-        None,
-        None,
-        button.default_extra_attrs,
-      ),
+      button.new()
+        |> button.variant(button.Secondary)
+        |> button.view("Read docs", None),
     ]),
   ])
 }

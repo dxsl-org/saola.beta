@@ -296,49 +296,25 @@ fn stat_pill(label: String) -> Element(Message) {
 
 fn size_btn(size: Int, current: Int) -> Element(Message) {
   let label = int.to_string(size) <> "×" <> int.to_string(size)
-  case size == current {
-    True ->
-      button.button(
-        button.Primary,
-        label,
-        button.Small,
-        None,
-        Some(HeatmapSizeChanged(size)),
-        button.default_extra_attrs,
-      )
-    False ->
-      button.button(
-        button.Secondary,
-        label,
-        button.Small,
-        None,
-        Some(HeatmapSizeChanged(size)),
-        button.default_extra_attrs,
-      )
+  let active_variant = case size == current {
+    True -> button.Primary
+    False -> button.Secondary
   }
+  button.new()
+  |> button.variant(active_variant)
+  |> button.size(button.Small)
+  |> button.view(label, Some(HeatmapSizeChanged(size)))
 }
 
 fn scheme_btn(scheme: String, current: String) -> Element(Message) {
-  case scheme == current {
-    True ->
-      button.button(
-        button.Primary,
-        scheme,
-        button.Small,
-        None,
-        Some(HeatmapSchemeChanged(scheme)),
-        button.default_extra_attrs,
-      )
-    False ->
-      button.button(
-        button.Secondary,
-        scheme,
-        button.Small,
-        None,
-        Some(HeatmapSchemeChanged(scheme)),
-        button.default_extra_attrs,
-      )
+  let active_variant = case scheme == current {
+    True -> button.Primary
+    False -> button.Secondary
   }
+  button.new()
+  |> button.variant(active_variant)
+  |> button.size(button.Small)
+  |> button.view(scheme, Some(HeatmapSchemeChanged(scheme)))
 }
 
 fn info_panel(model: Model) -> Element(Message) {

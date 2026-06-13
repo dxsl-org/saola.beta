@@ -15,11 +15,12 @@ Full per-batch history lives in [`docs/project-changelog.md`](docs/project-chang
 - All Saola CSS now lives under `@layer saola.*` — unlayered consumer CSS always wins; the global Tailwind preflight no longer leaks into host pages (scoped `:where(widget-roots)` reset replaces it; the global form is opt-in via `saola-preflight.css`). Class and CSS-variable names remain Basecoat/shadcn-compatible.
 - Demo loads CSS via `dev/dev-widgets.css` (generated aggregate) + slimmed `assets/app.css`; `assets/basecoat.css` is now pipeline input only.
 - All 50 widget modules now use `list.flatten` for conditional attribute assembly instead of `a.none()` sentinels — eliminates trailing spaces in generated `class` attributes (e.g. `class="btn    "` → `class="btn"`).
-- `button_anchor` + four shortcuts (`button_primary_anchor`, `button_secondary_anchor`, `button_outline_anchor`, `button_ghost_anchor`) — render as `<a href>` with full button styling for navigation URLs; `disabled` maps to `aria-disabled`/`tabindex="-1"`.
+- **Button API redesign** — one public `ButtonConfig` record consumed through two styles: builder pipes (`button.new() |> button.variant(..) |> button.view(label, Some(msg))`) and record update (`ButtonConfig(..button.default_config(), loading: True)`). Render-as is type-safe via terminals: `view` → `<button>` (requires `Option(msg)`), `view_anchor` → `<a>` (requires `href`). New options: `loading` (spinner + `aria-busy`, stays in the a11y tree via `aria-disabled`), `icon_start`/`icon_end`, `add_class` (append-only). Anchor shortcuts (`button_primary_anchor` etc.) render navigation URLs with full button styling.
 
 ### Removed
 
 - `assets/component.css` (rules relocated to their owning widget files).
+- `ButtonExtraAttrs` and the positional `button()`/`button_anchor()` functions — replaced by `ButtonConfig` + `view`/`view_anchor` (breaking; shortcut functions keep their signatures).
 
 ## [1.0.0] — 2026-05-17
 

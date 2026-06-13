@@ -21,22 +21,8 @@ pub fn view(model: Model) -> Element(Message) {
           content: [],
           footer: option.Some(
             h.div([a.class("flex gap-2")], [
-              button.button(
-                button.Secondary,
-                "Cancel",
-                button.Large,
-                option.None,
-                option.Some(CloseDialog),
-                button.default_extra_attrs,
-              ),
-              button.button(
-                button.Primary,
-                "Continue",
-                button.Large,
-                option.None,
-                option.Some(CloseDialog),
-                button.default_extra_attrs,
-              ),
+              button.button_secondary("Cancel", CloseDialog),
+              button.button_primary("Continue", CloseDialog),
             ]),
           ),
           show_close_button: True,

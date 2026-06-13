@@ -1,5 +1,5 @@
 import gleam/dict
-import gleam/option.{None, Some}
+import gleam/option.{Some}
 import lustre/attribute as a
 import lustre/element.{type Element, text}
 import lustre/element/html as h
@@ -129,14 +129,7 @@ fn signup_form(model: Model) -> Element(Message) {
       ),
     ),
     h.div([a.class("flex gap-2 pt-2")], [
-      button.button(
-        button.Primary,
-        "Create account",
-        button.Large,
-        None,
-        None,
-        button.ButtonExtraAttrs(False, Some(button.Submit), button.default_aria),
-      ),
+      button.button_submit("Create account"),
     ]),
     case dict.size(model.signup_errors) > 0 {
       True ->

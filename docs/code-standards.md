@@ -29,14 +29,11 @@ pub fn button(variant: ButtonVariant, size: ButtonSize, label: String, on_click:
 
 The consumer's Lustre `Model` owns all state (open/close, selected, errors, etc.).
 
-### 2. Full + Shortcut Pattern
+### 2. Full-Options Form + Shortcut Pattern
 
 Every widget exposes two entry points:
 
-**Full function** — all options available
-```gleam
-pub fn button(variant: ButtonVariant, size: ButtonSize, label: String, on_click: Option(msg), extra_attrs: ButtonExtraAttrs) -> Element(msg)
-```
+**Full-options form** — flat `widget(...)` for simple widgets, or the dual-style `Config` pattern (§3b) for complex ones.
 
 **Shortcut functions** — sensible defaults for common cases
 ```gleam
@@ -44,21 +41,47 @@ pub fn button_primary(label: String, on_click: msg) -> Element(msg)
 pub fn button_secondary(label: String, on_click: msg) -> Element(msg)
 ```
 
-Shortcuts delegate to the full function using `const default_*` (for scalar fields) or `fn default_*()` (for polymorphic fields).
+Shortcuts delegate to the full-options form using `const default_*` (for scalar fields) or `fn default_*()` / `default_config()` (for polymorphic fields).
 
 ### 3. Attrs Records (When Justified)
 
 Introduce an `Attrs` type **only** when the full function would take 4+ parameters.
 
 ```gleam
-pub type ButtonExtraAttrs {
-  ButtonExtraAttrs(class: String, disabled: Bool, aria_label: String)
+pub type DialogAttrs {
+  DialogAttrs(description: String, icon: Option(Element(msg)), class: String)
 }
 
-pub fn button(variant: ButtonVariant, size: ButtonSize, label: String, attrs: ButtonExtraAttrs) -> Element(msg)
+pub fn dialog(open: Bool, title: String, attrs: DialogAttrs) -> Element(msg)
 ```
 
-Provide `pub const default_extra_attrs` for convenience. Do not wrap everything into Attrs just to reduce parameters.
+Provide `pub const default_*` for convenience. Do not wrap everything into Attrs just to reduce parameters.
+
+### 3b. Dual-Style Config Pattern (Complex Widgets)
+
+When a widget accumulates many optional fields (~6+) or has multiple render targets, upgrade from `Attrs` to one public `Config` record consumed through two equivalent syntaxes. Reference implementation: `src/saola/button.gleam`.
+
+```gleam
+// Builder style — pipe setters
+button.new()
+|> button.variant(button.Outline)
+|> button.loading(model.saving)
+|> button.view("Save", Some(SaveClicked))
+
+// Config style — record update
+button.view(
+  button.ButtonConfig(..button.default_config(), loading: model.saving),
+  "Save",
+  Some(SaveClicked),
+)
+```
+
+Contract:
+- `WidgetConfig(msg)` is **public, not opaque** — record-update syntax must work for consumers.
+- `new()` and `default_config()` both return defaults; each setter is one line of record update over the same record.
+- The Config holds **presentation options only**. Required data and the render-target decision live in **terminal functions** (`view` → `<button>`, `view_anchor` → `<a>`). `on_click`/`href` are terminal parameters, never setters — this keeps render-as type-safe and unmixable.
+- A single `view()` that infers the element from which setters were called is banned.
+- Existing flat widgets stay valid; migrate only when option count grows.
 
 ### 4. Variants as ADTs (Not Strings)
 
