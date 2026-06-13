@@ -225,7 +225,10 @@ pub fn view_anchor(
   href: String,
 ) -> Element(msg) {
   let non_interactive_attrs = case config.disabled || config.loading {
-    True -> [a.attribute("aria-disabled", "true"), a.attribute("tabindex", "-1")]
+    True -> [
+      a.attribute("aria-disabled", "true"),
+      a.attribute("tabindex", "-1"),
+    ]
     False -> []
   }
   h.a(

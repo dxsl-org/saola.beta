@@ -91,6 +91,10 @@ pub fn view() -> Element(Message) {
       DocSection("anchor", "Anchor (Navigation)", [
         h.div([a.class("button-grid")], [
           button.button_primary_anchor("Primary Link", "#"),
+          button.new()
+            |> button.variant(button.Primary)
+            |> button.add_class("no-underline hover:text-primary")
+            |> button.view_anchor("Primary Link Without Underline", "#"),
           button.button_secondary_anchor("Secondary Link", "#"),
           button.button_outline_anchor("Outline Link", "#"),
           button.button_ghost_anchor("Ghost Link", "#"),
