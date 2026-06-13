@@ -8,6 +8,8 @@ import saola/icon/lc
 import saola/preview/model.{type Message, Home, OnRouteChange}
 import saola/preview/view/doc_page.{DocSection}
 
+import components/general/button/button as saolabutton
+
 pub fn view() -> Element(Message) {
   let attrs_disabled = button.ButtonExtraAttrs(True, None, button.default_aria)
   let attrs_aria_label =
@@ -181,6 +183,22 @@ pub fn view() -> Element(Message) {
           "button.button_outline_anchor(\"GitHub\", \"https://github.com/...\")",
           "button.button_anchor(Primary, \"Read more\", Large, None, \"/blog\", button.default_extra_attrs)",
         ]),
+      ]),
+      DocSection("Test", "Test", [
+        element.fragment([
+          saolabutton.render(saolabutton.ButtonConfig(
+            button_type: saolabutton.HtmlButton,
+            text: "Gửi biểu mẫu",
+            class_names: "btn btn-lg-primary",
+          )),
+
+          // Nút loại 2: Thẻ <a> (Link) dẫn sang trang khác
+          saolabutton.render(saolabutton.ButtonConfig(
+            button_type: saolabutton.HtmlLink(href: "https://gleam.run"),
+            text: "Đọc tài liệu",
+            class_names: "btn btn-lg-link",
+          ))
+        ])
       ]),
     ],
   )
