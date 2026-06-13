@@ -21,17 +21,17 @@ pub fn dropdown_menu(is_open: Bool, on_close: fn() -> msg, ...) -> Element(msg)
 // WRONG: do not keep is_open inside the widget
 ```
 
-### 2. Full function + convenience shortcuts
+### 2. Full-options form + convenience shortcuts
 
 Every widget exposes:
-- `widget(...)` — all options available
+- A **full-options form** — flat `widget(...)` for simple widgets, or `Config` + `view` terminals for widgets with many options (see rule 8)
 - Shortcut functions for common cases (`widget_primary`, `widget_simple`, etc.)
 
-Shortcuts delegate to `widget` using `default_*` values.
+Shortcuts delegate to the full-options form using defaults.
 
 ```gleam
 pub fn button_primary(label: String, click_message: msg) -> Element(msg) {
-  button(Primary, label, Large, Some(click_message), default_extra_attrs)
+  new() |> view(label, Some(click_message))
 }
 ```
 
@@ -63,6 +63,8 @@ pub fn dialog(attrs: DialogAttrs) -> Element(msg)
 
 When an `Attrs` type is justified, pair it with a `pub const default_*` (or `pub fn default_*()` for generic fields) so callers can opt in to just the fields they need.
 
+When the option count keeps growing (~6+ optional fields) or the widget needs multiple render targets, upgrade from `Attrs` to the dual-style `Config` pattern (rule 8) instead of widening the positional signature.
+
 ### 5. Form inputs — InitValue / SyncValue
 
 Form inputs expose a two-mode ADT for value binding:
@@ -76,7 +78,7 @@ pub type InputValue {
 
 `InitValue` maps to `a.default_value`, `SyncValue` maps to `a.value`.
 
-### 5. Variants as ADTs
+### 6. Variants as ADTs
 
 Use Gleam ADTs for visual variants, never magic strings.
 
@@ -84,7 +86,7 @@ Use Gleam ADTs for visual variants, never magic strings.
 pub type BadgeVariant { Default | Secondary | Destructive | Outline }
 ```
 
-### 6. CSS — Basecoat class names, string concatenation
+### 7. CSS — Basecoat class names, string concatenation
 
 Derive class names from [Basecoat](https://basecoatui.com) directly. Build with string concatenation; no `cn()` utility is needed.
 
@@ -95,22 +97,41 @@ let class = case variant {
 }
 ```
 
-### 7. Flat API — prefer constructors over builder pattern
+### 8. Widget API styles — flat for simple, dual-style `Config` for complex
 
-We prefer flat functions over builder/compound patterns, because Gleam’s features make builders verbose and unnecessary.
+**Simple widgets** (few options, one render target) stay flat:
 
 ```gleam
-// Preferred: flat function
 alert(Destructive, title: "Error", description: "...", icon: some_icon)
 alert_danger(title: "Error")
-
-// Discourage: compound/builder pattern
-Alert.root() |> Alert.title("Error") |> Alert.description("...") |> Alert.icon(some_icon)
 ```
 
-Builder patterns are not banned but should only be used in rare cases where they significantly improve ergonomics.
+**Complex widgets** (many optional fields, loading/icon variants, multiple render targets) use the **dual-style `Config` pattern** — one public record consumed through two equivalent syntaxes (reference implementation: `saola/button`):
 
-### 8. ARIA attributes — explicit, no Radix dependency
+```gleam
+// Builder style — pipe setters
+button.new()
+|> button.variant(button.Outline)
+|> button.loading(model.saving)
+|> button.view("Save", Some(SaveClicked))
+
+// Config style — record update
+button.view(
+  button.ButtonConfig(..button.default_config(), loading: model.saving),
+  "Save",
+  Some(SaveClicked),
+)
+```
+
+Pattern contract:
+- One **public** (not opaque) `WidgetConfig(msg)` record — public so record-update syntax works for consumers.
+- `new()` (builder entry) and `default_config()` (record-update entry) both return the defaults; each setter is one line of record update.
+- The `Config` holds **presentation options only**. Required data and the render-target decision live in **terminal functions**: `view(config, label, on_click)` → `<button>`, `view_anchor(config, label, href)` → `<a>`. Never make `on_click`/`href` setters — terminals keep render-as type-safe and unmixable.
+- Shortcuts (rule 2) are implemented as `new() |> ... |> view(...)`.
+
+Free-floating builder chains without typed terminals (e.g. a single `view()` that guesses the element from whichever setters were called) are still banned. Existing flat widgets stay valid; migrate to `Config` only when their option count grows.
+
+### 9. ARIA attributes — explicit, no Radix dependency
 
 - Prefer semantic HTML tags over ARIA attributes (e.g., use `<button>` instead of `<div role="button">`).
 - Design widget constructors to accept ARIA attributes relevant to the widget (grouped in a parameter). This helps users learn which attributes are applicable.
@@ -123,7 +144,7 @@ a.aria_expanded(is_open)
 a.aria_labelledby(title_id)
 ```
 
-### 9. Auto-generated IDs
+### 10. Auto-generated IDs
 
 Use `typeid` when an accessible ID is needed but not provided by the consumer:
 

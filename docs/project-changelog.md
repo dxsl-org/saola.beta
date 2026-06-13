@@ -2,6 +2,27 @@
 
 All notable changes to the Saola UI Kit are documented here.
 
+## [2026-06-13] — Button API Redesign + Class Hygiene
+
+### Summary
+
+Redesigned the button widget around one public `ButtonConfig` record consumed through two styles (builder pipes and record update), with type-safe render-as via terminal functions. Also eliminated `a.none()` class-attribute pollution across all 50 widgets.
+
+### Changes
+
+**Button API (breaking)**
+- Removed `ButtonExtraAttrs` and positional `button()`/`button_anchor()`
+- New `ButtonConfig` + `new()`/`default_config()` + one-line setters (`variant`, `size`, `icon_start`, `icon_end`, `loading`, `disabled`, `type_`, `aria`, `add_class`)
+- Terminals decide render target: `view(config, label, on_click)` → `<button>`; `view_anchor(config, label, href)` → `<a>` — click/href are terminal params, never setters (type-safe, unmixable)
+- New features: `loading` (spinner replaces `icon_start`, `aria-busy`, non-interactive via `aria-disabled` so it stays in the accessibility tree), `icon_start`/`icon_end`, `add_class` (append-only)
+- `button_close` gains accessible "Close" label; anchor shortcuts for navigation URLs
+- Shortcuts keep their signatures; 11 files migrated; 396 tests (6 new)
+- Rejected after debate: `children` (invalid-HTML risk), inline `styles` (defeats class system), setter-based on_click/href
+- CLAUDE.md rule 8 + docs/code-standards.md §3b codify the dual-style Config pattern for complex widgets
+
+**Class attribute hygiene**
+- All 50 widgets: `a.none()` sentinels (which are `class("")` and space-join into `class="btn    "`) replaced with `list.flatten` conditional assembly
+
 ## [2026-06-12] — Modular CSS Distribution
 
 ### Summary
