@@ -9,7 +9,6 @@ import saola/preview/model.{type Message, Home, OnRouteChange}
 import saola/preview/view/doc_page.{DocSection}
 
 import components/general/button/button as saola_button
-import components/general/button/button_base
 
 pub fn view() -> Element(Message) {
   doc_page.doc_page(
