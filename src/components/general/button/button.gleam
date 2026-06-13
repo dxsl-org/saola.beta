@@ -1,18 +1,44 @@
-import components/general/button/button_default
-import components/general/button/button_link
+import components/general/button/button_base.{
+  type ButtonConfig, type Variant, ButtonConfig, Default,
+}
+import gleam/option.{None, Some}
 import lustre/element.{type Element}
 
-pub fn button_default(
-  text text: String,
-  class_names class_names: String,
-) -> Element(msg) {
-  button_default.button_default(text: text, class_names: class_names)
+pub fn new() -> ButtonConfig {
+  ButtonConfig(
+    text: "",
+    variant: Default,
+    danger: False,
+    disabled: False,
+    href: None,
+    class_names: "",
+  )
 }
 
-pub fn button_link(
-  text text: String,
-  href href: String,
-  class_names class_names: String,
-) -> Element(msg) {
-  button_link.button_link(text: text, href: href, class_names: class_names)
+pub fn variant(config: ButtonConfig, v: Variant) -> ButtonConfig {
+  ButtonConfig(..config, variant: v)
+}
+
+pub fn text(config: ButtonConfig, t: String) -> ButtonConfig {
+  ButtonConfig(..config, text: t)
+}
+
+pub fn danger(config: ButtonConfig, d: Bool) -> ButtonConfig {
+  ButtonConfig(..config, danger: d)
+}
+
+pub fn disabled(config: ButtonConfig, d: Bool) -> ButtonConfig {
+  ButtonConfig(..config, disabled: d)
+}
+
+pub fn href(config: ButtonConfig, h: String) -> ButtonConfig {
+  ButtonConfig(..config, href: Some(h))
+}
+
+pub fn class_names(config: ButtonConfig, c: String) -> ButtonConfig {
+  ButtonConfig(..config, class_names: c)
+}
+
+pub fn render(config: ButtonConfig) -> Element(msg) {
+  button_base.render(config)
 }

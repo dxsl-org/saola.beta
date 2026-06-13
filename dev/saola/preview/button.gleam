@@ -8,7 +8,8 @@ import saola/icon/lc
 import saola/preview/model.{type Message, Home, OnRouteChange}
 import saola/preview/view/doc_page.{DocSection}
 
-import components/general/button/button.{button_default, button_link} as saola_button
+import components/general/button/button as saola_button
+import components/general/button/button_base
 
 pub fn view() -> Element(Message) {
   doc_page.doc_page(
@@ -139,17 +140,17 @@ pub fn view() -> Element(Message) {
       ]),
       DocSection("Test", "Test", [
         element.fragment([
-          saola_button.button_default(
-            class_names: "btn-lg-primary",
-            text: "Gửi biểu mẫu",
-          ),
-
-          // Nút loại 2: Thẻ <a> (Link) dẫn sang trang khác
-          saola_button.button_link(
-            href: "https://gleam.run",
-            text: "Đọc tài liệu",
-            class_names: "btn-lg-ghost",
-          ),
+          saola_button.new()
+            |> saola_button.text("Test")
+            |> saola_button.variant(button_base.Primary)
+            |> saola_button.class_names("btn-lg-primary")
+            |> saola_button.render(),
+          saola_button.new()
+            |> saola_button.text("Trang chủ")
+            |> saola_button.variant(button_base.Link)
+            |> saola_button.href("/home")
+            |> saola_button.class_names("btn-lg-primary")
+            |> saola_button.render(),
         ]),
       ]),
     ],
