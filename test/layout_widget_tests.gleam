@@ -144,7 +144,8 @@ pub fn dialog_with_close_button_renders_test() {
       on_close: Nil,
     )
     |> element.to_string
-  assert string.contains(html, "btn-sm-outline")
+  // Close button is icon-only (empty label + icon) → square icon variant.
+  assert string.contains(html, "btn-sm-icon-outline")
 }
 
 // --- toast ---

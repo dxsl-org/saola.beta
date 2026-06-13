@@ -226,7 +226,7 @@ pub fn view(
   }
   h.button(
     list.flatten([
-      [a.class(css_class(config))],
+      [a.class(css_class(config, label))],
       busy_attrs(config),
       click_attrs,
       disabled_attrs,
@@ -238,20 +238,31 @@ pub fn view(
 }
 
 /// Render as `<a href>` styled as a button. Use when the action navigates
-/// to a URL. `disabled`/`loading` map to `aria-disabled` + `tabindex="-1"`
-/// (anchors have no native disabled). `config.type_` is ignored.
+/// to a URL. `config.type_` is ignored.
+///
+/// When `disabled`/`loading`, the `href` is **omitted** (alongside
+/// `aria-disabled="true"` + `tabindex="-1"`): anchors have no native disabled
+/// and `aria-disabled` is advisory only, so keeping `href` would leave the
+/// link mouse-clickable and still navigating. No `href` = not a hyperlink =
+/// genuinely inert, while `aria-disabled` keeps it announced to screen readers.
 pub fn view_anchor(
   config: ButtonConfig(msg),
   label: String,
   href: String,
 ) -> Element(msg) {
-  let non_interactive_attrs = case config.disabled || config.loading {
+  let non_interactive = config.disabled || config.loading
+  let href_attrs = case non_interactive {
+    True -> []
+    False -> [a.href(href)]
+  }
+  let non_interactive_attrs = case non_interactive {
     True -> [a.attribute("aria-disabled", "true"), a.attribute("tabindex", "-1")]
     False -> []
   }
   h.a(
     list.flatten([
-      [a.class(css_class(config)), a.href(href)],
+      [a.class(css_class(config, label))],
+      href_attrs,
       busy_attrs(config),
       non_interactive_attrs,
       aria_attrs(config),
@@ -262,21 +273,36 @@ pub fn view_anchor(
 
 // --- Internal rendering helpers ---
 
-fn css_class(config: ButtonConfig(msg)) -> String {
-  let base = case config.size, config.variant {
-    Large, Primary -> "btn-lg-primary"
-    Large, Secondary -> "btn-lg-secondary"
-    Large, Outline -> "btn-lg-outline"
-    Large, Ghost -> "btn-lg-ghost"
-    Large, Link -> "btn-lg-link"
-    Large, Destructive -> "btn-lg-destructive"
-    Small, Primary -> "btn-sm-primary"
-    Small, Secondary -> "btn-sm-secondary"
-    Small, Outline -> "btn-sm-outline"
-    Small, Ghost -> "btn-sm-ghost"
-    Small, Link -> "btn-sm-link"
-    Small, Destructive -> "btn-sm-destructive"
+/// Build the Basecoat class. An empty label with a lead element (icon_start
+/// or the loading spinner) is an icon-only button and uses Basecoat's square
+/// `-icon-` variant (e.g. `btn-sm-icon-outline`) instead of the text-padded
+/// variant — otherwise the button has no text to size against and renders
+/// mis-shapen.
+fn css_class(config: ButtonConfig(msg), label: String) -> String {
+  let size_token = case config.size {
+    Large -> "lg"
+    Small -> "sm"
   }
+  let variant_token = case config.variant {
+    Primary -> "primary"
+    Secondary -> "secondary"
+    Outline -> "outline"
+    Ghost -> "ghost"
+    Link -> "link"
+    Destructive -> "destructive"
+  }
+  // Icon-only = no text label but at least one glyph (start/end icon or the
+  // loading spinner). icon_end counts too, else an end-icon-only button would
+  // wrongly get the text-padded variant.
+  let has_glyph = case config.icon_start, config.icon_end, config.loading {
+    None, None, False -> False
+    _, _, _ -> True
+  }
+  let icon_infix = case string.trim(label) == "" && has_glyph {
+    True -> "-icon"
+    False -> ""
+  }
+  let base = "btn-" <> size_token <> icon_infix <> "-" <> variant_token
   case config.class {
     "" -> base
     extra -> base <> " " <> extra
@@ -337,6 +363,12 @@ pub fn button_destructive(label: String, click_message: msg) -> Element(msg) {
   new() |> variant(Destructive) |> view(label, Some(click_message))
 }
 
+/// Link-styled button (looks like a hyperlink, acts as a `<button>`).
+/// For real navigation use `button_link_anchor` (renders `<a href>`).
+pub fn button_link(label: String, click_message: msg) -> Element(msg) {
+  new() |> variant(Link) |> view(label, Some(click_message))
+}
+
 /// Submit button (type="submit"). Use inside a <form>.
 pub fn button_submit(label: String) -> Element(msg) {
   new() |> type_(Submit) |> view(label, None)
@@ -372,4 +404,15 @@ pub fn button_outline_anchor(label: String, href: String) -> Element(msg) {
 /// Ghost button rendered as `<a href>`. Use for navigation URLs.
 pub fn button_ghost_anchor(label: String, href: String) -> Element(msg) {
   new() |> variant(Ghost) |> view_anchor(label, href)
+}
+
+/// Destructive button rendered as `<a href>`. Use for navigation URLs.
+pub fn button_destructive_anchor(label: String, href: String) -> Element(msg) {
+  new() |> variant(Destructive) |> view_anchor(label, href)
+}
+
+/// Link-styled button rendered as `<a href>` — the most natural navigation
+/// link (looks like a hyperlink, is one).
+pub fn button_link_anchor(label: String, href: String) -> Element(msg) {
+  new() |> variant(Link) |> view_anchor(label, href)
 }
