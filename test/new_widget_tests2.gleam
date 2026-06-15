@@ -50,14 +50,12 @@ pub fn radio_group_selected_is_checked_test() {
 
 pub fn radio_group_horizontal_has_data_orientation_test() {
   let html =
-    radio_group.radio_group(
+    radio_group.new()
+    |> radio_group.orientation(radio_group.Horizontal)
+    |> radio_group.view(
       [radio_group.RadioOption("a", "A")],
       "a",
       fn(v) { v },
-      radio_group.RadioGroupAttrs(
-        ..radio_group.default_attrs,
-        orientation: radio_group.Horizontal,
-      ),
     )
     |> element.to_string
   assert string.contains(html, "data-orientation=\"horizontal\"")

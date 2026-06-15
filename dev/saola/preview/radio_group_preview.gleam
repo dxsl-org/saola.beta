@@ -32,7 +32,10 @@ pub fn view(model: Model) -> Element(Message) {
       ]),
       DocSection("horizontal", "Horizontal", [
         h.div([a.class("grid gap-4 mt-4")], [
-          radio_group.radio_group(
+          radio_group.new()
+          |> radio_group.name("size")
+          |> radio_group.orientation(radio_group.Horizontal)
+          |> radio_group.view(
             [
               radio_group.RadioOption("xs", "XS"),
               radio_group.RadioOption("sm", "SM"),
@@ -42,11 +45,6 @@ pub fn view(model: Model) -> Element(Message) {
             ],
             "md",
             fn(_) { ToggleBoldChanged(model.toggle_bold) },
-            radio_group.RadioGroupAttrs(
-              ..radio_group.default_attrs,
-              orientation: radio_group.Horizontal,
-              name: "size",
-            ),
           ),
         ]),
       ]),

@@ -62,15 +62,15 @@ pub fn view(model: Model) -> Element(Message) {
                 Some(FormMessageChanged),
               ),
             ]),
-            checkbox.checkbox(
+            checkbox.new()
+            |> checkbox.form_attr(
+              checkbox.FormAttr("updates", checkbox.InitValue("yes")),
+            )
+            |> checkbox.id("updates")
+            |> checkbox.help_text("This checkbox submits a normal form value.")
+            |> checkbox.view(
               "Send me product updates",
               checkbox.InitChecked(True),
-              checkbox.ExtraAttrs(
-                checkbox.FormAttr("updates", checkbox.InitValue("yes")),
-                "updates",
-                "",
-              ),
-              "This checkbox submits a normal form value.",
             ),
             button.button_submit("Send"),
           ]),

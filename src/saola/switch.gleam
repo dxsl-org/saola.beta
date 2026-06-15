@@ -1,3 +1,12 @@
+//// Switch (toggle) widget — dual-style `Config` (uniform Saola pattern):
+////
+//// ```gleam
+//// switch.switch_simple("Notifications", model.on, Toggled)              // shortcut
+//// switch.new()
+//// |> switch.name("notify")
+//// |> switch.view("Notifications", switch.SyncChecked(model.on), Toggled)
+//// ```
+
 import gleam/list
 import gleam/result
 import lustre/attribute as a
@@ -17,36 +26,64 @@ pub type SwitchStatus {
   SyncChecked(Bool)
 }
 
-pub type SwitchExtraAttrs {
-  SwitchExtraAttrs(id: String, name: String, disabled: Bool, class: String)
+/// Presentation options for a switch. Public for record-update syntax. The
+/// `label`, `status`, and `on_change` handler are the required data (`view`).
+pub type SwitchConfig {
+  SwitchConfig(id: String, name: String, disabled: Bool, class: String)
 }
 
-pub const default_extra_attrs = SwitchExtraAttrs(
-  id: "",
-  name: "",
-  disabled: False,
-  class: "",
-)
+/// Builder entry point. Defaults: auto id, no name, enabled, no extra class.
+pub fn new() -> SwitchConfig {
+  SwitchConfig(id: "", name: "", disabled: False, class: "")
+}
 
-/// Fully customizable switch (toggle).
-pub fn switch(
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> SwitchConfig {
+  new()
+}
+
+/// Set the `id` attribute (auto-generated when empty).
+pub fn id(config: SwitchConfig, id: String) -> SwitchConfig {
+  SwitchConfig(..config, id: id)
+}
+
+/// Set the `name` attribute.
+pub fn name(config: SwitchConfig, name: String) -> SwitchConfig {
+  SwitchConfig(..config, name: name)
+}
+
+/// Set the disabled state.
+pub fn disabled(config: SwitchConfig, disabled: Bool) -> SwitchConfig {
+  SwitchConfig(..config, disabled: disabled)
+}
+
+/// Append an extra CSS class on the label. Additive only.
+pub fn add_class(config: SwitchConfig, class: String) -> SwitchConfig {
+  let merged = case config.class {
+    "" -> class
+    existing -> existing <> " " <> class
+  }
+  SwitchConfig(..config, class: merged)
+}
+
+/// Render the switch. `on_change` receives the new checked Bool.
+pub fn view(
+  config: SwitchConfig,
   label: String,
   status: SwitchStatus,
-  on_change on_change: fn(Bool) -> msg,
-  extra_attrs extra_attrs: SwitchExtraAttrs,
+  on_change: fn(Bool) -> msg,
 ) -> Element(msg) {
-  let SwitchExtraAttrs(id:, name:, disabled:, class:) = extra_attrs
   let input_id =
-    case id {
+    case config.id {
       "" -> typeid.new(prefix: "sw") |> result.map(typeid.to_string)
       v -> Ok(v)
     }
     |> result.unwrap("switch-fallback")
-  let label_class = case class {
+  let label_class = case config.class {
     "" -> class_label
     c -> class_label <> " " <> c
   }
-  let name_attrs = case name {
+  let name_attrs = case config.name {
     "" -> []
     n -> [a.name(n)]
   }
@@ -54,18 +91,13 @@ pub fn switch(
     InitChecked(v) -> a.default_checked(v)
     SyncChecked(v) -> a.checked(v)
   }
-  let disabled_attrs = case disabled {
+  let disabled_attrs = case config.disabled {
     True -> [a.disabled(True)]
     False -> []
   }
   h.label([a.class(label_class <> " gap-3 cursor-pointer")], [
     h.input(list.flatten([
-      [
-        a.type_("checkbox"),
-        a.role("switch"),
-        a.class(class_input),
-        a.id(input_id),
-      ],
+      [a.type_("checkbox"), a.role("switch"), a.class(class_input), a.id(input_id)],
       name_attrs,
       [status_attr],
       disabled_attrs,
@@ -75,15 +107,12 @@ pub fn switch(
   ])
 }
 
+// --- Convenience shortcuts ---
+
 pub fn switch_simple(
   label: String,
   checked: Bool,
   on_change: fn(Bool) -> msg,
 ) -> Element(msg) {
-  switch(
-    label,
-    SyncChecked(checked),
-    on_change: on_change,
-    extra_attrs: default_extra_attrs,
-  )
+  new() |> view(label, SyncChecked(checked), on_change)
 }

@@ -1,3 +1,13 @@
+//// Checkbox widget — dual-style `Config` (uniform Saola pattern):
+////
+//// ```gleam
+//// checkbox.checkbox_basic("Accept terms")                            // shortcut
+//// checkbox.new()
+//// |> checkbox.form_attr(checkbox.FormAttr("tnc", checkbox.InitValue("yes")))
+//// |> checkbox.help_text("Required to continue")
+//// |> checkbox.view("Accept terms and conditions", checkbox.InitChecked(False))
+//// ```
+
 import gleam/result
 
 import lustre/attribute as a
@@ -9,35 +19,33 @@ pub const class_input = "input"
 pub const class_label = "label"
 
 pub type CheckStatus {
-  /// The value which is to be passed to Lustre's `default_checked`.
-  /// It only applies to the first time the checkbox is rendered.
-  /// Should be used when the form is handled with `formal` library.
+  /// Seeds the checked state once (Lustre `default_checked`). Use with `formal`.
   InitChecked(Bool)
-  /// The value which is to be passed to Lustre's `checked`.
-  /// It will be kept in sync with the app model.
-  /// Use when you want to control the checkbox in the same manner as Vue / React.
+  /// Kept in sync with the app model (Lustre `checked`).
   SyncChecked(Bool)
 }
 
 pub type CheckboxValue {
-  /// The value which is to be passed to Lustre's `default_value`.
-  /// It only applies to the first time the checkbox is rendered.
-  /// Should be used when the form is handled with `formal` library.
+  /// Seeds the value once (Lustre `default_value`). Use with `formal`.
   InitValue(String)
-  /// The value which is to be passed to Lustre's `value`.
-  /// It will be kept in sync with the app model.
-  /// Use when you want to control the checkbox in the same manner as Vue / React.
+  /// Kept in sync with the app model (Lustre `value`).
   SyncValue(String)
 }
 
-/// Checkbox attribute which makes sense if checkbox is used in a form.
-/// The `value` argument will be passed to Lustre's `default_value`
+/// Form binding for a checkbox (its `name` + submitted value).
 pub type FormAttr {
   FormAttr(name: String, value: CheckboxValue)
 }
 
-pub type ExtraAttrs {
-  ExtraAttrs(form_attr: FormAttr, id: String, class: String)
+/// Presentation/form options for a checkbox. Public for record-update syntax.
+/// The `label` and `status` are required data, passed to `view`.
+pub type CheckboxConfig {
+  CheckboxConfig(
+    form_attr: FormAttr,
+    id: String,
+    help_text: String,
+    class: String,
+  )
 }
 
 pub const default_check_status = InitChecked(False)
@@ -46,7 +54,39 @@ pub const default_value = InitValue("on")
 
 pub const default_form_attr = FormAttr("", default_value)
 
-pub const default_extra_attrs = ExtraAttrs(default_form_attr, "", "")
+/// Builder entry point. Defaults: no form binding, auto id, no help text/class.
+pub fn new() -> CheckboxConfig {
+  CheckboxConfig(form_attr: default_form_attr, id: "", help_text: "", class: "")
+}
+
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> CheckboxConfig {
+  new()
+}
+
+/// Set the form binding (name + submitted value).
+pub fn form_attr(config: CheckboxConfig, form_attr: FormAttr) -> CheckboxConfig {
+  CheckboxConfig(..config, form_attr: form_attr)
+}
+
+/// Set the `id` attribute (auto-generated when help text is shown and empty).
+pub fn id(config: CheckboxConfig, id: String) -> CheckboxConfig {
+  CheckboxConfig(..config, id: id)
+}
+
+/// Set helper text shown beneath the label.
+pub fn help_text(config: CheckboxConfig, help_text: String) -> CheckboxConfig {
+  CheckboxConfig(..config, help_text: help_text)
+}
+
+/// Append an extra CSS class on the label. Additive only.
+pub fn add_class(config: CheckboxConfig, class: String) -> CheckboxConfig {
+  let merged = case config.class {
+    "" -> class
+    existing -> existing <> " " <> class
+  }
+  CheckboxConfig(..config, class: merged)
+}
 
 fn base_input(status: CheckStatus, form_attr: FormAttr) {
   let FormAttr(name:, value:) = form_attr
@@ -71,37 +111,24 @@ fn base_input(status: CheckStatus, form_attr: FormAttr) {
   ])
 }
 
-/// Fully customizable checkbox.
-///
-/// Example:
-///
-/// ```gleam
-/// let attr = FormAttr("tnc", InitValue("yes"))
-/// checkbox("Accept terms and conditions", default_check_status, attr, "")
-/// ```
-pub fn checkbox(
-  label: String,
-  status: CheckStatus,
-  extra_attrs: ExtraAttrs,
-  help_text help_text: String,
-) {
-  let ExtraAttrs(form_attr:, id:, class:) = extra_attrs
-  let label_attrs = case class {
+/// Render the checkbox with the given label and checked status.
+pub fn view(config: CheckboxConfig, label: String, status: CheckStatus) {
+  let label_attrs = case config.class {
     "" -> []
     class -> [a.class(class)]
   }
-  case help_text {
+  case config.help_text {
     "" ->
       h.label([a.class(class_label), a.class("gap-3"), ..label_attrs], [
-        base_input(status, form_attr),
+        base_input(status, config.form_attr),
         h.text(label),
       ])
     help -> {
-      // Prepare `id` attribute for the `<input>` element, so that we can use with `<label for >`.
-      // If the `id` is not provided by the caller, and when the `<label>` does not grab the `<input>`
-      // (when we need `id` and `for`), we generate it from `typeid`.
+      // When help text is shown the label can't wrap the input (it needs its
+      // own <p>), so the input needs an id for `<label for>`. Generate one if
+      // the caller didn't supply it.
       let input_id =
-        case id {
+        case config.id {
           "" -> typeid.new(prefix: "chkbx") |> result.map(typeid.to_string)
           id -> Ok(id)
         }
@@ -115,7 +142,7 @@ pub fn checkbox(
             InitChecked(v) -> a.default_checked(v)
             SyncChecked(v) -> a.checked(v)
           },
-          ..case form_attr {
+          ..case config.form_attr {
             FormAttr("", _) -> []
             FormAttr(name, value) -> [
               a.name(name),
@@ -137,12 +164,9 @@ pub fn checkbox(
   }
 }
 
-// --- Common used checkboxes ---
+// --- Convenience shortcuts ---
 
-/// Example:
-/// ```gleam
-/// checkbox_basic("Accept terms and conditions")
-/// ```
+/// Example: `checkbox_basic("Accept terms and conditions")`.
 pub fn checkbox_basic(label: String) {
-  checkbox(label, default_check_status, default_extra_attrs, "")
+  new() |> view(label, default_check_status)
 }

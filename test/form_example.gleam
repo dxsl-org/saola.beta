@@ -82,16 +82,13 @@ pub fn view(model: Model) -> Element(Msg) {
         |> textarea.required(True)
         |> textarea.view(Some(textarea.SyncValue(model.message)), Some(MessageChanged)),
       ]),
-      checkbox.checkbox(
-        "Send me product updates",
-        checkbox.InitChecked(True),
-        checkbox.ExtraAttrs(
-          checkbox.FormAttr("updates", checkbox.InitValue("yes")),
-          "updates",
-          "",
-        ),
-        "This checkbox submits a normal form value.",
-      ),
+      checkbox.new()
+      |> checkbox.form_attr(
+        checkbox.FormAttr("updates", checkbox.InitValue("yes")),
+      )
+      |> checkbox.id("updates")
+      |> checkbox.help_text("This checkbox submits a normal form value.")
+      |> checkbox.view("Send me product updates", checkbox.InitChecked(True)),
       button.button_submit("Send"),
     ]),
     submitted_summary(model.submitted_values),

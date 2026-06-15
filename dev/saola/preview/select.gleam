@@ -32,39 +32,27 @@ pub fn view(fruit: String, timezone: String) -> Element(Message) {
             h.label([a.class("label")], [
               text("Favourite fruit: " <> fruit),
             ]),
-            select.select(
-              fruit_options,
-              select.SyncValue(fruit),
-              on_change: fn(v) { SelectChanged("fruit", v) },
-              extra_attrs: select.SelectExtraAttrs(
-                ..select.default_extra_attrs,
-                name: "fruit",
-              ),
-            ),
+            select.new()
+            |> select.name("fruit")
+            |> select.view(fruit_options, select.SyncValue(fruit), fn(v) {
+              SelectChanged("fruit", v)
+            }),
           ]),
           h.div([a.class("grid gap-2")], [
             h.label([a.class("label")], [text("Timezone")]),
-            select.select(
-              timezone_options,
-              select.SyncValue(timezone),
-              on_change: fn(v) { SelectChanged("timezone", v) },
-              extra_attrs: select.SelectExtraAttrs(
-                ..select.default_extra_attrs,
-                name: "timezone",
-              ),
-            ),
+            select.new()
+            |> select.name("timezone")
+            |> select.view(timezone_options, select.SyncValue(timezone), fn(v) {
+              SelectChanged("timezone", v)
+            }),
           ]),
           h.div([a.class("grid gap-2")], [
             h.label([a.class("label")], [text("Disabled")]),
-            select.select(
-              fruit_options,
-              select.InitValue("banana"),
-              on_change: fn(v) { SelectChanged("disabled", v) },
-              extra_attrs: select.SelectExtraAttrs(
-                ..select.default_extra_attrs,
-                disabled: True,
-              ),
-            ),
+            select.new()
+            |> select.disabled(True)
+            |> select.view(fruit_options, select.InitValue("banana"), fn(v) {
+              SelectChanged("disabled", v)
+            }),
           ]),
         ]),
       ]),
@@ -72,11 +60,12 @@ pub fn view(fruit: String, timezone: String) -> Element(Message) {
         doc_page.snippet([
           "import saola/select",
           "",
-          "select.select(",
+          "select.new()",
+          "|> select.name(\"fruit\")",
+          "|> select.view(",
           "  [select.SelectOption(\"apple\", \"Apple\"), ...],",
           "  select.SyncValue(model.fruit),",
-          "  on_change: fn(v) { SelectChanged(\"fruit\", v) },",
-          "  extra_attrs: select.SelectExtraAttrs(..select.default_extra_attrs, name: \"fruit\"),",
+          "  fn(v) { SelectChanged(\"fruit\", v) },",
           ")",
           "",
           "// Disabled option",

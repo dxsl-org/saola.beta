@@ -11,34 +11,27 @@ import saola/textarea
 fn checkbox_examples() -> List(Element(Message)) {
   [
     checkbox.checkbox_basic("Basic Checkbox"),
-    checkbox.checkbox(
-      "Checkbox with help text",
-      checkbox.default_check_status,
-      checkbox.default_extra_attrs,
-      "This is a help text for the checkbox.",
-    ),
-    checkbox.checkbox(
-      "Checkbox with composed attributes",
-      checkbox.default_check_status,
-      checkbox.ExtraAttrs(checkbox.default_form_attr, "", "custom-class"),
-      "This checkbox uses composed attributes from default constants.",
-    ),
-    checkbox.checkbox(
-      "Checkbox with InitChecked(True)",
-      checkbox.InitChecked(True),
-      checkbox.default_extra_attrs,
-      "This checkbox is initially checked using InitChecked(True).",
-    ),
-    checkbox.checkbox(
-      "Checkbox with InitValue",
-      checkbox.default_check_status,
-      checkbox.ExtraAttrs(
-        checkbox.FormAttr("agree", checkbox.InitValue("yes")),
-        "",
-        "",
+    checkbox.new()
+      |> checkbox.help_text("This is a help text for the checkbox.")
+      |> checkbox.view("Checkbox with help text", checkbox.default_check_status),
+    checkbox.new()
+      |> checkbox.add_class("custom-class")
+      |> checkbox.help_text(
+        "This checkbox uses composed attributes from default constants.",
+      )
+      |> checkbox.view(
+        "Checkbox with composed attributes",
+        checkbox.default_check_status,
       ),
-      "This checkbox uses InitValue for form submission.",
-    ),
+    checkbox.new()
+      |> checkbox.help_text(
+        "This checkbox is initially checked using InitChecked(True).",
+      )
+      |> checkbox.view("Checkbox with InitChecked(True)", checkbox.InitChecked(True)),
+    checkbox.new()
+      |> checkbox.form_attr(checkbox.FormAttr("agree", checkbox.InitValue("yes")))
+      |> checkbox.help_text("This checkbox uses InitValue for form submission.")
+      |> checkbox.view("Checkbox with InitValue", checkbox.default_check_status),
   ]
 }
 

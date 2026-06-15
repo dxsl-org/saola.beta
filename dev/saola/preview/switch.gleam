@@ -15,15 +15,11 @@ pub fn view(notifications: Bool, marketing: Bool) -> Element(Message) {
         switch.switch_simple("Marketing emails", marketing, fn(v) {
           SwitchToggled("marketing", v)
         }),
-        switch.switch(
-          "Disabled switch",
-          switch.InitChecked(True),
-          on_change: fn(v) { SwitchToggled("disabled", v) },
-          extra_attrs: switch.SwitchExtraAttrs(
-            ..switch.default_extra_attrs,
-            disabled: True,
-          ),
-        ),
+        switch.new()
+        |> switch.disabled(True)
+        |> switch.view("Disabled switch", switch.InitChecked(True), fn(v) {
+          SwitchToggled("disabled", v)
+        }),
       ]),
     ]),
     DocSection("usage", "Usage", [
@@ -36,11 +32,11 @@ pub fn view(notifications: Bool, marketing: Bool) -> Element(Message) {
         "})",
         "",
         "// Disabled",
-        "switch.switch(",
-        "  \"Disabled\", switch.InitChecked(True),",
-        "  on_change: fn(v) { SwitchToggled(\"disabled\", v) },",
-        "  extra_attrs: switch.SwitchExtraAttrs(..switch.default_extra_attrs, disabled: True),",
-        ")",
+        "switch.new()",
+        "|> switch.disabled(True)",
+        "|> switch.view(\"Disabled\", switch.InitChecked(True), fn(v) {",
+        "  SwitchToggled(\"disabled\", v)",
+        "})",
       ]),
     ]),
   ])

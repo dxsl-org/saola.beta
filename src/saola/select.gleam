@@ -1,3 +1,13 @@
+//// Native select widget — dual-style `Config` (uniform Saola pattern):
+////
+//// ```gleam
+//// select.select_simple(options, Picked)                              // shortcut
+//// select.new()
+//// |> select.name("country")
+//// |> select.required(True)
+//// |> select.view(options, select.SyncValue(model.country), Picked)
+//// ```
+
 import gleam/list
 import lustre/attribute as a
 import lustre/element.{type Element}
@@ -18,8 +28,10 @@ pub type SelectValue {
   SyncValue(String)
 }
 
-pub type SelectExtraAttrs {
-  SelectExtraAttrs(
+/// Presentation options for a select. Public for record-update syntax. The
+/// `options`, `value`, and `on_change` handler are the required data (`view`).
+pub type SelectConfig {
+  SelectConfig(
     id: String,
     name: String,
     disabled: Bool,
@@ -29,14 +41,56 @@ pub type SelectExtraAttrs {
   )
 }
 
-pub const default_extra_attrs = SelectExtraAttrs(
-  id: "",
-  name: "",
-  disabled: False,
-  required: False,
-  aria_invalid: False,
-  class: "",
-)
+/// Builder entry point. Defaults: no id/name, enabled, optional, valid, no class.
+pub fn new() -> SelectConfig {
+  SelectConfig(
+    id: "",
+    name: "",
+    disabled: False,
+    required: False,
+    aria_invalid: False,
+    class: "",
+  )
+}
+
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> SelectConfig {
+  new()
+}
+
+/// Set the `id` attribute.
+pub fn id(config: SelectConfig, id: String) -> SelectConfig {
+  SelectConfig(..config, id: id)
+}
+
+/// Set the `name` attribute.
+pub fn name(config: SelectConfig, name: String) -> SelectConfig {
+  SelectConfig(..config, name: name)
+}
+
+/// Set the disabled state.
+pub fn disabled(config: SelectConfig, disabled: Bool) -> SelectConfig {
+  SelectConfig(..config, disabled: disabled)
+}
+
+/// Set the required state.
+pub fn required(config: SelectConfig, required: Bool) -> SelectConfig {
+  SelectConfig(..config, required: required)
+}
+
+/// Set `aria-invalid="true"` for validation styling.
+pub fn aria_invalid(config: SelectConfig, aria_invalid: Bool) -> SelectConfig {
+  SelectConfig(..config, aria_invalid: aria_invalid)
+}
+
+/// Append an extra CSS class after the base `select` class. Additive only.
+pub fn add_class(config: SelectConfig, class: String) -> SelectConfig {
+  let merged = case config.class {
+    "" -> class
+    existing -> existing <> " " <> class
+  }
+  SelectConfig(..config, class: merged)
+}
 
 fn render_option(opt: SelectOption) -> Element(msg) {
   case opt {
@@ -46,46 +100,41 @@ fn render_option(opt: SelectOption) -> Element(msg) {
   }
 }
 
-/// Fully customizable native select.
-pub fn select(
+/// Render the `<select>`. `value` binds via the `SelectValue` ADT; `on_change`
+/// wires the change handler.
+pub fn view(
+  config: SelectConfig,
   options: List(SelectOption),
   value: SelectValue,
-  on_change on_change: fn(String) -> msg,
-  extra_attrs extra_attrs: SelectExtraAttrs,
+  on_change: fn(String) -> msg,
 ) -> Element(msg) {
-  let SelectExtraAttrs(id:, name:, disabled:, required:, aria_invalid:, class:) =
-    extra_attrs
-  let id_attrs = case id {
+  let id_attrs = case config.id {
     "" -> []
     v -> [a.id(v)]
   }
-  let name_attrs = case name {
+  let name_attrs = case config.name {
     "" -> []
     n -> [a.name(n)]
   }
-  let disabled_attrs = case disabled {
+  let disabled_attrs = case config.disabled {
     True -> [a.disabled(True)]
     False -> []
   }
-  let required_attrs = case required {
+  let required_attrs = case config.required {
     True -> [a.required(True)]
     False -> []
   }
-  let aria_invalid_attrs = case aria_invalid {
+  let aria_invalid_attrs = case config.aria_invalid {
     True -> [a.attribute("aria-invalid", "true")]
     False -> []
   }
+  let class_str = case config.class {
+    "" -> class_select
+    c -> class_select <> " " <> c
+  }
   h.select(
     list.flatten([
-      [
-        a.class(
-          class_select
-          <> case class {
-            "" -> ""
-            c -> " " <> c
-          },
-        ),
-      ],
+      [a.class(class_str)],
       id_attrs,
       name_attrs,
       [
@@ -103,14 +152,11 @@ pub fn select(
   )
 }
 
+// --- Convenience shortcuts ---
+
 pub fn select_simple(
   options: List(SelectOption),
   on_change: fn(String) -> msg,
 ) -> Element(msg) {
-  select(
-    options,
-    InitValue(""),
-    on_change: on_change,
-    extra_attrs: default_extra_attrs,
-  )
+  new() |> view(options, InitValue(""), on_change)
 }
