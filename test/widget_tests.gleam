@@ -395,12 +395,10 @@ pub fn card_simple_renders_test() {
 
 pub fn card_with_description_renders_test() {
   let html =
-    card.card(card.CardAttrs(
-      title: "Profile",
-      description: "Manage your account.",
-      content: [],
-      footer: None,
-    ))
+    card.new()
+    |> card.title("Profile")
+    |> card.description("Manage your account.")
+    |> card.view([])
     |> element.to_string
   assert string.contains(html, "Profile")
   assert string.contains(html, "Manage your account.")
@@ -408,14 +406,12 @@ pub fn card_with_description_renders_test() {
 }
 
 pub fn card_with_footer_renders_test() {
-  let footer = button.button_primary("Save", Nil)
+  let footer_el = button.button_primary("Save", Nil)
   let html =
-    card.card(card.CardAttrs(
-      title: "Account",
-      description: "",
-      content: [],
-      footer: Some(footer),
-    ))
+    card.new()
+    |> card.title("Account")
+    |> card.footer(footer_el)
+    |> card.view([])
     |> element.to_string
   assert string.contains(html, "<footer")
   assert string.contains(html, "Save")
@@ -423,12 +419,8 @@ pub fn card_with_footer_renders_test() {
 
 pub fn card_empty_header_omitted_test() {
   let html =
-    card.card(card.CardAttrs(
-      title: "",
-      description: "",
-      content: [],
-      footer: None,
-    ))
+    card.new()
+    |> card.view([])
     |> element.to_string
   assert !string.contains(html, "<header")
 }

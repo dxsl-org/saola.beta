@@ -314,14 +314,8 @@ fn table_panel(model: Model) -> Element(Message) {
     h.p([a.class("threat-intel-panel-title")], [h.text("Threat Actors")]),
     case rows {
       [] ->
-        empty.empty(
-          media: None,
-          media_variant: empty.Default,
-          title: "No actors match",
-          description: [h.text("Adjust the filters or search query.")],
-          content: [],
-          class: "",
-        )
+        empty.new()
+        |> empty.view("No actors match", [h.text("Adjust the filters or search query.")], [])
       _ ->
         data_table.data_table(
           actor_columns(),

@@ -1,4 +1,3 @@
-import gleam/option.{None}
 import lustre/element.{type Element}
 import saola/card
 import saola/code_editor
@@ -87,75 +86,67 @@ pub fn monaco_editor() -> Element(Message) {
 }
 
 fn codemirror_card() -> Element(Message) {
-  card.card(card.CardAttrs(
-    title: "CodeMirror 6",
-    description: "Lightweight editor — fast startup, tree-sitter grammar, and a small bundle footprint.",
-    content: [
-      code_editor.editor(
-        attrs: code_editor.EditorAttrs(
-          ..code_editor.default_editor_attrs,
-          value: "import gleam/io\n\npub fn main() {\n  io.println(\"Hello from Saola + CodeMirror\")\n}\n",
-          language: "javascript",
-          height: 300,
-        ),
+  card.new()
+  |> card.title("CodeMirror 6")
+  |> card.description("Lightweight editor — fast startup, tree-sitter grammar, and a small bundle footprint.")
+  |> card.view([
+    code_editor.editor(
+      attrs: code_editor.EditorAttrs(
+        ..code_editor.default_editor_attrs,
+        value: "import gleam/io\n\npub fn main() {\n  io.println(\"Hello from Saola + CodeMirror\")\n}\n",
+        language: "javascript",
+        height: 300,
       ),
-    ],
-    footer: None,
-  ))
+    ),
+  ])
 }
 
 fn monaco_card() -> Element(Message) {
-  card.card(card.CardAttrs(
-    title: "Monaco Editor",
-    description: "VS Code's editor engine — IntelliSense, multi-cursor, diff view, and rich language support.",
-    content: [
-      monaco_editor.editor(
-        attrs: monaco_editor.EditorAttrs(
-          ..monaco_editor.default_editor_attrs,
-          value: "import gleam/io\n\npub fn main() {\n  io.println(\"Hello from Saola + Monaco\")\n}\n",
-          language: "javascript",
-          height: 300,
-        ),
+  card.new()
+  |> card.title("Monaco Editor")
+  |> card.description("VS Code's editor engine — IntelliSense, multi-cursor, diff view, and rich language support.")
+  |> card.view([
+    monaco_editor.editor(
+      attrs: monaco_editor.EditorAttrs(
+        ..monaco_editor.default_editor_attrs,
+        value: "import gleam/io\n\npub fn main() {\n  io.println(\"Hello from Saola + Monaco\")\n}\n",
+        language: "javascript",
+        height: 300,
       ),
-    ],
-    footer: None,
-  ))
+    ),
+  ])
 }
 
 fn d3_card() -> Element(Message) {
-  card.card(card.CardAttrs(
-    title: "D3 blackbox",
-    description: "Rendered by D3, mounted through a Saola custom element.",
-    content: [
-      d3_bar_chart.bar_chart(
-        chart_data_d3(),
-        attrs: d3_bar_chart.BarChartAttrs(
-          ..d3_bar_chart.default_bar_chart_attrs,
-          title: "Revenue",
-          height: 320,
-        ),
+  card.new()
+  |> card.title("D3 blackbox")
+  |> card.description("Rendered by D3, mounted through a Saola custom element.")
+  |> card.view([
+    d3_bar_chart.bar_chart(
+      chart_data_d3(),
+      attrs: d3_bar_chart.BarChartAttrs(
+        ..d3_bar_chart.default_bar_chart_attrs,
+        title: "Revenue",
+        height: 320,
       ),
-    ],
-    footer: None,
-  ))
+    ),
+  ])
 }
 
 fn lustre_card() -> Element(Message) {
-  card.card(card.CardAttrs(
-    title: "Pure Lustre SVG",
-    description: "Rendered as regular Lustre SVG elements with no D3 runtime.",
-    content: [
-      lustre_bar_chart.bar_chart(
-        chart_data_lustre(),
-        attrs: lustre_bar_chart.BarChartAttrs(
-          ..lustre_bar_chart.default_bar_chart_attrs,
-          title: "Revenue",
-          height: 320,
-        ),
+  card.new()
+  |> card.title("Pure Lustre SVG")
+  |> card.description("Rendered as regular Lustre SVG elements with no D3 runtime.")
+  |> card.view([
+    lustre_bar_chart.bar_chart(
+      chart_data_lustre(),
+      attrs: lustre_bar_chart.BarChartAttrs(
+        ..lustre_bar_chart.default_bar_chart_attrs,
+        title: "Revenue",
+        height: 320,
       ),
-    ],
-    footer: None,
-  ))
+    ),
+  ])
 }
 
 fn chart_data_d3() -> List(d3_bar_chart.ChartPoint) {

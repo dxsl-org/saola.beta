@@ -1,5 +1,5 @@
 import gleam/list
-import gleam/option.{None, Some}
+import gleam/option.{Some}
 import lustre/attribute as a
 import lustre/effect
 import lustre/element.{type Element}
@@ -51,72 +51,70 @@ pub fn update(model: Model, msg: Msg) {
 }
 
 pub fn view(model: Model) -> Element(Msg) {
-  card.card(card.CardAttrs(
-    title: "Contact form",
-    description: "A small Saola form wired with Lustre messages.",
-    content: [
-      h.form([a.class("grid gap-4"), e.on_submit(Submitted)], [
-        field("name", "Name", [
-          input.input(
-            input.Text,
-            Some(input.SyncValue(model.name)),
-            on_input: Some(NameChanged),
-            extra_attrs: input.InputExtraAttrs(
-              id: "name",
-              name: "name",
-              placeholder: "Nguyen Van A",
-              disabled: False,
-              required: True,
-              class: "",
-            ),
+  card.new()
+  |> card.title("Contact form")
+  |> card.description("A small Saola form wired with Lustre messages.")
+  |> card.view([
+    h.form([a.class("grid gap-4"), e.on_submit(Submitted)], [
+      field("name", "Name", [
+        input.input(
+          input.Text,
+          Some(input.SyncValue(model.name)),
+          on_input: Some(NameChanged),
+          extra_attrs: input.InputExtraAttrs(
+            id: "name",
+            name: "name",
+            placeholder: "Nguyen Van A",
+            disabled: False,
+            required: True,
+            class: "",
           ),
-        ]),
-        field("email", "Email", [
-          input.input(
-            input.Email,
-            Some(input.SyncValue(model.email)),
-            on_input: Some(EmailChanged),
-            extra_attrs: input.InputExtraAttrs(
-              id: "email",
-              name: "email",
-              placeholder: "you@example.com",
-              disabled: False,
-              required: True,
-              class: "",
-            ),
-          ),
-        ]),
-        field("message", "Message", [
-          textarea.textarea(
-            Some(textarea.SyncValue(model.message)),
-            on_input: Some(MessageChanged),
-            extra_attrs: textarea.TextareaExtraAttrs(
-              id: "message",
-              name: "message",
-              placeholder: "How can we help?",
-              rows: Some(4),
-              disabled: False,
-              required: True,
-              class: "",
-            ),
-          ),
-        ]),
-        checkbox.checkbox(
-          "Send me product updates",
-          checkbox.InitChecked(True),
-          checkbox.ExtraAttrs(
-            checkbox.FormAttr("updates", checkbox.InitValue("yes")),
-            "updates",
-            "",
-          ),
-          "This checkbox submits a normal form value.",
         ),
-        button.button_submit("Send"),
       ]),
-      submitted_summary(model.submitted_values),
-    ],
-    footer: None,
-  ))
+      field("email", "Email", [
+        input.input(
+          input.Email,
+          Some(input.SyncValue(model.email)),
+          on_input: Some(EmailChanged),
+          extra_attrs: input.InputExtraAttrs(
+            id: "email",
+            name: "email",
+            placeholder: "you@example.com",
+            disabled: False,
+            required: True,
+            class: "",
+          ),
+        ),
+      ]),
+      field("message", "Message", [
+        textarea.textarea(
+          Some(textarea.SyncValue(model.message)),
+          on_input: Some(MessageChanged),
+          extra_attrs: textarea.TextareaExtraAttrs(
+            id: "message",
+            name: "message",
+            placeholder: "How can we help?",
+            rows: Some(4),
+            disabled: False,
+            required: True,
+            class: "",
+          ),
+        ),
+      ]),
+      checkbox.checkbox(
+        "Send me product updates",
+        checkbox.InitChecked(True),
+        checkbox.ExtraAttrs(
+          checkbox.FormAttr("updates", checkbox.InitValue("yes")),
+          "updates",
+          "",
+        ),
+        "This checkbox submits a normal form value.",
+      ),
+      button.button_submit("Send"),
+    ]),
+    submitted_summary(model.submitted_values),
+  ])
 }
 
 fn field(

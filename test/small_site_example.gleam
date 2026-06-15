@@ -1,4 +1,4 @@
-import gleam/option.{None, Some}
+import gleam/option.{None}
 import lustre/attribute as a
 import lustre/effect
 import lustre/element.{type Element}
@@ -87,12 +87,10 @@ fn metric_card(
   value: String,
   description: String,
 ) -> Element(Msg) {
-  card.card(card.CardAttrs(
-    title: title,
-    description: description,
-    content: [h.p([a.class("text-3xl font-semibold")], [h.text(value)])],
-    footer: None,
-  ))
+  card.new()
+  |> card.title(title)
+  |> card.description(description)
+  |> card.view([h.p([a.class("text-3xl font-semibold")], [h.text(value)])])
 }
 
 fn overview_panel() -> Element(Msg) {
@@ -125,16 +123,15 @@ fn plans_panel() -> Element(Msg) {
 }
 
 fn team_panel() -> Element(Msg) {
-  card.card(card.CardAttrs(
-    title: "Team workflow",
-    description: "A compact panel rendered inside a Saola tab.",
-    content: [
-      h.ul([], [
-        h.li([], [h.text("Review dashboard activity")]),
-        h.li([], [h.text("Invite teammates")]),
-        h.li([], [h.text("Track usage by workspace")]),
-      ]),
-    ],
-    footer: Some(button.button_primary("Invite", StartedTrial)),
-  ))
+  card.new()
+  |> card.title("Team workflow")
+  |> card.description("A compact panel rendered inside a Saola tab.")
+  |> card.footer(button.button_primary("Invite", StartedTrial))
+  |> card.view([
+    h.ul([], [
+      h.li([], [h.text("Review dashboard activity")]),
+      h.li([], [h.text("Invite teammates")]),
+      h.li([], [h.text("Track usage by workspace")]),
+    ]),
+  ])
 }

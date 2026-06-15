@@ -1,3 +1,15 @@
+//// Item widget (list row) — dual-style `Config` (uniform Saola pattern):
+////
+//// ```gleam
+//// item.item_simple("Title", "Description", Some(action))    // shortcut
+//// item.new()
+//// |> item.variant(item.Outline)
+//// |> item.media(icon)
+//// |> item.media_variant(item.MediaIcon)
+//// |> item.actions([button])
+//// |> item.view("Title", "Description", "")        // empty href → <div>; href → <a>
+//// ```
+
 import gleam/option.{type Option, None, Some}
 import lustre/attribute as a
 import lustre/element.{type Element}
@@ -18,6 +30,77 @@ pub type ItemMediaVariant {
   MediaDefault
   MediaIcon
   MediaImage
+}
+
+/// Presentation options for an item. Public for record-update syntax. The
+/// `title`/`description` text and the `href` (render target) are required —
+/// passed to `view`.
+pub type ItemConfig(msg) {
+  ItemConfig(
+    variant: ItemVariant,
+    size: ItemSize,
+    media: Option(Element(msg)),
+    media_variant: ItemMediaVariant,
+    actions: List(Element(msg)),
+    class: String,
+  )
+}
+
+/// Builder entry point. Defaults: Default, Large, no media, no actions.
+pub fn new() -> ItemConfig(msg) {
+  ItemConfig(
+    variant: Default,
+    size: Large,
+    media: None,
+    media_variant: MediaDefault,
+    actions: [],
+    class: "",
+  )
+}
+
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> ItemConfig(msg) {
+  new()
+}
+
+/// Set the variant (Default, Outline, Muted).
+pub fn variant(config: ItemConfig(msg), variant: ItemVariant) -> ItemConfig(msg) {
+  ItemConfig(..config, variant: variant)
+}
+
+/// Set the size (Large — default, Small).
+pub fn size(config: ItemConfig(msg), size: ItemSize) -> ItemConfig(msg) {
+  ItemConfig(..config, size: size)
+}
+
+/// Set the leading media element (icon/image/avatar).
+pub fn media(config: ItemConfig(msg), media: Element(msg)) -> ItemConfig(msg) {
+  ItemConfig(..config, media: Some(media))
+}
+
+/// Set how the media is framed (MediaDefault, MediaIcon, MediaImage).
+pub fn media_variant(
+  config: ItemConfig(msg),
+  media_variant: ItemMediaVariant,
+) -> ItemConfig(msg) {
+  ItemConfig(..config, media_variant: media_variant)
+}
+
+/// Set the trailing action elements.
+pub fn actions(
+  config: ItemConfig(msg),
+  actions: List(Element(msg)),
+) -> ItemConfig(msg) {
+  ItemConfig(..config, actions: actions)
+}
+
+/// Append an extra CSS class on the root. Additive only.
+pub fn add_class(config: ItemConfig(msg), class: String) -> ItemConfig(msg) {
+  let merged = case config.class {
+    "" -> class
+    existing -> existing <> " " <> class
+  }
+  ItemConfig(..config, class: merged)
 }
 
 fn variant_class(v: ItemVariant) -> String {
@@ -43,24 +126,14 @@ fn media_class(v: ItemMediaVariant) -> String {
   }
 }
 
-fn root_class(variant: ItemVariant, size: ItemSize, extra: String) -> String {
-  let base = "item " <> variant_class(variant) <> " " <> size_class(size)
-  case extra {
-    "" -> base
-    c -> base <> " " <> c
-  }
-}
-
 fn item_body(
-  media: Option(Element(msg)),
-  media_variant: ItemMediaVariant,
+  config: ItemConfig(msg),
   title: String,
   description: String,
-  actions: List(Element(msg)),
 ) -> List(Element(msg)) {
-  let media_el = case media {
+  let media_el = case config.media {
     None -> element.none()
-    Some(m) -> h.div([a.class(media_class(media_variant))], [m])
+    Some(m) -> h.div([a.class(media_class(config.media_variant))], [m])
   }
   let title_el = case title {
     "" -> element.none()
@@ -74,47 +147,45 @@ fn item_body(
     "", "" -> element.none()
     _, _ -> h.div([a.class("item-content")], [title_el, desc_el])
   }
-  let actions_el = case actions {
+  let actions_el = case config.actions {
     [] -> element.none()
     acts -> h.div([a.class("item-actions")], acts)
   }
   [media_el, content_el, actions_el]
 }
 
-pub fn item(
-  variant variant: ItemVariant,
-  size size: ItemSize,
-  media media: Option(Element(msg)),
-  media_variant media_variant: ItemMediaVariant,
-  title title: String,
-  description description: String,
-  actions actions: List(Element(msg)),
-  class class: String,
+/// Render the item. An empty `href` renders `<div>`; a non-empty `href`
+/// renders `<a href>` (a navigable list row).
+pub fn view(
+  config: ItemConfig(msg),
+  title: String,
+  description: String,
+  href: String,
 ) -> Element(msg) {
-  let cls = root_class(variant, size, class)
-  let body = item_body(media, media_variant, title, description, actions)
-  h.div([a.class(cls)], body)
+  let base = "item " <> variant_class(config.variant) <> " " <> size_class(config.size)
+  let cls = case config.class {
+    "" -> base
+    c -> base <> " " <> c
+  }
+  let body = item_body(config, title, description)
+  case href {
+    "" -> h.div([a.class(cls)], body)
+    url -> h.a([a.class(cls), a.href(url)], body)
+  }
 }
+
+// --- Convenience shortcuts ---
 
 pub fn item_simple(
   title: String,
   description: String,
   action: Option(Element(msg)),
 ) -> Element(msg) {
-  let actions = case action {
+  let acts = case action {
     None -> []
     Some(act) -> [act]
   }
-  item(
-    variant: Default,
-    size: Large,
-    media: None,
-    media_variant: MediaDefault,
-    title: title,
-    description: description,
-    actions: actions,
-    class: "",
-  )
+  new() |> actions(acts) |> view(title, description, "")
 }
 
 pub fn item_link(
@@ -124,19 +195,19 @@ pub fn item_link(
   action action: Option(Element(msg)),
   class class: String,
 ) -> Element(msg) {
-  let cls = root_class(Default, Large, class)
-  let actions = case action {
+  let acts = case action {
     None -> []
     Some(act) -> [act]
   }
-  let body = item_body(None, MediaDefault, title, description, actions)
-  h.a([a.class(cls), a.href(href)], body)
+  new() |> actions(acts) |> add_class(class) |> view(title, description, href)
 }
 
+/// A list container grouping items.
 pub fn item_group(children: List(Element(msg))) -> Element(msg) {
   h.div([a.role("list"), a.class("item-group")], children)
 }
 
+/// A separator rule between items.
 pub fn item_separator() -> Element(msg) {
   h.hr([a.role("separator"), a.class("item-separator")])
 }

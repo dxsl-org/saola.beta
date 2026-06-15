@@ -1,4 +1,3 @@
-import gleam/option.{None, Some}
 import lustre/attribute as a
 import lustre/element.{type Element, text}
 import lustre/element/html as h
@@ -17,25 +16,15 @@ pub fn view() -> Element(Message) {
           card.card_simple("Simple Card", [
             h.p([], [text("This is a card with just a title and some content.")]),
           ]),
-          card.card(card.CardAttrs(
-            title: "Card with Description",
-            description: "A short description of what this card contains.",
-            content: [
-              h.p([], [text("Main content area goes here.")]),
-            ],
-            footer: None,
-          )),
-          card.card(card.CardAttrs(
-            title: "Card with Footer",
-            description: "This card has a footer with an action button.",
-            content: [
-              h.p([], [text("Card body content.")]),
-            ],
-            footer: Some(button.button_primary(
-              "Save changes",
-              OnRouteChange(Home),
-            )),
-          )),
+          card.new()
+            |> card.title("Card with Description")
+            |> card.description("A short description of what this card contains.")
+            |> card.view([h.p([], [text("Main content area goes here.")])]),
+          card.new()
+            |> card.title("Card with Footer")
+            |> card.description("This card has a footer with an action button.")
+            |> card.footer(button.button_primary("Save changes", OnRouteChange(Home)))
+            |> card.view([h.p([], [text("Card body content.")])]),
         ]),
       ]),
       DocSection("usage", "Usage", [
@@ -46,12 +35,10 @@ pub fn view() -> Element(Message) {
           "  h.p([], [text(\"Content here.\")]),",
           "])",
           "",
-          "card.card(card.CardAttrs(",
-          "  title: \"Title\",",
-          "  description: \"Description.\",",
-          "  content: [h.p([], [text(\"Body.\")])],",
-          "  footer: None,",
-          "))",
+          "card.new()",
+          "|> card.title(\"Title\")",
+          "|> card.description(\"Description.\")",
+          "|> card.view([h.p([], [text(\"Body.\")])])",
         ]),
       ]),
     ],

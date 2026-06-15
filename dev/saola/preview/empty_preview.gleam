@@ -29,24 +29,14 @@ pub fn view() -> Element(Message) {
         ),
       ]),
       DocSection("custom", "Custom (empty_full)", [
-        empty.empty(
-          media: Some(ls.search_x([])),
-          media_variant: empty.Icon,
-          title: "No results",
-          description: [text("Try a different search term.")],
-          content: [],
-          class: "",
-        ),
+        empty.new()
+        |> empty.media(ls.search_x([]))
+        |> empty.media_variant(empty.Icon)
+        |> empty.view("No results", [text("Try a different search term.")], []),
       ]),
       DocSection("bare", "Bare (no header)", [
-        empty.empty(
-          media: None,
-          media_variant: empty.Default,
-          title: "",
-          description: [],
-          content: [button.button_primary("Get started", StartedTrial)],
-          class: "",
-        ),
+        empty.new()
+        |> empty.view("", [], [button.button_primary("Get started", StartedTrial)]),
       ]),
       DocSection("usage", "Usage", [
         doc_page.snippet([

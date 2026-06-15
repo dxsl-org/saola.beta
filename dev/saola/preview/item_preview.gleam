@@ -1,5 +1,5 @@
 import gleam/list
-import gleam/option.{None, Some}
+import gleam/option.{Some}
 import lustre/element.{type Element}
 import lustre/element/html as h
 import saola/button
@@ -12,84 +12,45 @@ pub fn view() -> Element(Message) {
   let actions = [button.button_outline("View", StartedTrial)]
 
   let three_items = [
-    item.item(
-      variant: item.Default,
-      size: item.Large,
-      media: Some(lu.user([])),
-      media_variant: item.MediaIcon,
-      title: "Alice Smith",
-      description: "Software engineer",
-      actions: actions,
-      class: "",
-    ),
-    item.item(
-      variant: item.Default,
-      size: item.Large,
-      media: Some(lu.user([])),
-      media_variant: item.MediaIcon,
-      title: "Bob Jones",
-      description: "Product designer",
-      actions: actions,
-      class: "",
-    ),
-    item.item(
-      variant: item.Default,
-      size: item.Large,
-      media: Some(lu.user([])),
-      media_variant: item.MediaIcon,
-      title: "Carol Doe",
-      description: "Engineering manager",
-      actions: actions,
-      class: "",
-    ),
+    item.new()
+      |> item.media(lu.user([]))
+      |> item.media_variant(item.MediaIcon)
+      |> item.actions(actions)
+      |> item.view("Alice Smith", "Software engineer", ""),
+    item.new()
+      |> item.media(lu.user([]))
+      |> item.media_variant(item.MediaIcon)
+      |> item.actions(actions)
+      |> item.view("Bob Jones", "Product designer", ""),
+    item.new()
+      |> item.media(lu.user([]))
+      |> item.media_variant(item.MediaIcon)
+      |> item.actions(actions)
+      |> item.view("Carol Doe", "Engineering manager", ""),
   ]
 
   doc_page.doc_page("Item", "Row-layout primitive for lists.", [
     DocSection("variants", "Variants", [
       h.div([], [
-        item.item(
-          variant: item.Default,
-          size: item.Large,
-          media: None,
-          media_variant: item.MediaDefault,
-          title: "Default variant",
-          description: "Transparent background.",
-          actions: actions,
-          class: "",
-        ),
-        item.item(
-          variant: item.Outline,
-          size: item.Large,
-          media: None,
-          media_variant: item.MediaDefault,
-          title: "Outline variant",
-          description: "Bordered.",
-          actions: actions,
-          class: "",
-        ),
-        item.item(
-          variant: item.Muted,
-          size: item.Large,
-          media: None,
-          media_variant: item.MediaDefault,
-          title: "Muted variant",
-          description: "Muted background.",
-          actions: actions,
-          class: "",
-        ),
+        item.new()
+          |> item.actions(actions)
+          |> item.view("Default variant", "Transparent background.", ""),
+        item.new()
+          |> item.variant(item.Outline)
+          |> item.actions(actions)
+          |> item.view("Outline variant", "Bordered.", ""),
+        item.new()
+          |> item.variant(item.Muted)
+          |> item.actions(actions)
+          |> item.view("Muted variant", "Muted background.", ""),
       ]),
     ]),
     DocSection("sizes", "Sizes", [
-      item.item(
-        variant: item.Outline,
-        size: item.Small,
-        media: None,
-        media_variant: item.MediaDefault,
-        title: "Small size",
-        description: "Tighter padding.",
-        actions: actions,
-        class: "",
-      ),
+      item.new()
+        |> item.variant(item.Outline)
+        |> item.size(item.Small)
+        |> item.actions(actions)
+        |> item.view("Small size", "Tighter padding.", ""),
     ]),
     DocSection("group", "Group with Separators", [
       item.item_group(list.intersperse(three_items, item.item_separator())),
@@ -107,16 +68,16 @@ pub fn view() -> Element(Message) {
       doc_page.snippet([
         "import saola/item",
         "",
-        "item.item(",
-        "  variant: item.Default,",
-        "  size: item.Large,",
-        "  media: None,",
-        "  media_variant: item.MediaDefault,",
-        "  title: \"Alice Smith\",",
-        "  description: \"Software engineer\",",
-        "  actions: [button.button_outline(\"View\", OnView)],",
-        "  class: \"\",",
-        ")",
+        "// Shortcuts",
+        "item.item_simple(\"Alice\", \"Engineer\", Some(view_button))",
+        "item.item_link(href: \"/u/alice\", title: \"Alice\", ...)  // renders <a>",
+        "",
+        "// Builder — view(config, title, description, href).",
+        "// Empty href -> <div>; non-empty href -> <a>.",
+        "item.new()",
+        "|> item.variant(item.Outline)",
+        "|> item.actions([button.button_outline(\"View\", OnView)])",
+        "|> item.view(\"Alice Smith\", \"Software engineer\", \"\")",
       ]),
     ]),
   ])
