@@ -38,10 +38,10 @@ pub fn view(model: Model) -> Element(Message) {
           "    required: True,",
           "    error: err(\"name\"),",
           "  ),",
-          "  input.input(input.Text, Some(input.SyncValue(model.signup_name)),",
-          "    on_input: Some(SignupNameChanged),",
-          "    extra_attrs: input.InputExtraAttrs(..input.default_extra_attrs, name: \"name\"),",
-          "  ),",
+          "  input.new()",
+          "  |> input.name(\"name\")",
+          "  |> input.placeholder(\"Nguyen Van A\")",
+          "  |> input.view(Some(input.SyncValue(model.signup_name)), Some(SignupNameChanged)),",
           ")",
         ]),
       ]),
@@ -62,16 +62,10 @@ fn signup_form(model: Model) -> Element(Message) {
         required: True,
         error: err("name"),
       ),
-      input.input(
-        input.Text,
-        Some(input.SyncValue(model.signup_name)),
-        on_input: Some(SignupNameChanged),
-        extra_attrs: input.InputExtraAttrs(
-          ..input.default_extra_attrs,
-          name: "name",
-          placeholder: "Nguyen Van A",
-        ),
-      ),
+      input.new()
+      |> input.name("name")
+      |> input.placeholder("Nguyen Van A")
+      |> input.view(Some(input.SyncValue(model.signup_name)), Some(SignupNameChanged)),
     ),
     field.field(
       field.FieldAttrs(
@@ -80,16 +74,11 @@ fn signup_form(model: Model) -> Element(Message) {
         required: True,
         error: err("email"),
       ),
-      input.input(
-        input.Email,
-        Some(input.SyncValue(model.signup_email)),
-        on_input: Some(SignupEmailChanged),
-        extra_attrs: input.InputExtraAttrs(
-          ..input.default_extra_attrs,
-          name: "email",
-          placeholder: "you@example.com",
-        ),
-      ),
+      input.new()
+      |> input.type_(input.Email)
+      |> input.name("email")
+      |> input.placeholder("you@example.com")
+      |> input.view(Some(input.SyncValue(model.signup_email)), Some(SignupEmailChanged)),
     ),
     field.field(
       field.FieldAttrs(
@@ -99,16 +88,10 @@ fn signup_form(model: Model) -> Element(Message) {
         hint: "At least 8 characters.",
         error: err("password"),
       ),
-      input.input(
-        input.Password,
-        Some(input.SyncValue(model.signup_password)),
-        on_input: Some(SignupPasswordChanged),
-        extra_attrs: input.InputExtraAttrs(
-          ..input.default_extra_attrs,
-          name: "password",
-          placeholder: "",
-        ),
-      ),
+      input.new()
+      |> input.type_(input.Password)
+      |> input.name("password")
+      |> input.view(Some(input.SyncValue(model.signup_password)), Some(SignupPasswordChanged)),
     ),
     field.field(
       field.FieldAttrs(
@@ -117,16 +100,10 @@ fn signup_form(model: Model) -> Element(Message) {
         required: True,
         error: err("confirm"),
       ),
-      input.input(
-        input.Password,
-        Some(input.SyncValue(model.signup_confirm)),
-        on_input: Some(SignupConfirmChanged),
-        extra_attrs: input.InputExtraAttrs(
-          ..input.default_extra_attrs,
-          name: "confirm",
-          placeholder: "",
-        ),
-      ),
+      input.new()
+      |> input.type_(input.Password)
+      |> input.name("confirm")
+      |> input.view(Some(input.SyncValue(model.signup_confirm)), Some(SignupConfirmChanged)),
     ),
     h.div([a.class("flex gap-2 pt-2")], [
       button.button_submit("Create account"),

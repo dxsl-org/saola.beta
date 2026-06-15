@@ -28,48 +28,38 @@ pub fn view(model: Model) -> Element(Message) {
         |> card.view([
           h.form([a.class("grid gap-4"), e.on_submit(FormSubmitted)], [
             field("name", "Name", [
-              input.input(
-                input.Text,
+              input.new()
+              |> input.id("name")
+              |> input.name("name")
+              |> input.placeholder("Nguyen Van A")
+              |> input.required(True)
+              |> input.view(
                 Some(input.SyncValue(model.form_name)),
-                on_input: Some(FormNameChanged),
-                extra_attrs: input.InputExtraAttrs(
-                  "name",
-                  "name",
-                  "Nguyen Van A",
-                  False,
-                  True,
-                  "",
-                ),
+                Some(FormNameChanged),
               ),
             ]),
             field("email", "Email", [
-              input.input(
-                input.Email,
+              input.new()
+              |> input.type_(input.Email)
+              |> input.id("email")
+              |> input.name("email")
+              |> input.placeholder("you@example.com")
+              |> input.required(True)
+              |> input.view(
                 Some(input.SyncValue(model.form_email)),
-                on_input: Some(FormEmailChanged),
-                extra_attrs: input.InputExtraAttrs(
-                  "email",
-                  "email",
-                  "you@example.com",
-                  False,
-                  True,
-                  "",
-                ),
+                Some(FormEmailChanged),
               ),
             ]),
             field("message", "Message", [
-              textarea.textarea(
+              textarea.new()
+              |> textarea.id("message")
+              |> textarea.name("message")
+              |> textarea.placeholder("How can we help?")
+              |> textarea.rows(4)
+              |> textarea.required(True)
+              |> textarea.view(
                 Some(textarea.SyncValue(model.form_message)),
-                on_input: Some(FormMessageChanged),
-                extra_attrs: textarea.TextareaExtraAttrs(
-                  "message",
-                  "message",
-                  "How can we help?",
-                  Some(4),
-                  False,
-                  True,
-                  "",
-                ),
+                Some(FormMessageChanged),
               ),
             ]),
             checkbox.checkbox(
@@ -96,10 +86,12 @@ pub fn view(model: Model) -> Element(Message) {
           "import lustre/event as e",
           "",
           "h.form([a.class(\"grid gap-4\"), e.on_submit(FormSubmitted)], [",
-          "  input.input(input.Text, Some(input.SyncValue(model.form_name)),",
-          "    on_input: Some(FormNameChanged),",
-          "    extra_attrs: input.InputExtraAttrs(\"name\", \"name\", \"Nguyen Van A\", False, True, \"\"),",
-          "  ),",
+          "  input.new()",
+          "  |> input.id(\"name\")",
+          "  |> input.name(\"name\")",
+          "  |> input.placeholder(\"Nguyen Van A\")",
+          "  |> input.required(True)",
+          "  |> input.view(Some(input.SyncValue(model.form_name)), Some(FormNameChanged)),",
           "  button.button_submit(\"Send\"),",
           "])",
         ]),

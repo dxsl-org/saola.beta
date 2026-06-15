@@ -13,12 +13,8 @@ import saola/textarea
 
 pub fn input_text_type_renders_test() {
   let html =
-    input.input(
-      input.Text,
-      None,
-      on_input: None,
-      extra_attrs: input.default_extra_attrs,
-    )
+    input.new()
+    |> input.view(None, None)
     |> element.to_string
   assert string.contains(html, "type=\"text\"")
   assert string.contains(html, "class=\"input")
@@ -38,19 +34,12 @@ pub fn input_password_type_renders_test() {
 
 pub fn input_with_id_and_name_renders_test() {
   let html =
-    input.input(
-      input.Text,
-      None,
-      on_input: None,
-      extra_attrs: input.InputExtraAttrs(
-        id: "username",
-        name: "username",
-        placeholder: "Enter name",
-        disabled: False,
-        required: True,
-        class: "",
-      ),
-    )
+    input.new()
+    |> input.id("username")
+    |> input.name("username")
+    |> input.placeholder("Enter name")
+    |> input.required(True)
+    |> input.view(None, None)
     |> element.to_string
   assert string.contains(html, "id=\"username\"")
   assert string.contains(html, "name=\"username\"")
@@ -60,27 +49,17 @@ pub fn input_with_id_and_name_renders_test() {
 
 pub fn input_disabled_renders_test() {
   let html =
-    input.input(
-      input.Text,
-      None,
-      on_input: None,
-      extra_attrs: input.InputExtraAttrs(
-        ..input.default_extra_attrs,
-        disabled: True,
-      ),
-    )
+    input.new()
+    |> input.disabled(True)
+    |> input.view(None, None)
     |> element.to_string
   assert string.contains(html, "disabled")
 }
 
 pub fn input_no_id_omitted_test() {
   let html =
-    input.input(
-      input.Text,
-      None,
-      on_input: None,
-      extra_attrs: input.default_extra_attrs,
-    )
+    input.new()
+    |> input.view(None, None)
     |> element.to_string
   assert !string.contains(html, "id=")
   assert !string.contains(html, "name=")
@@ -90,19 +69,12 @@ pub fn input_no_id_omitted_test() {
 
 pub fn textarea_renders_test() {
   let html =
-    textarea.textarea(
-      Some(textarea.SyncValue("Hello")),
-      on_input: None,
-      extra_attrs: textarea.TextareaExtraAttrs(
-        id: "msg",
-        name: "message",
-        placeholder: "Type here",
-        rows: Some(4),
-        disabled: False,
-        required: False,
-        class: "",
-      ),
-    )
+    textarea.new()
+    |> textarea.id("msg")
+    |> textarea.name("message")
+    |> textarea.placeholder("Type here")
+    |> textarea.rows(4)
+    |> textarea.view(Some(textarea.SyncValue("Hello")), None)
     |> element.to_string
   assert string.contains(html, "<textarea")
   assert string.contains(html, "class=\"input")

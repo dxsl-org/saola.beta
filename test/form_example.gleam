@@ -57,49 +57,30 @@ pub fn view(model: Model) -> Element(Msg) {
   |> card.view([
     h.form([a.class("grid gap-4"), e.on_submit(Submitted)], [
       field("name", "Name", [
-        input.input(
-          input.Text,
-          Some(input.SyncValue(model.name)),
-          on_input: Some(NameChanged),
-          extra_attrs: input.InputExtraAttrs(
-            id: "name",
-            name: "name",
-            placeholder: "Nguyen Van A",
-            disabled: False,
-            required: True,
-            class: "",
-          ),
-        ),
+        input.new()
+        |> input.id("name")
+        |> input.name("name")
+        |> input.placeholder("Nguyen Van A")
+        |> input.required(True)
+        |> input.view(Some(input.SyncValue(model.name)), Some(NameChanged)),
       ]),
       field("email", "Email", [
-        input.input(
-          input.Email,
-          Some(input.SyncValue(model.email)),
-          on_input: Some(EmailChanged),
-          extra_attrs: input.InputExtraAttrs(
-            id: "email",
-            name: "email",
-            placeholder: "you@example.com",
-            disabled: False,
-            required: True,
-            class: "",
-          ),
-        ),
+        input.new()
+        |> input.type_(input.Email)
+        |> input.id("email")
+        |> input.name("email")
+        |> input.placeholder("you@example.com")
+        |> input.required(True)
+        |> input.view(Some(input.SyncValue(model.email)), Some(EmailChanged)),
       ]),
       field("message", "Message", [
-        textarea.textarea(
-          Some(textarea.SyncValue(model.message)),
-          on_input: Some(MessageChanged),
-          extra_attrs: textarea.TextareaExtraAttrs(
-            id: "message",
-            name: "message",
-            placeholder: "How can we help?",
-            rows: Some(4),
-            disabled: False,
-            required: True,
-            class: "",
-          ),
-        ),
+        textarea.new()
+        |> textarea.id("message")
+        |> textarea.name("message")
+        |> textarea.placeholder("How can we help?")
+        |> textarea.rows(4)
+        |> textarea.required(True)
+        |> textarea.view(Some(textarea.SyncValue(model.message)), Some(MessageChanged)),
       ]),
       checkbox.checkbox(
         "Send me product updates",

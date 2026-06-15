@@ -1,3 +1,16 @@
+//// Text input widget — dual-style `Config` (uniform Saola pattern):
+////
+//// ```gleam
+//// input.input_text("Email", EmailChanged)                       // shortcut
+//// input.new()
+//// |> input.type_(input.Email)
+//// |> input.placeholder("you@example.com")
+//// |> input.required(True)
+//// |> input.view(Some(input.SyncValue(model.email)), Some(EmailChanged))
+//// ```
+//// Value binding uses the `InputValue` ADT (rule 5): `InitValue` seeds a
+//// default once (for `formal`), `SyncValue` is kept in sync with the model.
+
 import gleam/list
 import gleam/option.{type Option, None, Some}
 import lustre/attribute as a
@@ -24,8 +37,11 @@ pub type InputValue {
   SyncValue(String)
 }
 
-pub type InputExtraAttrs {
-  InputExtraAttrs(
+/// Presentation options for an input. Public for record-update syntax. The
+/// `value` and `on_input` handler are the required data, passed to `view`.
+pub type InputConfig {
+  InputConfig(
+    type_: InputType,
     id: String,
     name: String,
     placeholder: String,
@@ -35,7 +51,63 @@ pub type InputExtraAttrs {
   )
 }
 
-pub const default_extra_attrs = InputExtraAttrs("", "", "", False, False, "")
+/// Builder entry point. Defaults: Text, no id/name/placeholder, enabled,
+/// optional, no extra class.
+pub fn new() -> InputConfig {
+  InputConfig(
+    type_: Text,
+    id: "",
+    name: "",
+    placeholder: "",
+    disabled: False,
+    required: False,
+    class: "",
+  )
+}
+
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> InputConfig {
+  new()
+}
+
+/// Set the input type (Text — default, Email, Password, Search, Tel, Url, Number).
+pub fn type_(config: InputConfig, type_: InputType) -> InputConfig {
+  InputConfig(..config, type_: type_)
+}
+
+/// Set the `id` attribute.
+pub fn id(config: InputConfig, id: String) -> InputConfig {
+  InputConfig(..config, id: id)
+}
+
+/// Set the `name` attribute.
+pub fn name(config: InputConfig, name: String) -> InputConfig {
+  InputConfig(..config, name: name)
+}
+
+/// Set the placeholder text.
+pub fn placeholder(config: InputConfig, placeholder: String) -> InputConfig {
+  InputConfig(..config, placeholder: placeholder)
+}
+
+/// Set the disabled state.
+pub fn disabled(config: InputConfig, disabled: Bool) -> InputConfig {
+  InputConfig(..config, disabled: disabled)
+}
+
+/// Set the required state.
+pub fn required(config: InputConfig, required: Bool) -> InputConfig {
+  InputConfig(..config, required: required)
+}
+
+/// Append an extra CSS class after the base `input` class. Additive only.
+pub fn add_class(config: InputConfig, class: String) -> InputConfig {
+  let merged = case config.class {
+    "" -> class
+    existing -> existing <> " " <> class
+  }
+  InputConfig(..config, class: merged)
+}
 
 fn type_string(t: InputType) -> String {
   case t {
@@ -49,21 +121,13 @@ fn type_string(t: InputType) -> String {
   }
 }
 
-/// Fully customizable text input.
-///
-/// Example:
-/// ```gleam
-/// input(Text, None, on_input: Some(UserTyped), extra_attrs: default_extra_attrs)
-/// input(Email, Some(SyncValue(model.email)), on_input: Some(EmailChanged), extra_attrs: default_extra_attrs)
-/// ```
-pub fn input(
-  type_: InputType,
+/// Render the `<input>`. `value` binds via the `InputValue` ADT; `on_input`
+/// wires the change handler.
+pub fn view(
+  config: InputConfig,
   value: Option(InputValue),
-  on_input on_input: Option(fn(String) -> msg),
-  extra_attrs extra_attrs: InputExtraAttrs,
+  on_input: Option(fn(String) -> msg),
 ) -> Element(msg) {
-  let InputExtraAttrs(id:, name:, placeholder:, disabled:, required:, class:) =
-    extra_attrs
   let value_attrs = case value {
     None -> []
     Some(InitValue(v)) -> [a.default_value(v)]
@@ -73,32 +137,32 @@ pub fn input(
     None -> []
     Some(handler) -> [e.on_input(handler)]
   }
-  let id_attrs = case id {
+  let id_attrs = case config.id {
     "" -> []
     v -> [a.id(v)]
   }
-  let name_attrs = case name {
+  let name_attrs = case config.name {
     "" -> []
     v -> [a.name(v)]
   }
-  let placeholder_attrs = case placeholder {
+  let placeholder_attrs = case config.placeholder {
     "" -> []
     v -> [a.placeholder(v)]
   }
-  let disabled_attrs = case disabled {
+  let disabled_attrs = case config.disabled {
     False -> []
     True -> [a.disabled(True)]
   }
-  let required_attrs = case required {
+  let required_attrs = case config.required {
     False -> []
     True -> [a.required(True)]
   }
-  let extra_class_attrs = case class {
+  let extra_class_attrs = case config.class {
     "" -> []
     c -> [a.class(c)]
   }
   h.input(list.flatten([
-    [a.type_(type_string(type_)), a.class(class_input)],
+    [a.type_(type_string(config.type_)), a.class(class_input)],
     value_attrs,
     on_input_attrs,
     id_attrs,
@@ -110,47 +174,16 @@ pub fn input(
   ]))
 }
 
-pub fn input_text(
-  placeholder: String,
-  on_input: fn(String) -> msg,
-) -> Element(msg) {
-  input(
-    Text,
-    None,
-    on_input: Some(on_input),
-    extra_attrs: InputExtraAttrs(
-      ..default_extra_attrs,
-      placeholder: placeholder,
-    ),
-  )
+// --- Convenience shortcuts ---
+
+pub fn input_text(ph: String, on_input: fn(String) -> msg) -> Element(msg) {
+  new() |> placeholder(ph) |> view(None, Some(on_input))
 }
 
-pub fn input_email(
-  placeholder: String,
-  on_input: fn(String) -> msg,
-) -> Element(msg) {
-  input(
-    Email,
-    None,
-    on_input: Some(on_input),
-    extra_attrs: InputExtraAttrs(
-      ..default_extra_attrs,
-      placeholder: placeholder,
-    ),
-  )
+pub fn input_email(ph: String, on_input: fn(String) -> msg) -> Element(msg) {
+  new() |> type_(Email) |> placeholder(ph) |> view(None, Some(on_input))
 }
 
-pub fn input_password(
-  placeholder: String,
-  on_input: fn(String) -> msg,
-) -> Element(msg) {
-  input(
-    Password,
-    None,
-    on_input: Some(on_input),
-    extra_attrs: InputExtraAttrs(
-      ..default_extra_attrs,
-      placeholder: placeholder,
-    ),
-  )
+pub fn input_password(ph: String, on_input: fn(String) -> msg) -> Element(msg) {
+  new() |> type_(Password) |> placeholder(ph) |> view(None, Some(on_input))
 }

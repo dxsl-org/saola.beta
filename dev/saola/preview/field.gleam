@@ -1,6 +1,6 @@
 import gleam/option
 import lustre/attribute as a
-import lustre/element.{type Element, text}
+import lustre/element.{type Element}
 import lustre/element/html as h
 import saola/field
 import saola/input
@@ -29,15 +29,13 @@ pub fn view(name: String, email: String) -> Element(Message) {
               required: False,
               hint: "",
             ),
-            input.input(
-              input.Email,
+            input.new()
+            |> input.type_(input.Email)
+            |> input.placeholder("you@example.com")
+            |> input.name("email")
+            |> input.view(
               option.Some(input.SyncValue(email)),
-              on_input: option.Some(fn(v) { FormEmailChanged(v) }),
-              extra_attrs: input.InputExtraAttrs(
-                ..input.default_extra_attrs,
-                placeholder: "you@example.com",
-                name: "email",
-              ),
+              option.Some(fn(v) { FormEmailChanged(v) }),
             ),
           ),
           field.field(
@@ -49,15 +47,12 @@ pub fn view(name: String, email: String) -> Element(Message) {
               required: False,
               hint: "",
             ),
-            input.input(
-              input.Text,
+            input.new()
+            |> input.placeholder("choose a username")
+            |> input.name("username")
+            |> input.view(
               option.Some(input.SyncValue(name)),
-              on_input: option.Some(FormNameChanged),
-              extra_attrs: input.InputExtraAttrs(
-                ..input.default_extra_attrs,
-                placeholder: "choose a username",
-                name: "username",
-              ),
+              option.Some(FormNameChanged),
             ),
           ),
           field.field(
@@ -125,7 +120,7 @@ pub fn view(name: String, email: String) -> Element(Message) {
           "    label: \"Email\", description: \"We'll never share your email.\",",
           "    error: \"\", orientation: field.Vertical, required: False, hint: \"\",",
           "  ),",
-          "  input.input(input.Email, ...),",
+          "  input.new() |> input.type_(input.Email) |> input.view(value, on_msg),",
           ")",
         ]),
       ]),

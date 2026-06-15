@@ -51,19 +51,12 @@ fn input_examples() -> List(Element(Message)) {
       model.OnRouteChange(model.Inputs)
     }),
     input.input_password("Password", fn(_) { model.OnRouteChange(model.Inputs) }),
-    input.input(
-      input.Number,
-      option.None,
-      on_input: option.None,
-      extra_attrs: input.InputExtraAttrs(
-        "qty",
-        "quantity",
-        "0",
-        False,
-        False,
-        "",
-      ),
-    ),
+    input.new()
+    |> input.type_(input.Number)
+    |> input.id("qty")
+    |> input.name("quantity")
+    |> input.placeholder("0")
+    |> input.view(option.None, option.None),
   ]
 }
 
@@ -72,19 +65,11 @@ fn textarea_examples() -> List(Element(Message)) {
     textarea.textarea_simple("Write something...", fn(_) {
       model.OnRouteChange(model.Inputs)
     }),
-    textarea.textarea(
-      option.None,
-      on_input: option.None,
-      extra_attrs: textarea.TextareaExtraAttrs(
-        "",
-        "bio",
-        "Tell us about yourself",
-        option.Some(4),
-        False,
-        False,
-        "",
-      ),
-    ),
+    textarea.new()
+    |> textarea.name("bio")
+    |> textarea.placeholder("Tell us about yourself")
+    |> textarea.rows(4)
+    |> textarea.view(option.None, option.None),
   ]
 }
 
