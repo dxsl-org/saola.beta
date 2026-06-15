@@ -1,3 +1,12 @@
+//// Stepper (multi-step progress) widget — dual-style `Config` (uniform pattern):
+////
+//// ```gleam
+//// stepper.stepper_simple(steps, model.step)                          // shortcut
+//// stepper.new()
+//// |> stepper.orientation(stepper.Vertical)
+//// |> stepper.view(steps, model.step, Some(StepClicked))
+//// ```
+
 import gleam/int
 import gleam/list
 import gleam/option.{type Option, None, Some}
@@ -22,22 +31,52 @@ pub type StepItem {
   StepItem(label: String, description: String, status: StepStatus)
 }
 
-/// Multi-step progress indicator.
-///
-/// - `active_step`: 0-indexed index of the current step
-/// - `on_step_click`: if `Some`, completed steps are clickable
-pub fn stepper(
+/// Presentation options for a stepper. Public for record-update syntax. The
+/// `steps`/`active_step`/`on_step_click` are the required data (`view`).
+pub type StepperConfig {
+  StepperConfig(orientation: StepperOrientation, class: String)
+}
+
+/// Builder entry point. Defaults: Horizontal, no extra class.
+pub fn new() -> StepperConfig {
+  StepperConfig(orientation: Horizontal, class: "")
+}
+
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> StepperConfig {
+  new()
+}
+
+/// Set the orientation (Horizontal — default, Vertical).
+pub fn orientation(
+  config: StepperConfig,
   orientation: StepperOrientation,
+) -> StepperConfig {
+  StepperConfig(..config, orientation: orientation)
+}
+
+/// Append an extra CSS class on the root. Additive only.
+pub fn add_class(config: StepperConfig, class: String) -> StepperConfig {
+  let merged = case config.class {
+    "" -> class
+    existing -> existing <> " " <> class
+  }
+  StepperConfig(..config, class: merged)
+}
+
+/// Render the stepper. `active_step` is the 0-indexed current step. When
+/// `on_step_click` is `Some`, completed steps are clickable.
+pub fn view(
+  config: StepperConfig,
   steps: List(StepItem),
   active_step: Int,
   on_step_click: Option(fn(Int) -> msg),
-  class: String,
 ) -> Element(msg) {
-  let orient_class = case orientation {
+  let orient_class = case config.orientation {
     Horizontal -> "stepper stepper-horizontal"
     Vertical -> "stepper stepper-vertical"
   }
-  let root_class = case class {
+  let root_class = case config.class {
     "" -> orient_class
     c -> orient_class <> " " <> c
   }
@@ -110,6 +149,8 @@ pub fn stepper(
   )
 }
 
+// --- Convenience shortcuts ---
+
 pub fn stepper_simple(steps: List(StepItem), active_step: Int) -> Element(msg) {
-  stepper(Horizontal, steps, active_step, None, "")
+  new() |> view(steps, active_step, None)
 }

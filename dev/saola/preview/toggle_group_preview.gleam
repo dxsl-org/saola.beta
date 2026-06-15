@@ -25,7 +25,9 @@ pub fn view(model: Model) -> Element(Message) {
       ]),
       DocSection("multi-select", "Multi select", [
         h.div([a.class("grid gap-4 mt-4")], [
-          toggle_group.toggle_group(
+          toggle_group.new()
+          |> toggle_group.group_type(toggle_group.MultiSelect)
+          |> toggle_group.view(
             [
               toggle_group.ToggleGroupItem("bold", "B"),
               toggle_group.ToggleGroupItem("italic", "I"),
@@ -34,8 +36,6 @@ pub fn view(model: Model) -> Element(Message) {
             ],
             model.toggle_group_selected,
             ToggleGroupChanged,
-            toggle_group.MultiSelect,
-            "",
           ),
         ]),
       ]),
@@ -51,7 +51,9 @@ pub fn view(model: Model) -> Element(Message) {
           ")",
           "",
           "// Multi select",
-          "toggle_group.toggle_group([...], model.selected, ToggleGroupChanged, toggle_group.MultiSelect, \"\")",
+          "toggle_group.new()",
+          "|> toggle_group.group_type(toggle_group.MultiSelect)",
+          "|> toggle_group.view([...], model.selected, ToggleGroupChanged)",
         ]),
       ]),
     ],

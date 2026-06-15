@@ -37,23 +37,14 @@ pub fn view(model: Model) -> Element(Message) {
         h.div([a.class("grid gap-8")], [
           h.div([a.class("grid gap-4")], [
             h.h2([], [h.text("Horizontal")]),
-            stepper.stepper(
-              stepper.Horizontal,
-              steps,
-              model.stepper_step,
-              Some(StepperStepClicked),
-              "",
-            ),
+            stepper.new()
+            |> stepper.view(steps, model.stepper_step, Some(StepperStepClicked)),
           ]),
           h.div([a.class("grid gap-4")], [
             h.h2([], [h.text("Vertical")]),
-            stepper.stepper(
-              stepper.Vertical,
-              steps,
-              model.stepper_step,
-              Some(StepperStepClicked),
-              "",
-            ),
+            stepper.new()
+            |> stepper.orientation(stepper.Vertical)
+            |> stepper.view(steps, model.stepper_step, Some(StepperStepClicked)),
           ]),
           h.div([a.class("grid gap-4")], [
             h.h2([], [h.text("With error state")]),
@@ -86,13 +77,13 @@ pub fn view(model: Model) -> Element(Message) {
           "import gleam/option.{Some}",
           "",
           "// model.stepper_step : Int",
-          "stepper.stepper(",
-          "  stepper.Horizontal,",
-          "  steps,",
-          "  model.stepper_step,",
-          "  Some(StepperStepClicked),",
-          "  \"\",",
-          ")",
+          "stepper.new()",
+          "|> stepper.view(steps, model.stepper_step, Some(StepperStepClicked))",
+          "",
+          "// Vertical orientation",
+          "stepper.new()",
+          "|> stepper.orientation(stepper.Vertical)",
+          "|> stepper.view(steps, model.stepper_step, Some(StepperStepClicked))",
         ]),
       ]),
     ],

@@ -17,40 +17,24 @@ pub fn view(model: Model) -> Element(Message) {
     ]),
     DocSection("outline", "Outline variant", [
       h.div([a.class("flex gap-2 mt-4")], [
-        toggle.toggle(
-          model.toggle_bold,
-          "Bold",
-          ToggleBoldChanged,
-          toggle.ToggleAttrs(..toggle.default_attrs, variant: toggle.Outline),
-        ),
-        toggle.toggle(
-          model.toggle_italic,
-          "Italic",
-          ToggleItalicChanged,
-          toggle.ToggleAttrs(..toggle.default_attrs, variant: toggle.Outline),
-        ),
+        toggle.new()
+        |> toggle.variant(toggle.Outline)
+        |> toggle.view(model.toggle_bold, "Bold", ToggleBoldChanged),
+        toggle.new()
+        |> toggle.variant(toggle.Outline)
+        |> toggle.view(model.toggle_italic, "Italic", ToggleItalicChanged),
       ]),
     ]),
     DocSection("sizes", "Sizes", [
       h.div([a.class("flex gap-2 items-center mt-4")], [
-        toggle.toggle(
-          False,
-          "Small",
-          fn(_) { ToggleBoldChanged(model.toggle_bold) },
-          toggle.ToggleAttrs(..toggle.default_attrs, size: toggle.Small),
-        ),
-        toggle.toggle(
-          True,
-          "Medium",
-          fn(_) { ToggleBoldChanged(model.toggle_bold) },
-          toggle.default_attrs,
-        ),
-        toggle.toggle(
-          False,
-          "Large",
-          fn(_) { ToggleBoldChanged(model.toggle_bold) },
-          toggle.ToggleAttrs(..toggle.default_attrs, size: toggle.Large),
-        ),
+        toggle.new()
+        |> toggle.size(toggle.Small)
+        |> toggle.view(False, "Small", fn(_) { ToggleBoldChanged(model.toggle_bold) }),
+        toggle.new()
+        |> toggle.view(True, "Medium", fn(_) { ToggleBoldChanged(model.toggle_bold) }),
+        toggle.new()
+        |> toggle.size(toggle.Large)
+        |> toggle.view(False, "Large", fn(_) { ToggleBoldChanged(model.toggle_bold) }),
       ]),
     ]),
     DocSection("usage", "Usage", [
@@ -60,11 +44,15 @@ pub fn view(model: Model) -> Element(Message) {
         "// Simple",
         "toggle.toggle_simple(model.toggle_bold, \"Bold\", ToggleBoldChanged)",
         "",
-        "// With variant/size",
-        "toggle.toggle(",
-        "  model.toggle_bold, \"Bold\", ToggleBoldChanged,",
-        "  toggle.ToggleAttrs(..toggle.default_attrs, variant: toggle.Outline),",
-        ")",
+        "// With variant",
+        "toggle.new()",
+        "|> toggle.variant(toggle.Outline)",
+        "|> toggle.view(model.toggle_bold, \"Bold\", ToggleBoldChanged)",
+        "",
+        "// With size",
+        "toggle.new()",
+        "|> toggle.size(toggle.Small)",
+        "|> toggle.view(model.toggle_bold, \"Bold\", ToggleBoldChanged)",
       ]),
     ]),
   ])

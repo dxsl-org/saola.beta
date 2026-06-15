@@ -1,3 +1,15 @@
+//// Tabs widget — dual-style `Config` (uniform Saola pattern):
+////
+//// ```gleam
+//// tabs.tabs_simple(items: my_tabs, active_id: model.tab, on_tab_change: TabChanged)  // shortcut
+//// tabs.new()
+//// |> tabs.add_class("my-tabs")
+//// |> tabs.view(my_tabs, model.tab, TabChanged)
+//// ```
+////
+//// NOTE: `aria-hidden` alone doesn't remove inactive panels from keyboard tab
+//// order. Add `[role="tabpanel"][aria-hidden="true"] { display: none; }` to CSS.
+
 import gleam/list
 import lustre/attribute as a
 import lustre/element.{type Element}
@@ -12,6 +24,31 @@ pub type Tab(msg) {
     label: String,
     content: Element(msg),
   )
+}
+
+/// Presentation options for tabs. Public for record-update syntax. The `tabs`
+/// list, `active_id`, and `on_tab_change` are the required data (`view`).
+pub type TabsConfig {
+  TabsConfig(class: String)
+}
+
+/// Builder entry point. Default: no extra class.
+pub fn new() -> TabsConfig {
+  TabsConfig(class: "")
+}
+
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> TabsConfig {
+  new()
+}
+
+/// Append an extra CSS class on the root. Additive only.
+pub fn add_class(config: TabsConfig, class: String) -> TabsConfig {
+  let merged = case config.class {
+    "" -> class
+    existing -> existing <> " " <> class
+  }
+  TabsConfig(class: merged)
 }
 
 fn tab_id(id: String) -> String {
@@ -82,33 +119,15 @@ fn render_panel(tab: Tab(msg), is_active: Bool) -> Element(msg) {
   )
 }
 
-/// Render a tab group. `active_id` is the ID of the currently visible tab.
-/// `on_tab_change` is called with the new tab ID when the user clicks a tab.
-///
-/// NOTE: `aria-hidden` alone does not remove inactive panels from keyboard
-/// tab order. Add `[role="tabpanel"][aria-hidden="true"] { display: none; }`
-/// to your CSS so focusable elements inside hidden panels are unreachable.
-///
-/// ## Examples
-///
-/// ```gleam
-/// tabs(
-///   tabs: [
-///     Tab(id: "account", label: "Account", content: html.p([], [element.text("Account settings")])),
-///     TabWithIcon(id: "security", icon: lock_icon, label: "Security", content: html.p([], [element.text("Security settings")])),
-///   ],
-///   active_id: model.active_tab,
-///   on_tab_change: TabChanged,
-///   class: "my-tabs",
-/// )
-/// ```
-pub fn tabs(
-  tabs tabs: List(Tab(msg)),
-  active_id active_id: String,
-  on_tab_change on_tab_change: fn(String) -> msg,
-  class class: String,
+/// Render the tab group. `active_id` is the visible tab's id; `on_tab_change`
+/// receives the clicked tab's id.
+pub fn view(
+  config: TabsConfig,
+  tabs: List(Tab(msg)),
+  active_id: String,
+  on_tab_change: fn(String) -> msg,
 ) -> Element(msg) {
-  let extra_class_attrs = case class {
+  let extra_class_attrs = case config.class {
     "" -> []
     c -> [a.class(c)]
   }
@@ -126,29 +145,12 @@ pub fn tabs(
   ])
 }
 
-/// Simple tabs with default styling.
-///
-/// ## Examples
-///
-/// ```gleam
-/// tabs_simple(
-///   tabs: [
-///     Tab(id: "overview", label: "Overview", content: overview_view()),
-///     Tab(id: "details", label: "Details", content: details_view()),
-///   ],
-///   active_id: model.active_tab,
-///   on_tab_change: TabChanged,
-/// )
-/// ```
+// --- Convenience shortcuts ---
+
 pub fn tabs_simple(
   items items: List(Tab(msg)),
   active_id active_id: String,
   on_tab_change on_tab_change: fn(String) -> msg,
 ) -> Element(msg) {
-  tabs(
-    tabs: items,
-    active_id: active_id,
-    on_tab_change: on_tab_change,
-    class: "",
-  )
+  new() |> view(items, active_id, on_tab_change)
 }

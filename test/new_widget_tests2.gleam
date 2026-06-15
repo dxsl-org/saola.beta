@@ -93,12 +93,9 @@ pub fn toggle_pressed_has_aria_pressed_true_test() {
 
 pub fn toggle_disabled_test() {
   let html =
-    toggle.toggle(
-      False,
-      "X",
-      fn(v) { v },
-      toggle.ToggleAttrs(..toggle.default_attrs, disabled: True),
-    )
+    toggle.new()
+    |> toggle.disabled(True)
+    |> toggle.view(False, "X", fn(v) { v })
     |> element.to_string
   assert string.contains(html, "disabled")
 }

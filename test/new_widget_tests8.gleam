@@ -150,13 +150,8 @@ pub fn nav_bar_link_active_has_aria_current_test() {
 
 pub fn stepper_horizontal_has_correct_class_test() {
   let html =
-    stepper.stepper(
-      stepper.Horizontal,
-      [stepper.StepItem("Step 1", "", stepper.Pending)],
-      0,
-      None,
-      "",
-    )
+    stepper.new()
+    |> stepper.view([stepper.StepItem("Step 1", "", stepper.Pending)], 0, None)
     |> element.to_string
   assert string.contains(html, "stepper-horizontal")
   assert string.contains(html, "aria-label=\"Progress\"")
@@ -164,13 +159,9 @@ pub fn stepper_horizontal_has_correct_class_test() {
 
 pub fn stepper_vertical_has_correct_class_test() {
   let html =
-    stepper.stepper(
-      stepper.Vertical,
-      [stepper.StepItem("Step A", "", stepper.Complete)],
-      0,
-      None,
-      "",
-    )
+    stepper.new()
+    |> stepper.orientation(stepper.Vertical)
+    |> stepper.view([stepper.StepItem("Step A", "", stepper.Complete)], 0, None)
     |> element.to_string
   assert string.contains(html, "stepper-vertical")
 }
@@ -181,7 +172,8 @@ pub fn stepper_active_step_has_active_class_test() {
     stepper.StepItem("Two", "", stepper.Active),
   ]
   let html =
-    stepper.stepper(stepper.Horizontal, steps, 1, None, "")
+    stepper.new()
+    |> stepper.view(steps, 1, None)
     |> element.to_string
   assert string.contains(html, "stepper-step-active")
   assert string.contains(html, "aria-current=\"step\"")
