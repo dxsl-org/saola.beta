@@ -239,16 +239,11 @@ fn metric_pill(
   h.div([a.class("threat-metric-pill")], [
     badge.new() |> badge.variant(variant) |> badge.view(label),
     h.span([a.class("threat-metric-count")], [h.text(int.to_string(count))]),
-    progress.progress(
-      count,
-      progress.ProgressAttrs(
-        min: 0,
-        max: 30,
-        variant: progress.Default,
-        label: label,
-        class: "threat-metric-bar",
-      ),
-    ),
+    progress.new()
+      |> progress.max(30)
+      |> progress.label(label)
+      |> progress.add_class("threat-metric-bar")
+      |> progress.view(count),
   ])
 }
 

@@ -21,43 +21,24 @@ pub fn view() -> Element(Message) {
           ]),
           h.div([a.class("grid gap-4")], [
             h.h2([], [text("Variants")]),
-            progress.progress(
-              50,
-              progress.ProgressAttrs(
-                ..progress.default_attrs,
-                variant: progress.Default,
-                label: "Loading…",
-              ),
-            ),
-            progress.progress(
-              75,
-              progress.ProgressAttrs(
-                ..progress.default_attrs,
-                variant: progress.Success,
-                label: "75% complete",
-              ),
-            ),
-            progress.progress(
-              25,
-              progress.ProgressAttrs(
-                ..progress.default_attrs,
-                variant: progress.Destructive,
-                label: "Error — 25% processed",
-              ),
-            ),
+            progress.new()
+              |> progress.label("Loading…")
+              |> progress.view(50),
+            progress.new()
+              |> progress.variant(progress.Success)
+              |> progress.label("75% complete")
+              |> progress.view(75),
+            progress.new()
+              |> progress.variant(progress.Destructive)
+              |> progress.label("Error — 25% processed")
+              |> progress.view(25),
           ]),
           h.div([a.class("grid gap-4")], [
             h.h2([], [text("Custom range (0–5 steps)")]),
-            progress.progress(
-              3,
-              progress.ProgressAttrs(
-                min: 0,
-                max: 5,
-                variant: progress.Default,
-                label: "Step 3 of 5",
-                class: "",
-              ),
-            ),
+            progress.new()
+              |> progress.max(5)
+              |> progress.label("Step 3 of 5")
+              |> progress.view(3),
           ]),
         ]),
       ]),
@@ -67,11 +48,10 @@ pub fn view() -> Element(Message) {
           "",
           "progress.progress_simple(65)",
           "",
-          "progress.progress(75, progress.ProgressAttrs(",
-          "  ..progress.default_attrs,",
-          "  variant: progress.Success,",
-          "  label: \"75% complete\",",
-          "))",
+          "progress.new()",
+          "|> progress.variant(progress.Success)",
+          "|> progress.label(\"75% complete\")",
+          "|> progress.view(75)",
         ]),
       ]),
     ],

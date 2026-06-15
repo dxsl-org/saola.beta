@@ -1,3 +1,12 @@
+//// Pagination widget — dual-style `Config` (uniform Saola pattern):
+////
+//// ```gleam
+//// pagination.pagination_simple(page, total, PageChanged)            // shortcut
+//// pagination.new()
+//// |> pagination.show_prev_next(False)
+//// |> pagination.view(page, total, PageChanged)
+//// ```
+
 import gleam/int
 import gleam/list
 import lustre/attribute as a
@@ -5,8 +14,10 @@ import lustre/element.{type Element}
 import lustre/element/html as h
 import lustre/event as e
 
-pub type PaginationAttrs {
-  PaginationAttrs(
+/// Presentation options for pagination. Public for record-update syntax.
+/// `current_page`, `total_pages`, and `on_change` are required — passed to `view`.
+pub type PaginationConfig {
+  PaginationConfig(
     show_prev_next: Bool,
     prev_label: String,
     next_label: String,
@@ -14,12 +25,44 @@ pub type PaginationAttrs {
   )
 }
 
-pub const default_attrs = PaginationAttrs(
-  show_prev_next: True,
-  prev_label: "Previous",
-  next_label: "Next",
-  class: "",
-)
+/// Builder entry point. Defaults: prev/next shown, "Previous"/"Next", no class.
+pub fn new() -> PaginationConfig {
+  PaginationConfig(
+    show_prev_next: True,
+    prev_label: "Previous",
+    next_label: "Next",
+    class: "",
+  )
+}
+
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> PaginationConfig {
+  new()
+}
+
+/// Toggle the previous/next buttons (default True).
+pub fn show_prev_next(config: PaginationConfig, show: Bool) -> PaginationConfig {
+  PaginationConfig(..config, show_prev_next: show)
+}
+
+/// Set the "previous" button label.
+pub fn prev_label(config: PaginationConfig, label: String) -> PaginationConfig {
+  PaginationConfig(..config, prev_label: label)
+}
+
+/// Set the "next" button label.
+pub fn next_label(config: PaginationConfig, label: String) -> PaginationConfig {
+  PaginationConfig(..config, next_label: label)
+}
+
+/// Append an extra CSS class on the `<nav>`. Additive only.
+pub fn add_class(config: PaginationConfig, class: String) -> PaginationConfig {
+  let merged = case config.class {
+    "" -> class
+    existing -> existing <> " " <> class
+  }
+  PaginationConfig(..config, class: merged)
+}
 
 fn pages_list(from: Int, to: Int) -> List(Int) {
   case from > to {
@@ -28,13 +71,14 @@ fn pages_list(from: Int, to: Int) -> List(Int) {
   }
 }
 
-pub fn pagination(
+/// Render the pagination nav. `on_change` receives the target page number.
+pub fn view(
+  config: PaginationConfig,
   current_page: Int,
   total_pages: Int,
   on_change: fn(Int) -> msg,
-  attrs: PaginationAttrs,
 ) -> Element(msg) {
-  let extra_class_attrs = case attrs.class {
+  let extra_class_attrs = case config.class {
     "" -> []
     c -> [a.class(c)]
   }
@@ -62,7 +106,7 @@ pub fn pagination(
         [h.text(int.to_string(page))],
       )
     })
-  let prev_btn = case attrs.show_prev_next {
+  let prev_btn = case config.show_prev_next {
     False -> []
     True -> [
       h.button(
@@ -75,17 +119,17 @@ pub fn pagination(
             [
               a.type_("button"),
               a.class("btn btn-sm btn-ghost"),
-              a.attribute("aria-label", attrs.prev_label),
+              a.attribute("aria-label", config.prev_label),
             ],
             disabled_attrs,
             [e.on_click(on_change(current_page - 1))],
           ])
         },
-        [h.text(attrs.prev_label)],
+        [h.text(config.prev_label)],
       ),
     ]
   }
-  let next_btn = case attrs.show_prev_next {
+  let next_btn = case config.show_prev_next {
     False -> []
     True -> [
       h.button(
@@ -98,13 +142,13 @@ pub fn pagination(
             [
               a.type_("button"),
               a.class("btn btn-sm btn-ghost"),
-              a.attribute("aria-label", attrs.next_label),
+              a.attribute("aria-label", config.next_label),
             ],
             disabled_attrs,
             [e.on_click(on_change(current_page + 1))],
           ])
         },
-        [h.text(attrs.next_label)],
+        [h.text(config.next_label)],
       ),
     ]
   }
@@ -118,10 +162,13 @@ pub fn pagination(
   )
 }
 
+// --- Convenience shortcuts ---
+
+/// Pagination with default prev/next labels and styling.
 pub fn pagination_simple(
   current_page: Int,
   total_pages: Int,
   on_change: fn(Int) -> msg,
 ) -> Element(msg) {
-  pagination(current_page, total_pages, on_change, default_attrs)
+  new() |> view(current_page, total_pages, on_change)
 }

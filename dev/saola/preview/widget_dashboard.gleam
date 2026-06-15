@@ -139,13 +139,9 @@ pub fn view(model: Model) -> Element(Message) {
                 text(int.to_string(matched * 100 / int.max(total, 1)) <> "%"),
               ],
             ),
-            progress.progress(
-              matched * 100 / int.max(total, 1),
-              progress.ProgressAttrs(
-                ..progress.default_attrs,
-                label: "Match ratio",
-              ),
-            ),
+            progress.new()
+              |> progress.label("Match ratio")
+              |> progress.view(matched * 100 / int.max(total, 1)),
           ]),
           // ---- Table + score distribution chart ----------------------------------
           h.div([a.class("grid gap-6 lg:grid-cols-3")], [
@@ -322,18 +318,14 @@ fn employee_detail(emp: Employee) -> Element(Message) {
       h.div([a.class("flex gap-3 items-center")], [
         h.span([a.class("text-3xl font-bold")], [text(int.to_string(emp.score))]),
         h.div([a.class("flex-1")], [
-          progress.progress(
-            emp.score,
-            progress.ProgressAttrs(
-              ..progress.default_attrs,
-              label: "Performance score",
-              variant: case emp.score {
-                s if s >= 85 -> progress.Success
-                s if s < 65 -> progress.Destructive
-                _ -> progress.Default
-              },
-            ),
-          ),
+          progress.new()
+            |> progress.label("Performance score")
+            |> progress.variant(case emp.score {
+              s if s >= 85 -> progress.Success
+              s if s < 65 -> progress.Destructive
+              _ -> progress.Default
+            })
+            |> progress.view(emp.score),
         ]),
       ]),
     ]),

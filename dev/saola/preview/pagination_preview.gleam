@@ -22,15 +22,9 @@ pub fn view(model: Model) -> Element(Message) {
           ]),
           h.div([a.class("grid gap-4")], [
             h.h2([], [h.text("Without prev/next")]),
-            pagination.pagination(
-              model.pagination_page,
-              5,
-              PaginationChanged,
-              pagination.PaginationAttrs(
-                ..pagination.default_attrs,
-                show_prev_next: False,
-              ),
-            ),
+            pagination.new()
+              |> pagination.show_prev_next(False)
+              |> pagination.view(model.pagination_page, 5, PaginationChanged),
           ]),
         ]),
       ]),
