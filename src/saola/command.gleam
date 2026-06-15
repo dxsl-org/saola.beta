@@ -1,3 +1,12 @@
+//// Command palette widget — dual-style `Config` (uniform Saola pattern):
+////
+//// ```gleam
+//// command.command_simple(model.q, items, OnQuery, OnSelectAt)        // shortcut
+//// command.new()
+//// |> command.placeholder("Type a command…")
+//// |> command.view(model.q, items, model.hl, OnQuery, NavUp, NavDown, OnSelectAt)
+//// ```
+
 import gleam/dynamic/decode
 import gleam/list
 import lustre/attribute as a
@@ -18,11 +27,35 @@ pub type CommandItem(msg) {
   CommandGroup(label: String, items: List(CommandItem(msg)))
 }
 
-pub type CommandAttrs {
-  CommandAttrs(placeholder: String, class: String)
+/// Presentation options for a command palette. Public for record-update syntax.
+/// The query/items/highlight/handlers are the required data, passed to `view`.
+pub type CommandConfig {
+  CommandConfig(placeholder: String, class: String)
 }
 
-pub const default_attrs = CommandAttrs(placeholder: "Search...", class: "")
+/// Builder entry point. Defaults: "Search..." placeholder, no extra class.
+pub fn new() -> CommandConfig {
+  CommandConfig(placeholder: "Search...", class: "")
+}
+
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> CommandConfig {
+  new()
+}
+
+/// Set the search input placeholder.
+pub fn placeholder(config: CommandConfig, placeholder: String) -> CommandConfig {
+  CommandConfig(..config, placeholder: placeholder)
+}
+
+/// Append an extra CSS class on the root. Additive only.
+pub fn add_class(config: CommandConfig, class: String) -> CommandConfig {
+  let merged = case config.class {
+    "" -> class
+    existing -> existing <> " " <> class
+  }
+  CommandConfig(..config, class: merged)
+}
 
 fn count_items(items: List(CommandItem(msg))) -> Int {
   list.fold(items, 0, fn(acc, item) {
@@ -94,10 +127,7 @@ fn render_item(
       idx + 1,
     )
     CommandSeparator -> #(
-      h.div(
-        [a.class("command-separator"), a.attribute("role", "separator")],
-        [],
-      ),
+      h.div([a.class("command-separator"), a.attribute("role", "separator")], []),
       idx,
     )
     CommandGroup(group_label, sub_items) -> {
@@ -149,7 +179,9 @@ fn decode_keydown(
   }
 }
 
-pub fn command(
+/// Render the command palette.
+pub fn view(
+  config: CommandConfig,
   query: String,
   items: List(CommandItem(msg)),
   highlighted: Int,
@@ -157,10 +189,9 @@ pub fn command(
   on_nav_up: fn() -> msg,
   on_nav_down: fn() -> msg,
   on_select_at: fn(Int) -> msg,
-  attrs: CommandAttrs,
 ) -> Element(msg) {
   let item_count = count_items(items)
-  let extra_class_attrs = case attrs.class {
+  let extra_class_attrs = case config.class {
     "" -> []
     c -> [a.class(c)]
   }
@@ -184,7 +215,7 @@ pub fn command(
           a.type_("text"),
           a.class("command-input"),
           a.value(query),
-          a.placeholder(attrs.placeholder),
+          a.placeholder(config.placeholder),
           a.attribute("aria-autocomplete", "list"),
           e.on_input(on_query_change),
           e.on(
@@ -213,13 +244,16 @@ pub fn command(
   )
 }
 
+// --- Convenience shortcuts ---
+
 pub fn command_simple(
   query: String,
   items: List(CommandItem(msg)),
   on_query_change: fn(String) -> msg,
   on_select_at: fn(Int) -> msg,
 ) -> Element(msg) {
-  command(
+  new()
+  |> view(
     query,
     items,
     -1,
@@ -227,9 +261,10 @@ pub fn command_simple(
     fn() { on_select_at(-1) },
     fn() { on_select_at(-1) },
     on_select_at,
-    default_attrs,
   )
 }
+
+// --- Keyboard-navigation helpers ---
 
 pub fn command_item_count(items: List(CommandItem(msg))) -> Int {
   count_items(items)
@@ -280,9 +315,6 @@ pub fn command_nav_up(highlighted: Int, items: List(CommandItem(msg))) -> Int {
   command_clamp_highlight(highlighted - 1, items)
 }
 
-pub fn command_nav_down(
-  highlighted: Int,
-  items: List(CommandItem(msg)),
-) -> Int {
+pub fn command_nav_down(highlighted: Int, items: List(CommandItem(msg))) -> Int {
   command_clamp_highlight(highlighted + 1, items)
 }

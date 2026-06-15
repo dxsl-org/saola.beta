@@ -1,3 +1,16 @@
+//// Dropdown menu widget — dual-style `Config` (uniform Saola pattern).
+//// Consolidates the former TriggerAttrs + MinorAttrs into one `Config`.
+////
+//// ```gleam
+//// dropdown_menu.dropdown_simple(items: items, is_open: model.open, trigger_click: Toggle)  // shortcut
+//// dropdown_menu.new()
+//// |> dropdown_menu.trigger_label("Actions")
+//// |> dropdown_menu.view(items, model.open, Toggle)
+//// ```
+////
+//// NOTE: uses a `data-popover` attribute (not the native popover API) so the
+//// menu can be positioned with standard CSS relative to the trigger.
+
 import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/result
@@ -26,13 +39,13 @@ pub type DropdownMenuItem(a) {
   Group(label: String, items: List(BaseDropdownMenuItem(a)))
 }
 
-/// Attributes for the trigger button
-pub type TriggerAttrs(a) {
-  TriggerAttrs(label: String, icon: Option(Element(a)), class: String)
-}
-
-pub type MinorAttrs {
-  MinorAttrs(
+/// All presentation options. Public for record-update syntax. The `items`,
+/// `is_open`, and `trigger_click` are the required data, passed to `view`.
+pub type DropdownMenuConfig(a) {
+  DropdownMenuConfig(
+    trigger_label: String,
+    trigger_icon: Option(Element(a)),
+    trigger_class: String,
     id: String,
     main_class: String,
     popover_class: String,
@@ -40,9 +53,58 @@ pub type MinorAttrs {
   )
 }
 
-pub const default_trigger_attrs = TriggerAttrs("Open", None, "")
+/// Builder entry point. Defaults: trigger label "Open", no icon, auto id.
+pub fn new() -> DropdownMenuConfig(a) {
+  DropdownMenuConfig(
+    trigger_label: "Open",
+    trigger_icon: None,
+    trigger_class: "",
+    id: "",
+    main_class: "",
+    popover_class: "",
+    menu_class: "",
+  )
+}
 
-pub const default_minor_attrs = MinorAttrs("", "", "", "")
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> DropdownMenuConfig(a) {
+  new()
+}
+
+/// Set the trigger button label.
+pub fn trigger_label(config: DropdownMenuConfig(a), label: String) -> DropdownMenuConfig(a) {
+  DropdownMenuConfig(..config, trigger_label: label)
+}
+
+/// Set the trigger button icon.
+pub fn trigger_icon(config: DropdownMenuConfig(a), icon: Element(a)) -> DropdownMenuConfig(a) {
+  DropdownMenuConfig(..config, trigger_icon: Some(icon))
+}
+
+/// Set an extra class on the trigger button.
+pub fn trigger_class(config: DropdownMenuConfig(a), class: String) -> DropdownMenuConfig(a) {
+  DropdownMenuConfig(..config, trigger_class: class)
+}
+
+/// Set the base id (auto-generated when empty).
+pub fn id(config: DropdownMenuConfig(a), id: String) -> DropdownMenuConfig(a) {
+  DropdownMenuConfig(..config, id: id)
+}
+
+/// Set an extra class on the root container.
+pub fn main_class(config: DropdownMenuConfig(a), class: String) -> DropdownMenuConfig(a) {
+  DropdownMenuConfig(..config, main_class: class)
+}
+
+/// Set an extra class on the popover wrapper.
+pub fn popover_class(config: DropdownMenuConfig(a), class: String) -> DropdownMenuConfig(a) {
+  DropdownMenuConfig(..config, popover_class: class)
+}
+
+/// Set an extra class on the menu.
+pub fn menu_class(config: DropdownMenuConfig(a), class: String) -> DropdownMenuConfig(a) {
+  DropdownMenuConfig(..config, menu_class: class)
+}
 
 fn render_menu_item(item: DropdownMenuItem(a)) -> Element(a) {
   case item {
@@ -54,21 +116,15 @@ fn render_menu_item(item: DropdownMenuItem(a)) -> Element(a) {
 fn render_base_item(item: BaseDropdownMenuItem(a)) -> Element(a) {
   case item {
     Item(label) -> h.div([a.role("menuitem")], [h.text(label)])
-    ItemWithIcon(icon, label) -> {
-      h.div([a.role("menuitem")], [icon, h.text(label)])
-    }
+    ItemWithIcon(icon, label) -> h.div([a.role("menuitem")], [icon, h.text(label)])
     Link(label, url) -> h.a([a.role("menuitem"), a.href(url)], [h.text(label)])
-    LinkWithIcon(icon, label, url) -> {
+    LinkWithIcon(icon, label, url) ->
       h.a([a.role("menuitem"), a.href(url)], [icon, h.text(label)])
-    }
     Separator -> h.hr([a.role("separator")])
   }
 }
 
-fn render_item_group(
-  label: String,
-  items: List(BaseDropdownMenuItem(a)),
-) -> Element(a) {
+fn render_item_group(label: String, items: List(BaseDropdownMenuItem(a))) -> Element(a) {
   let group_id =
     typeid.new(prefix: "grp")
     |> result.map(typeid.to_string)
@@ -80,41 +136,16 @@ fn render_item_group(
   ])
 }
 
-/// Render a fully customizable dropdown menu
-///
-/// NOTE: We use a custom `data-popover` attribute instead of the native HTML `popover` API
-/// because the native popover API places elements in a "top layer" that breaks out of the
-/// normal document flow. This makes CSS positioning (like placing the menu directly below
-/// the trigger button) impossible without CSS anchor positioning, which is not yet
-/// supported in all browsers (e.g., Firefox). By using `data-popover` with `aria-hidden`
-/// toggled via click events, we can reliably position the dropdown menu using standard
-/// CSS `position: absolute` relative to the parent container.
-///
-/// Example:
-/// ```gleam
-/// type Msg {
-///    UserClickSave
-///    UserClickDelete
-///    ToggleDropdown
-/// }
-///
-/// dropdown_menu(
-///   items: [Item("Save"), Separator, Item("Delete")],
-///   trigger_attrs: default_trigger_attrs,
-///   is_open: model.dropdown_open,
-///   trigger_click: ToggleDropdown,
-///   minor_attrs: default_minor_attrs,
-/// )
-/// ```
-pub fn dropdown_menu(
-  items items: List(DropdownMenuItem(a)),
-  trigger_attrs trigger_attrs: TriggerAttrs(a),
-  is_open is_open: Bool,
-  trigger_click trigger_click: a,
-  minor_attrs minor_attrs: MinorAttrs,
+/// Render the dropdown menu. `is_open` is consumer-owned; `trigger_click` fires
+/// when the trigger button is clicked.
+pub fn view(
+  config: DropdownMenuConfig(a),
+  items: List(DropdownMenuItem(a)),
+  is_open: Bool,
+  trigger_click: a,
 ) -> Element(a) {
   let base_id =
-    case minor_attrs.id {
+    case config.id {
       "" -> typeid.new(prefix: "menu") |> result.map(typeid.to_string)
       id -> Ok(id)
     }
@@ -123,7 +154,6 @@ pub fn dropdown_menu(
   let menu_id = base_id <> "-menu"
   let popover_id = base_id <> "-popover"
 
-  // Build trigger button attributes
   let trigger_main_attrs = [
     a.type_("button"),
     a.id(trigger_id),
@@ -133,101 +163,64 @@ pub fn dropdown_menu(
     a.aria_expanded(False),
     a.aria_controls(menu_id),
   ]
-  let trigger_class_attrs = case trigger_attrs.class {
+  let trigger_class_attrs = case config.trigger_class {
     "" -> []
     c -> [a.class(c)]
   }
-  let trigger_icon = case trigger_attrs.icon {
+  let trigger_icon_el = case config.trigger_icon {
     None -> element.none()
     Some(icon) -> icon
   }
-  let trigger_label = h.text(trigger_attrs.label)
-
   let btn_trigger =
     h.button(list.flatten([trigger_main_attrs, trigger_class_attrs]), [
-      trigger_icon,
-      trigger_label,
+      trigger_icon_el,
+      h.text(config.trigger_label),
     ])
 
-  // Build menu
-  let menu_class_attrs = case minor_attrs.menu_class {
+  let menu_class_attrs = case config.menu_class {
     "" -> []
     c -> [a.class(c)]
   }
   let menu =
     h.div(
-      list.flatten([[a.role("menu"), a.id(menu_id), a.aria_labelledby(trigger_id)], menu_class_attrs]),
+      list.flatten([
+        [a.role("menu"), a.id(menu_id), a.aria_labelledby(trigger_id)],
+        menu_class_attrs,
+      ]),
       items |> list.map(render_menu_item),
     )
 
-  // Build popover wrapper
-  // NOTE: Using data-popover instead of native popover API for cross-browser positioning support
-  let popover_class_value = case minor_attrs.popover_class {
-    "" -> ""
-    c -> c
-  }
   let popover =
     h.div(
       [
         a.id(popover_id),
         a.data("popover", ""),
-        a.class(popover_class_value),
+        a.class(config.popover_class),
         a.aria_hidden(!is_open),
       ],
       [menu],
     )
 
-  // Build main container
-  let main_class = a.class("dropdown-menu " <> minor_attrs.main_class)
-  h.div([a.id(base_id), main_class], [btn_trigger, popover])
+  let main_class_attr = a.class("dropdown-menu " <> config.main_class)
+  h.div([a.id(base_id), main_class_attr], [btn_trigger, popover])
 }
 
-/// Create a simple dropdown menu with default styling
-///
-/// Example:
-/// ```gleam
-/// dropdown_simple(
-///   items: [Item("Save"), Item("Delete")],
-///   is_open: model.dropdown_open,
-///   trigger_click: UserClickedDropdown,
-/// )
-/// ```
+// --- Convenience shortcuts ---
+
 pub fn dropdown_simple(
   items items: List(DropdownMenuItem(a)),
   is_open is_open: Bool,
   trigger_click trigger_click: a,
 ) -> Element(a) {
-  dropdown_menu(
-    items: items,
-    trigger_attrs: default_trigger_attrs,
-    is_open: is_open,
-    trigger_click: trigger_click,
-    minor_attrs: default_minor_attrs,
-  )
+  new() |> view(items, is_open, trigger_click)
 }
 
-/// Create a dropdown menu with a custom trigger label
-///
-/// Example:
-/// ```gleam
-/// dropdown_with_trigger(
-///   items: [Item("Option 1"), Item("Option 2")],
-///   trigger_label: "Actions",
-///   is_open: model.dropdown_open,
-///   trigger_click: UserClickedDropdown,
-/// )
-/// ```
 pub fn dropdown_with_trigger(
   items items: List(DropdownMenuItem(a)),
-  trigger_label trigger_label: String,
+  trigger_label label: String,
   is_open is_open: Bool,
   trigger_click trigger_click: a,
 ) -> Element(a) {
-  dropdown_menu(
-    items: items,
-    trigger_attrs: TriggerAttrs(trigger_label, None, ""),
-    is_open: is_open,
-    trigger_click: trigger_click,
-    minor_attrs: default_minor_attrs,
-  )
+  DropdownMenuConfig(..new(), trigger_label: label)
+  |> view(items, is_open, trigger_click)
 }

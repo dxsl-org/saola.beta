@@ -1,3 +1,12 @@
+//// Navigation menu widget — dual-style `Config` (uniform Saola pattern):
+////
+//// ```gleam
+//// navigation_menu.navigation_menu_simple(items, model.open, OnOpenChange)  // shortcut
+//// navigation_menu.new()
+//// |> navigation_menu.add_class("my-nav")
+//// |> navigation_menu.view(items, model.open, OnOpenChange)
+//// ```
+
 import gleam/list
 import gleam/option.{type Option, None, Some}
 import lustre/attribute as a
@@ -16,11 +25,30 @@ pub type NavMenuItem(msg) {
   NavMenuDropdown(label: String, id: String, content: NavMenuContent(msg))
 }
 
-pub type NavMenuAttrs {
-  NavMenuAttrs(class: String)
+/// Presentation options for a navigation menu. Public for record-update syntax.
+/// The items/open_id/on_open_change are the required data, passed to `view`.
+pub type NavMenuConfig {
+  NavMenuConfig(class: String)
 }
 
-pub const default_attrs = NavMenuAttrs(class: "")
+/// Builder entry point. Default: no extra class.
+pub fn new() -> NavMenuConfig {
+  NavMenuConfig(class: "")
+}
+
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> NavMenuConfig {
+  new()
+}
+
+/// Append an extra CSS class on the `<nav>`. Additive only.
+pub fn add_class(config: NavMenuConfig, class: String) -> NavMenuConfig {
+  let merged = case config.class {
+    "" -> class
+    existing -> existing <> " " <> class
+  }
+  NavMenuConfig(class: merged)
+}
 
 fn render_simple_panel(items: List(#(String, String))) -> Element(msg) {
   h.ul(
@@ -84,10 +112,7 @@ fn render_item(
             a.attribute("aria-haspopup", "true"),
             e.on_click(on_open_change(next_open)),
           ],
-          [
-            h.text(label),
-            lc.chevron_down([a.class("nav-menu-trigger-icon")]),
-          ],
+          [h.text(label), lc.chevron_down([a.class("nav-menu-trigger-icon")])],
         ),
         panel,
       ])
@@ -95,18 +120,23 @@ fn render_item(
   }
 }
 
-pub fn navigation_menu(
+/// Render the navigation menu. `open_id` is the open dropdown's id (or None);
+/// `on_open_change` toggles it.
+pub fn view(
+  config: NavMenuConfig,
   items: List(NavMenuItem(msg)),
   open_id: Option(String),
   on_open_change: fn(Option(String)) -> msg,
-  attrs: NavMenuAttrs,
 ) -> Element(msg) {
-  let extra_class_attrs = case attrs.class {
+  let extra_class_attrs = case config.class {
     "" -> []
     c -> [a.class(c)]
   }
   h.nav(
-    list.flatten([[a.class("nav-menu"), a.attribute("aria-label", "Main")], extra_class_attrs]),
+    list.flatten([
+      [a.class("nav-menu"), a.attribute("aria-label", "Main")],
+      extra_class_attrs,
+    ]),
     [
       h.ul(
         [a.class("nav-menu-list")],
@@ -116,10 +146,12 @@ pub fn navigation_menu(
   )
 }
 
+// --- Convenience shortcuts ---
+
 pub fn navigation_menu_simple(
   items: List(NavMenuItem(msg)),
   open_id: Option(String),
   on_open_change: fn(Option(String)) -> msg,
 ) -> Element(msg) {
-  navigation_menu(items, open_id, on_open_change, default_attrs)
+  new() |> view(items, open_id, on_open_change)
 }

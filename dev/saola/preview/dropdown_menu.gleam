@@ -67,14 +67,6 @@ pub fn view(model: Model) -> Element(Message) {
     ]),
   ]
 
-  let custom_minor_attrs =
-    dd.MinorAttrs("my-dropdown", "custom-main", "custom-popover", "custom-menu")
-
-  let custom_trigger_with_icon =
-    dd.TriggerAttrs("Menu Options", Some(lc.chevron_down([])), "btn-custom")
-
-  let trigger_with_icon_only = dd.TriggerAttrs("", Some(ls.settings([])), "")
-
   // Wrapping the page in a div that fires UserClickedOutside whenever the user
   // clicks anywhere that is not inside a `.dropdown-menu` element, allowing all
   // open dropdowns to be closed.
@@ -135,23 +127,30 @@ pub fn view(model: Model) -> Element(Message) {
             ]),
             h.div([a.class("grid gap-4")], [
               h.h2([], [text("Custom Trigger with Icon")]),
-              dd.dropdown_menu(
-                items: mixed_items,
-                trigger_attrs: trigger_with_icon_only,
-                is_open: is_dropdown_open(model, "custom-icon"),
-                trigger_click: ToggleDropdown("custom-icon"),
-                minor_attrs: dd.default_minor_attrs,
-              ),
+              dd.new()
+                |> dd.trigger_label("")
+                |> dd.trigger_icon(ls.settings([]))
+                |> dd.view(
+                  mixed_items,
+                  is_dropdown_open(model, "custom-icon"),
+                  ToggleDropdown("custom-icon"),
+                ),
             ]),
             h.div([a.class("grid gap-4")], [
               h.h2([], [text("Custom Configuration")]),
-              dd.dropdown_menu(
-                items: mixed_items,
-                trigger_attrs: custom_trigger_with_icon,
-                is_open: is_dropdown_open(model, "custom-config"),
-                trigger_click: ToggleDropdown("custom-config"),
-                minor_attrs: custom_minor_attrs,
-              ),
+              dd.new()
+                |> dd.trigger_label("Menu Options")
+                |> dd.trigger_icon(lc.chevron_down([]))
+                |> dd.trigger_class("btn-custom")
+                |> dd.id("my-dropdown")
+                |> dd.main_class("custom-main")
+                |> dd.popover_class("custom-popover")
+                |> dd.menu_class("custom-menu")
+                |> dd.view(
+                  mixed_items,
+                  is_dropdown_open(model, "custom-config"),
+                  ToggleDropdown("custom-config"),
+                ),
             ]),
           ]),
         ],

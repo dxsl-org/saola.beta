@@ -1,3 +1,12 @@
+//// Menubar widget — dual-style `Config` (uniform Saola pattern):
+////
+//// ```gleam
+//// menubar.menubar_simple(items, model.open, OnOpen, OnClose)         // shortcut
+//// menubar.new()
+//// |> menubar.add_class("my-menubar")
+//// |> menubar.view(items, model.open, OnOpen, OnClose)
+//// ```
+
 import gleam/list
 import lustre/attribute as a
 import lustre/element.{type Element}
@@ -15,20 +24,41 @@ pub type MenubarSubItem(msg) {
   MenubarSeparator
 }
 
-pub type MenubarAttrs {
-  MenubarAttrs(class: String)
+/// Presentation options for a menubar. Public for record-update syntax. The
+/// items/open_menu/handlers are the required data, passed to `view`.
+pub type MenubarConfig {
+  MenubarConfig(class: String)
 }
 
-pub const default_attrs = MenubarAttrs(class: "")
+/// Builder entry point. Default: no extra class.
+pub fn new() -> MenubarConfig {
+  MenubarConfig(class: "")
+}
 
-pub fn menubar(
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> MenubarConfig {
+  new()
+}
+
+/// Append an extra CSS class on the root. Additive only.
+pub fn add_class(config: MenubarConfig, class: String) -> MenubarConfig {
+  let merged = case config.class {
+    "" -> class
+    existing -> existing <> " " <> class
+  }
+  MenubarConfig(class: merged)
+}
+
+/// Render the menubar. `open_menu` is the label of the open top-level menu (or
+/// "" for none); `on_open`/`on_close` toggle it.
+pub fn view(
+  config: MenubarConfig,
   items: List(MenubarItem(msg)),
   open_menu: String,
   on_open: fn(String) -> msg,
   on_close: fn() -> msg,
-  attrs: MenubarAttrs,
 ) -> Element(msg) {
-  let extra_class_attrs = case attrs.class {
+  let extra_class_attrs = case config.class {
     "" -> []
     c -> [a.class(c)]
   }
@@ -101,11 +131,13 @@ pub fn menubar(
   )
 }
 
+// --- Convenience shortcuts ---
+
 pub fn menubar_simple(
   items: List(MenubarItem(msg)),
   open_menu: String,
   on_open: fn(String) -> msg,
   on_close: fn() -> msg,
 ) -> Element(msg) {
-  menubar(items, open_menu, on_open, on_close, default_attrs)
+  new() |> view(items, open_menu, on_open, on_close)
 }

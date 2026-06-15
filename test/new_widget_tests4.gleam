@@ -223,7 +223,8 @@ pub fn command_empty_state_renders_test() {
 
 pub fn command_highlighted_item_has_class_test() {
   let html =
-    command.command(
+    command.new()
+    |> command.view(
       "",
       [command.CommandAction("v", "Item", "sel")],
       0,
@@ -231,7 +232,6 @@ pub fn command_highlighted_item_has_class_test() {
       fn() { "" },
       fn() { "" },
       fn(_idx) { "" },
-      command.default_attrs,
     )
     |> element.to_string
   assert string.contains(html, "command-item-highlighted")
