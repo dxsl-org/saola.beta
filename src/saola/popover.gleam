@@ -1,3 +1,12 @@
+//// Popover widget — dual-style `Config` (uniform Saola pattern):
+////
+//// ```gleam
+//// popover.popover_simple(model.open, trigger, content, ClosePop)     // shortcut (bottom)
+//// popover.new()
+//// |> popover.side(popover.Right)
+//// |> popover.view(model.open, trigger, content, ClosePop)
+//// ```
+
 import gleam/list
 import lustre/attribute as a
 import lustre/element.{type Element}
@@ -11,21 +20,52 @@ pub type PopoverSide {
   Right
 }
 
-pub fn popover(
+/// Presentation options for a popover. Public for record-update syntax. The
+/// `open`/`trigger`/`content`/`on_close` are the required data (`view`).
+pub type PopoverConfig {
+  PopoverConfig(side: PopoverSide, class: String)
+}
+
+/// Builder entry point. Defaults: Bottom side, no extra class.
+pub fn new() -> PopoverConfig {
+  PopoverConfig(side: Bottom, class: "")
+}
+
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> PopoverConfig {
+  new()
+}
+
+/// Set the side the popover opens toward (Top, Bottom — default, Left, Right).
+pub fn side(config: PopoverConfig, side: PopoverSide) -> PopoverConfig {
+  PopoverConfig(..config, side: side)
+}
+
+/// Append an extra CSS class on the wrapper. Additive only.
+pub fn add_class(config: PopoverConfig, class: String) -> PopoverConfig {
+  let merged = case config.class {
+    "" -> class
+    existing -> existing <> " " <> class
+  }
+  PopoverConfig(..config, class: merged)
+}
+
+/// Render the popover: `trigger` is always shown; `content` (with a close
+/// button) shows while `open`.
+pub fn view(
+  config: PopoverConfig,
   open: Bool,
   trigger: Element(msg),
   content: Element(msg),
   on_close: fn() -> msg,
-  side: PopoverSide,
-  class: String,
 ) -> Element(msg) {
-  let side_attr = case side {
+  let side_attr = case config.side {
     Top -> a.attribute("data-side", "top")
     Bottom -> a.attribute("data-side", "bottom")
     Left -> a.attribute("data-side", "left")
     Right -> a.attribute("data-side", "right")
   }
-  let extra_class_attrs = case class {
+  let extra_class_attrs = case config.class {
     "" -> []
     c -> [a.class(c)]
   }
@@ -58,11 +98,13 @@ pub fn popover(
   ])
 }
 
+// --- Convenience shortcuts ---
+
 pub fn popover_simple(
   open: Bool,
   trigger: Element(msg),
   content: Element(msg),
   on_close: fn() -> msg,
 ) -> Element(msg) {
-  popover(open, trigger, content, on_close, Bottom, "")
+  new() |> view(open, trigger, content, on_close)
 }
