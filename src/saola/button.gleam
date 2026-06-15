@@ -72,6 +72,7 @@ pub type ButtonVariant {
 }
 
 pub type ButtonSize {
+  Medium
   Large
   Small
 }
@@ -104,7 +105,11 @@ pub type ButtonRoleType {
 /// `ButtonConfig(..default_config(), loading: True)` and pipe setters
 /// `new() |> loading(True)`.
 ///
-/// - `loading`: renders a spinner in place of `icon_start`, sets
+/// - `before`/`after`: arbitrary children rendered before / after the label
+///   (an icon, a badge, several elements). `icon_start`/`icon_end` are
+///   single-element shortcuts over these. The loading spinner and the
+///   "loaded" check are nothing special — just elements you place in a slot.
+/// - `loading`: replaces the `before` slot with a spinner, sets
 ///   `aria-busy="true"`, and blocks interaction (disabled / aria-disabled).
 /// - `type_`: only meaningful for `view`; `view_anchor` ignores it.
 /// - `class`: appended after the Basecoat variant class — additive only,
@@ -113,8 +118,8 @@ pub type ButtonConfig(msg) {
   ButtonConfig(
     variant: ButtonVariant,
     size: ButtonSize,
-    icon_start: Option(Element(msg)),
-    icon_end: Option(Element(msg)),
+    before: List(Element(msg)),
+    after: List(Element(msg)),
     loading: Bool,
     disabled: Bool,
     type_: Option(ButtonRoleType),
@@ -126,14 +131,15 @@ pub type ButtonConfig(msg) {
 
 pub const default_aria = ButtonAria("", None)
 
-/// Builder entry point. Defaults: Primary, Large, no icons, not loading,
-/// not disabled, no type attribute, empty aria, no extra class.
+/// Builder entry point. Defaults: Primary, Medium, no children, not loading,
+/// not disabled, no explicit type (renders `type="button"`), empty aria, no
+/// extra class.
 pub fn new() -> ButtonConfig(msg) {
   ButtonConfig(
     variant: Primary,
-    size: Large,
-    icon_start: None,
-    icon_end: None,
+    size: Medium,
+    before: [],
+    after: [],
     loading: False,
     disabled: False,
     type_: None,
@@ -159,30 +165,49 @@ pub fn variant(
   ButtonConfig(..config, variant: variant)
 }
 
-/// Set the size (Large, Small).
+/// Set the size (Medium — default, Large, Small).
 pub fn size(config: ButtonConfig(msg), size: ButtonSize) -> ButtonConfig(msg) {
   ButtonConfig(..config, size: size)
 }
 
-/// Icon rendered before the label. Replaced by a spinner while `loading`.
+/// Children rendered before the label (icon, badge, spinner, several
+/// elements). Replaced by a spinner while `loading`.
+pub fn before(
+  config: ButtonConfig(msg),
+  children: List(Element(msg)),
+) -> ButtonConfig(msg) {
+  ButtonConfig(..config, before: children)
+}
+
+/// Children rendered after the label.
+pub fn after(
+  config: ButtonConfig(msg),
+  children: List(Element(msg)),
+) -> ButtonConfig(msg) {
+  ButtonConfig(..config, after: children)
+}
+
+/// Single-icon shortcut for `before` — `icon_start(x)` == `before([x])`.
 pub fn icon_start(
   config: ButtonConfig(msg),
   icon: Element(msg),
 ) -> ButtonConfig(msg) {
-  ButtonConfig(..config, icon_start: Some(icon))
+  before(config, [icon])
 }
 
-/// Icon rendered after the label.
+/// Single-icon shortcut for `after` — `icon_end(x)` == `after([x])`.
 pub fn icon_end(
   config: ButtonConfig(msg),
   icon: Element(msg),
 ) -> ButtonConfig(msg) {
-  ButtonConfig(..config, icon_end: Some(icon))
+  after(config, [icon])
 }
 
-/// Loading state: spinner replaces `icon_start`, `aria-busy="true"` is set,
-/// and the button is non-interactive while True. The consumer owns the Bool
-/// (widgets are stateless).
+/// Loading state: a spinner replaces the `before` slot, `aria-busy="true"` is
+/// set, and the button is non-interactive while True. The consumer owns the
+/// Bool (widgets are stateless). A "loaded" look is just a check element placed
+/// in `before` once loading clears — no dedicated state needed; Basecoat's
+/// `transition: all` smooths the loading → loaded → idle hand-off.
 pub fn loading(config: ButtonConfig(msg), loading: Bool) -> ButtonConfig(msg) {
   ButtonConfig(..config, loading: loading)
 }
@@ -244,9 +269,10 @@ pub fn view(
     False, True -> [a.attribute("aria-disabled", "true")]
     False, False -> []
   }
+  // Default to type="button": a <button> with no type is type="submit" per
+  // HTML, so an unset button inside a <form> would submit it unintentionally.
   let type_attrs = case config.type_ {
-    None -> []
-    Some(Regular) -> [a.type_("button")]
+    None | Some(Regular) -> [a.type_("button")]
     Some(Submit) -> [a.type_("submit")]
     Some(Reset) -> [a.type_("reset")]
   }
@@ -307,9 +333,12 @@ pub fn view_anchor(
 /// variant — otherwise the button has no text to size against and renders
 /// mis-shapen.
 fn css_class(config: ButtonConfig(msg), label: String) -> String {
-  let size_token = case config.size {
-    Large -> "lg"
-    Small -> "sm"
+  // Medium has no size segment in Basecoat (`btn-primary`); Large/Small do
+  // (`btn-lg-primary`, `btn-sm-primary`).
+  let size_seg = case config.size {
+    Medium -> ""
+    Large -> "-lg"
+    Small -> "-sm"
   }
   let variant_token = case config.variant {
     Primary -> "primary"
@@ -319,18 +348,18 @@ fn css_class(config: ButtonConfig(msg), label: String) -> String {
     Link -> "link"
     Destructive -> "destructive"
   }
-  // Icon-only = no text label but at least one glyph (start/end icon or the
-  // loading spinner). icon_end counts too, else an end-icon-only button would
-  // wrongly get the text-padded variant.
-  let has_glyph = case config.icon_start, config.icon_end, config.loading {
-    None, None, False -> False
+  // Icon-only = no text label but at least one glyph in a slot (before/after
+  // children or the loading spinner). Without this, a slot-only button gets the
+  // text-padded variant and renders mis-shapen.
+  let has_glyph = case config.before, config.after, config.loading {
+    [], [], False -> False
     _, _, _ -> True
   }
-  let icon_infix = case string.trim(label) == "" && has_glyph {
+  let icon_seg = case string.trim(label) == "" && has_glyph {
     True -> "-icon"
     False -> ""
   }
-  let base = "btn-" <> size_token <> icon_infix <> "-" <> variant_token
+  let base = "btn" <> size_seg <> icon_seg <> "-" <> variant_token
   case config.class {
     "" -> base
     extra -> base <> " " <> extra
@@ -371,15 +400,14 @@ fn aria_attrs(config: ButtonConfig(msg)) -> List(a.Attribute(msg)) {
 
 fn content(config: ButtonConfig(msg), label: String) -> List(Element(msg)) {
   let lead = case config.loading {
-    True -> spinner.spinner(spinner.Small, "")
-    False -> option.unwrap(config.icon_start, element.none())
+    True -> [spinner.spinner(spinner.Small, "")]
+    False -> config.before
   }
   let label_el = case string.trim(label) {
-    "" -> element.none()
-    text -> h.text(text)
+    "" -> []
+    text -> [h.text(text)]
   }
-  let trail = option.unwrap(config.icon_end, element.none())
-  [lead, label_el, trail]
+  list.flatten([lead, label_el, config.after])
 }
 
 // --- Convenience shortcuts ---

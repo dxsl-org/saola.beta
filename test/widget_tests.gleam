@@ -67,24 +67,49 @@ pub fn alert_full_with_title_renders_test() {
 
 pub fn button_primary_renders_test() {
   let html = button.button_primary("Save", Nil) |> element.to_string
-  assert string.contains(html, "btn-lg-primary")
+  assert string.contains(html, "btn-primary")
   assert string.contains(html, "Save")
   assert string.contains(html, "<button")
 }
 
+pub fn button_default_size_is_medium_test() {
+  // Medium is the default and has no size segment (btn-primary, not btn-lg-*).
+  let html = button.button_primary("Go", Nil) |> element.to_string
+  assert string.contains(html, "class=\"btn-primary\"")
+  assert !string.contains(html, "btn-lg")
+  assert !string.contains(html, "btn-sm")
+}
+
+pub fn button_default_type_is_button_test() {
+  // A <button> with no explicit type defaults to submit per HTML; we force
+  // type="button" so an unset button can't submit its enclosing form.
+  let html = button.button_primary("Go", Nil) |> element.to_string
+  assert string.contains(html, "type=\"button\"")
+}
+
+pub fn button_medium_explicit_renders_test() {
+  let html =
+    button.new()
+    |> button.size(button.Medium)
+    |> button.variant(button.Outline)
+    |> button.view("M", None)
+    |> element.to_string
+  assert string.contains(html, "class=\"btn-outline\"")
+}
+
 pub fn button_secondary_renders_test() {
   let html = button.button_secondary("Cancel", Nil) |> element.to_string
-  assert string.contains(html, "btn-lg-secondary")
+  assert string.contains(html, "btn-secondary")
 }
 
 pub fn button_outline_renders_test() {
   let html = button.button_outline("Edit", Nil) |> element.to_string
-  assert string.contains(html, "btn-lg-outline")
+  assert string.contains(html, "btn-outline")
 }
 
 pub fn button_destructive_renders_test() {
   let html = button.button_destructive("Delete", Nil) |> element.to_string
-  assert string.contains(html, "btn-lg-destructive")
+  assert string.contains(html, "btn-destructive")
 }
 
 pub fn button_submit_has_type_submit_test() {
@@ -131,7 +156,7 @@ pub fn button_config_style_renders_test() {
       None,
     )
     |> element.to_string
-  assert string.contains(html, "btn-lg-primary")
+  assert string.contains(html, "btn-primary")
   assert string.contains(html, "disabled")
 }
 
@@ -149,7 +174,7 @@ pub fn button_loading_renders_spinner_and_busy_test() {
   assert !string.contains(without_aria, "disabled")
 }
 
-pub fn button_loading_replaces_icon_start_test() {
+pub fn button_loading_replaces_before_slot_test() {
   let html =
     button.new()
     |> button.icon_start(element.text("ICONMARK"))
@@ -160,13 +185,28 @@ pub fn button_loading_replaces_icon_start_test() {
   assert !string.contains(html, "ICONMARK")
 }
 
+pub fn button_before_after_render_multiple_children_test() {
+  // before/after are arbitrary children lists, not single icons.
+  let html =
+    button.new()
+    |> button.before([element.text("A1"), element.text("A2")])
+    |> button.after([element.text("Z1"), element.text("Z2")])
+    |> button.view("Mid", None)
+    |> element.to_string
+  assert string.contains(html, "A1")
+  assert string.contains(html, "A2")
+  assert string.contains(html, "Mid")
+  assert string.contains(html, "Z1")
+  assert string.contains(html, "Z2")
+}
+
 pub fn button_add_class_appends_test() {
   let html =
     button.new()
     |> button.add_class("w-full")
     |> button.view("Save", None)
     |> element.to_string
-  assert string.contains(html, "btn-lg-primary w-full")
+  assert string.contains(html, "btn-primary w-full")
 }
 
 pub fn button_anchor_renders_href_test() {
@@ -177,7 +217,7 @@ pub fn button_anchor_renders_href_test() {
     |> element.to_string
   assert string.contains(html, "<a")
   assert string.contains(html, "href=\"/docs\"")
-  assert string.contains(html, "btn-lg-outline")
+  assert string.contains(html, "btn-outline")
 }
 
 pub fn button_anchor_disabled_uses_aria_test() {
@@ -203,8 +243,8 @@ pub fn button_icon_only_uses_icon_variant_test() {
     |> button.icon_start(element.text("I"))
     |> button.view("Save", None)
     |> element.to_string
-  assert string.contains(labeled, "btn-lg-primary")
-  assert !string.contains(labeled, "btn-lg-icon")
+  assert string.contains(labeled, "btn-primary")
+  assert !string.contains(labeled, "btn-icon")
 }
 
 pub fn button_icon_end_only_uses_icon_variant_test() {
@@ -214,7 +254,7 @@ pub fn button_icon_end_only_uses_icon_variant_test() {
     |> button.icon_end(element.text("X"))
     |> button.view("", None)
     |> element.to_string
-  assert string.contains(html, "btn-lg-icon-primary")
+  assert string.contains(html, "btn-icon-primary")
 }
 
 pub fn button_loading_icon_only_uses_icon_variant_test() {
@@ -244,21 +284,21 @@ pub fn button_accent_overrides_color_var_test() {
 
 pub fn button_link_shortcut_renders_test() {
   let html = button.button_link("More", Nil) |> element.to_string
-  assert string.contains(html, "btn-lg-link")
+  assert string.contains(html, "btn-link")
   assert string.contains(html, "<button")
 }
 
 pub fn button_destructive_anchor_renders_test() {
   let html =
     button.button_destructive_anchor("Delete", "/delete") |> element.to_string
-  assert string.contains(html, "btn-lg-destructive")
+  assert string.contains(html, "btn-destructive")
   assert string.contains(html, "<a")
   assert string.contains(html, "href=\"/delete\"")
 }
 
 pub fn button_link_anchor_renders_test() {
   let html = button.button_link_anchor("Home", "/") |> element.to_string
-  assert string.contains(html, "btn-lg-link")
+  assert string.contains(html, "btn-link")
   assert string.contains(html, "<a")
   assert string.contains(html, "href=\"/\"")
 }

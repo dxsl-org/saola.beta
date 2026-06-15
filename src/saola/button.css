@@ -237,4 +237,16 @@
     pointer-events: none;
     opacity: 50%;
   }
+
+  /* Underline belongs to the `link` VARIANT, not the <a> element. A button is a
+     button (no underline) even when rendered as <a href>; the link variant reads
+     as a hyperlink (underline) even when rendered as <button>. This kills the UA
+     anchor underline that leaks onto button-styled <a>. */
+  :where(button, a)[class*="btn-"] {
+    text-decoration: none;
+  }
+  :where(button, a)[class*="btn-"][class*="-link"] {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
 }

@@ -43,12 +43,34 @@ pub fn view() -> Element(Message) {
           button.button_close(OnRouteChange(Home)),
         ]),
       ]),
+      DocSection("children-slots", "Children Slots", [
+        h.p([a.class("text-muted-foreground text-sm")], [
+          element.text(
+            "before/after take arbitrary children lists (not just one icon). "
+            <> "icon_start/icon_end are single-element shortcuts. loading/loaded "
+            <> "are just an element placed in a slot.",
+          ),
+        ]),
+        h.div([a.class("button-grid")], [
+          button.new()
+            |> button.before([lc.check([]), lc.check([])])
+            |> button.after([lc.circle_arrow_right([])])
+            |> button.view("Multi", Some(OnRouteChange(Home))),
+          button.new()
+            |> button.variant(button.Outline)
+            |> button.after([lc.chevron_down([])])
+            |> button.view("After only", Some(OnRouteChange(Home))),
+        ]),
+      ]),
       DocSection("sizes", "Sizes", [
         h.div([a.class("button-grid")], [
-          button.new() |> button.view("Large", None),
           button.new()
             |> button.size(button.Small)
             |> button.view("Small", None),
+          button.new() |> button.view("Medium (default)", None),
+          button.new()
+            |> button.size(button.Large)
+            |> button.view("Large", None),
         ]),
       ]),
       DocSection("loading", "Loading", [

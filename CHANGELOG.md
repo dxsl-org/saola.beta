@@ -12,12 +12,14 @@ Full per-batch history lives in [`docs/project-changelog.md`](docs/project-chang
 - **Button styling guide** — the button preview page (a "Customizing Styles" section) and the `saola/button` module docs now spell out the three CSS customization layers: theme tokens (`--color-*`/`--radius-*`), per-widget override (unlayered rules beat `@layer saola.*` without `!important`), and `add_class` for one-offs. Clarifies that `@generated` only forbids editing the sliced `src/saola/*.css`, not customizing from your own stylesheet.
 - **Button shortcut symmetry** — `button_link` (Link-variant `<button>`), `button_destructive_anchor` and `button_link_anchor` complete full 6-variant coverage across both the `<button>` and `<a href>` shortcut families.
 - **Button custom accent** — `accent(Accent(bg, fg))` recolors the solid look by overriding the `--color-primary` pair inline, reusing Basecoat's background/hover/focus machinery with no parallel CSS. Values accept any CSS color or a theme token (`var(--chart-2)`), keeping custom colors theme-coherent. The sanctioned "near two-axis" mechanism (variant × color) — documented as a reusable widget technique in `docs/code-standards.md` §3c.
+- **Button children slots** — `before`/`after` take arbitrary children lists (an icon, a badge, several elements), generalizing the single-icon `icon_start`/`icon_end` (now thin shortcuts over them). The "loaded"/success look is just a check element placed in a slot — no dedicated state — so the loading → loaded → idle transition is consumer-driven via slots + Basecoat's `transition: all`.
 
 ### Fixed
 
 - **Icon-only buttons use the square Basecoat class** — an empty label with an icon (or loading spinner) now emits `btn-{sm,lg}-icon-{variant}` instead of the text-padded `btn-{sm,lg}-{variant}`, so `button_close` and other icon-only buttons render as proper squares rather than mis-shapen narrow buttons.
 - **Disabled/loading anchors are genuinely inert** — `view_anchor` now omits `href` while `disabled`/`loading` (keeping `aria-disabled` + `tabindex="-1"`). Previously the link kept its `href` and stayed mouse-clickable since `aria-disabled` is advisory only.
 - **Loading & aria-disabled states are visually dimmed** — buttons/anchors using `aria-busy`/`aria-disabled` (loading buttons, disabled anchors) now get `opacity: 50%` + `pointer-events: none`, mirroring Basecoat's native `:disabled` visual that those aria-state elements never matched.
+- **Underline follows the `link` variant, not the element** — a button-styled `<a href>` no longer shows the browser's default anchor underline, and the `link` variant reads as a hyperlink (underline) on any element, `<button>` or `<a>`. Underline is a property of the variant, never of the rendered tag.
 
 ### Changed
 
@@ -25,6 +27,8 @@ Full per-batch history lives in [`docs/project-changelog.md`](docs/project-chang
 - Demo loads CSS via `dev/dev-widgets.css` (generated aggregate) + slimmed `assets/app.css`; `assets/basecoat.css` is now pipeline input only.
 - All 50 widget modules now use `list.flatten` for conditional attribute assembly instead of `a.none()` sentinels — eliminates trailing spaces in generated `class` attributes (e.g. `class="btn    "` → `class="btn"`).
 - **Button API redesign** — one public `ButtonConfig` record consumed through two styles: builder pipes (`button.new() |> button.variant(..) |> button.view(label, Some(msg))`) and record update (`ButtonConfig(..button.default_config(), loading: True)`). Render-as is type-safe via terminals: `view` → `<button>` (requires `Option(msg)`), `view_anchor` → `<a>` (requires `href`). New options: `loading` (spinner + `aria-busy`, stays in the a11y tree via `aria-disabled`), `icon_start`/`icon_end`, `add_class` (append-only). Anchor shortcuts (`button_primary_anchor` etc.) render navigation URLs with full button styling.
+- **Button default size is now `Medium`** (was `Large`) — `ButtonSize` gains `Medium`, mapping to Basecoat's `btn-{variant}` (no size segment). **Breaking:** `new()` and every shortcut now emit `btn-{variant}` instead of `btn-lg-{variant}`; pass `size(Large)` to restore the previous look.
+- **Button `view` defaults to `type="button"`** — a `<button>` with no `type` is `type="submit"` per HTML and would submit its enclosing `<form>`; `view` now forces `type="button"` unless `type_` is `Submit`/`Reset`. (`view_anchor` is unaffected — anchors have no `type`.)
 
 ### Removed
 
