@@ -1,4 +1,3 @@
-import gleam/option
 import lustre/attribute as a
 import lustre/element.{type Element, text}
 import lustre/element/html as h
@@ -13,38 +12,27 @@ pub fn view(model: Model) -> Element(Message) {
       h.div([a.class("mt-4")], [
         button.button_primary("Open Dialog", OpenDialog),
       ]),
-      dialog.dialog(
-        is_open: model.is_dialog_open,
-        attrs: dialog.DialogAttrs(
-          title: "Are you sure?",
-          description: "This action cannot be undone. This will permanently delete your account and remove your data from our servers.",
-          content: [],
-          footer: option.Some(
-            h.div([a.class("flex gap-2")], [
-              button.button_secondary("Cancel", CloseDialog),
-              button.button_primary("Continue", CloseDialog),
-            ]),
-          ),
-          show_close_button: True,
-          on_close: CloseDialog,
-        ),
-      ),
+      dialog.new()
+        |> dialog.description(
+          "This action cannot be undone. This will permanently delete your account and remove your data from our servers.",
+        )
+        |> dialog.footer(
+          h.div([a.class("flex gap-2")], [
+            button.button_secondary("Cancel", CloseDialog),
+            button.button_primary("Continue", CloseDialog),
+          ]),
+        )
+        |> dialog.view(model.is_dialog_open, "Are you sure?", [], CloseDialog),
     ]),
     DocSection("usage", "Usage", [
       doc_page.snippet([
         "import saola/dialog",
         "",
         "// model.is_dialog_open : Bool",
-        "dialog.dialog(",
-        "  is_open: model.is_dialog_open,",
-        "  attrs: dialog.DialogAttrs(",
-        "    title: \"Are you sure?\",",
-        "    description: \"This cannot be undone.\",",
-        "    content: [], footer: option.None,",
-        "    show_close_button: True,",
-        "    on_close: CloseDialog,",
-        "  ),",
-        ")",
+        "dialog.new()",
+        "|> dialog.description(\"This cannot be undone.\")",
+        "|> dialog.footer(confirm_row)",
+        "|> dialog.view(model.is_dialog_open, \"Are you sure?\", [], CloseDialog)",
       ]),
     ]),
   ])

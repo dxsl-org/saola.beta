@@ -495,45 +495,26 @@ pub fn drawer_open_renders_content_test() {
 
 pub fn drawer_bottom_has_handle_test() {
   let html =
-    drawer.drawer(
-      True,
-      "Bottom",
-      None,
-      h.text(""),
-      None,
-      fn() { Nil },
-      drawer.DrawerAttrs(side: drawer.Bottom, class: ""),
-    )
+    drawer.new()
+    |> drawer.view(True, "Bottom", h.text(""), fn() { Nil })
     |> element.to_string
   assert string.contains(html, "drawer-handle")
 }
 
 pub fn drawer_left_no_handle_test() {
   let html =
-    drawer.drawer(
-      True,
-      "Left",
-      None,
-      h.text(""),
-      None,
-      fn() { Nil },
-      drawer.DrawerAttrs(side: drawer.Left, class: ""),
-    )
+    drawer.new()
+    |> drawer.side(drawer.Left)
+    |> drawer.view(True, "Left", h.text(""), fn() { Nil })
     |> element.to_string
   assert !string.contains(html, "drawer-handle")
 }
 
 pub fn drawer_top_has_handle_test() {
   let html =
-    drawer.drawer(
-      True,
-      "Top",
-      None,
-      h.text(""),
-      None,
-      fn() { Nil },
-      drawer.DrawerAttrs(side: drawer.Top, class: ""),
-    )
+    drawer.new()
+    |> drawer.side(drawer.Top)
+    |> drawer.view(True, "Top", h.text(""), fn() { Nil })
     |> element.to_string
   assert string.contains(html, "drawer-handle")
 }
@@ -547,15 +528,9 @@ pub fn drawer_side_class_bottom_test() {
 
 pub fn drawer_description_renders_test() {
   let html =
-    drawer.drawer(
-      True,
-      "Title",
-      Some("A helpful description"),
-      h.text(""),
-      None,
-      fn() { Nil },
-      drawer.default_attrs,
-    )
+    drawer.new()
+    |> drawer.description("A helpful description")
+    |> drawer.view(True, "Title", h.text(""), fn() { Nil })
     |> element.to_string
   assert string.contains(html, "drawer-description")
   assert string.contains(html, "A helpful description")
@@ -563,30 +538,17 @@ pub fn drawer_description_renders_test() {
 
 pub fn drawer_no_description_when_none_test() {
   let html =
-    drawer.drawer(
-      True,
-      "Title",
-      None,
-      h.text(""),
-      None,
-      fn() { Nil },
-      drawer.default_attrs,
-    )
+    drawer.new()
+    |> drawer.view(True, "Title", h.text(""), fn() { Nil })
     |> element.to_string
   assert !string.contains(html, "drawer-description")
 }
 
 pub fn drawer_footer_renders_test() {
   let html =
-    drawer.drawer(
-      True,
-      "Title",
-      None,
-      h.text(""),
-      Some(h.div([], [h.text("footer content")])),
-      fn() { Nil },
-      drawer.default_attrs,
-    )
+    drawer.new()
+    |> drawer.footer(h.div([], [h.text("footer content")]))
+    |> drawer.view(True, "Title", h.text(""), fn() { Nil })
     |> element.to_string
   assert string.contains(html, "drawer-footer")
   assert string.contains(html, "footer content")

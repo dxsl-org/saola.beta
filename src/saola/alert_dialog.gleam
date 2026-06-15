@@ -1,29 +1,67 @@
+//// Alert dialog (confirm/cancel) widget — dual-style `Config` (uniform pattern):
+////
+//// ```gleam
+//// alert_dialog.alert_dialog_simple(model.open, "Delete?", "Permanent.", Yes, No)  // shortcut
+//// alert_dialog.new()
+//// |> alert_dialog.confirm_label("Delete")
+//// |> alert_dialog.cancel_label("Keep")
+//// |> alert_dialog.view(model.open, "Delete?", "This is permanent.", Yes, No)
+//// ```
+
 import gleam/list
 import lustre/attribute as a
 import lustre/element.{type Element}
 import lustre/element/html as h
 import lustre/event as e
 
-pub type AlertDialogAttrs {
-  AlertDialogAttrs(class: String)
+/// Presentation options for an alert dialog. Public for record-update syntax.
+/// The `open`/`title`/`description`/`on_confirm`/`on_cancel` are required (`view`).
+pub type AlertDialogConfig {
+  AlertDialogConfig(confirm_label: String, cancel_label: String, class: String)
 }
 
-pub const default_attrs = AlertDialogAttrs(class: "")
+/// Builder entry point. Defaults: "Confirm"/"Cancel" labels, no extra class.
+pub fn new() -> AlertDialogConfig {
+  AlertDialogConfig(confirm_label: "Confirm", cancel_label: "Cancel", class: "")
+}
 
-pub fn alert_dialog(
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> AlertDialogConfig {
+  new()
+}
+
+/// Set the confirm button label (default "Confirm").
+pub fn confirm_label(config: AlertDialogConfig, label: String) -> AlertDialogConfig {
+  AlertDialogConfig(..config, confirm_label: label)
+}
+
+/// Set the cancel button label (default "Cancel").
+pub fn cancel_label(config: AlertDialogConfig, label: String) -> AlertDialogConfig {
+  AlertDialogConfig(..config, cancel_label: label)
+}
+
+/// Append an extra CSS class on the dialog. Additive only.
+pub fn add_class(config: AlertDialogConfig, class: String) -> AlertDialogConfig {
+  let merged = case config.class {
+    "" -> class
+    existing -> existing <> " " <> class
+  }
+  AlertDialogConfig(..config, class: merged)
+}
+
+/// Render the alert dialog (renders nothing while `open` is False).
+pub fn view(
+  config: AlertDialogConfig,
   open: Bool,
   title: String,
   description: String,
-  confirm_label: String,
-  cancel_label: String,
   on_confirm: msg,
   on_cancel: msg,
-  attrs: AlertDialogAttrs,
 ) -> Element(msg) {
   case open {
     False -> h.text("")
     True -> {
-      let extra_class_attrs = case attrs.class {
+      let extra_class_attrs = case config.class {
         "" -> []
         c -> [a.class(c)]
       }
@@ -52,7 +90,7 @@ pub fn alert_dialog(
                   a.class("btn btn-outline"),
                   e.on_click(on_cancel),
                 ],
-                [h.text(cancel_label)],
+                [h.text(config.cancel_label)],
               ),
               h.button(
                 [
@@ -60,7 +98,7 @@ pub fn alert_dialog(
                   a.class("btn btn-primary"),
                   e.on_click(on_confirm),
                 ],
-                [h.text(confirm_label)],
+                [h.text(config.confirm_label)],
               ),
             ]),
           ]),
@@ -70,6 +108,8 @@ pub fn alert_dialog(
   }
 }
 
+// --- Convenience shortcuts ---
+
 pub fn alert_dialog_simple(
   open: Bool,
   title: String,
@@ -77,14 +117,5 @@ pub fn alert_dialog_simple(
   on_confirm: msg,
   on_cancel: msg,
 ) -> Element(msg) {
-  alert_dialog(
-    open,
-    title,
-    description,
-    "Confirm",
-    "Cancel",
-    on_confirm,
-    on_cancel,
-    default_attrs,
-  )
+  new() |> view(open, title, description, on_confirm, on_cancel)
 }

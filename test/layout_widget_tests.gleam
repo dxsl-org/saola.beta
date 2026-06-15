@@ -1,5 +1,4 @@
 import gleam/list
-import gleam/option.{None, Some}
 import gleam/string
 import lustre/element
 import lustre/element/html as h
@@ -79,17 +78,10 @@ pub fn tabs_inactive_panel_hidden_test() {
 
 pub fn dialog_open_renders_test() {
   let html =
-    dialog.dialog(
-      is_open: True,
-      attrs: dialog.DialogAttrs(
-        title: "Confirm",
-        description: "Are you sure?",
-        content: [],
-        footer: None,
-        show_close_button: False,
-        on_close: Nil,
-      ),
-    )
+    dialog.new()
+    |> dialog.description("Are you sure?")
+    |> dialog.show_close_button(False)
+    |> dialog.view(True, "Confirm", [], Nil)
     |> element.to_string
   assert string.contains(html, "<dialog")
   assert string.contains(html, "open")
@@ -101,17 +93,9 @@ pub fn dialog_open_renders_test() {
 
 pub fn dialog_closed_has_no_open_attr_test() {
   let html =
-    dialog.dialog(
-      is_open: False,
-      attrs: dialog.DialogAttrs(
-        title: "Info",
-        description: "",
-        content: [],
-        footer: None,
-        show_close_button: False,
-        on_close: Nil,
-      ),
-    )
+    dialog.new()
+    |> dialog.show_close_button(False)
+    |> dialog.view(False, "Info", [], Nil)
     |> element.to_string
   assert !string.contains(html, " open")
 }
@@ -119,17 +103,10 @@ pub fn dialog_closed_has_no_open_attr_test() {
 pub fn dialog_with_footer_renders_test() {
   let footer = button.button_primary("OK", Nil)
   let html =
-    dialog.dialog(
-      is_open: True,
-      attrs: dialog.DialogAttrs(
-        title: "Warning",
-        description: "",
-        content: [],
-        footer: Some(footer),
-        show_close_button: False,
-        on_close: Nil,
-      ),
-    )
+    dialog.new()
+    |> dialog.footer(footer)
+    |> dialog.show_close_button(False)
+    |> dialog.view(True, "Warning", [], Nil)
     |> element.to_string
   assert string.contains(html, "<footer")
   assert string.contains(html, "OK")

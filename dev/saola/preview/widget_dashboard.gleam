@@ -158,21 +158,20 @@ pub fn view(model: Model) -> Element(Message) {
             ]),
           ]),
           // ---- Row detail drawer -------------------------------------------------
-          drawer.drawer(
-            model.dash_drawer_open,
-            case selected_employee {
-              None -> "Employee Details"
-              Some(emp) -> emp.name
-            },
-            None,
-            case selected_employee {
-              None -> h.text("")
-              Some(emp) -> employee_detail(emp)
-            },
-            None,
-            fn() { DashDrawerClosed },
-            drawer.DrawerAttrs(side: drawer.Right, class: ""),
-          ),
+          drawer.new()
+            |> drawer.side(drawer.Right)
+            |> drawer.view(
+              model.dash_drawer_open,
+              case selected_employee {
+                None -> "Employee Details"
+                Some(emp) -> emp.name
+              },
+              case selected_employee {
+                None -> h.text("")
+                Some(emp) -> employee_detail(emp)
+              },
+              fn() { DashDrawerClosed },
+            ),
         ]),
       ]),
     ],

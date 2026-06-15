@@ -1,3 +1,14 @@
+//// Dialog (modal) widget — dual-style `Config` (uniform Saola pattern):
+////
+//// ```gleam
+//// dialog.dialog_simple(model.open, "Delete?", [body], CloseDialog)   // shortcut
+//// dialog.new()
+//// |> dialog.description("This cannot be undone.")
+//// |> dialog.footer(confirm_row)
+//// |> dialog.view(model.open, "Are you sure?", [], CloseDialog)
+//// ```
+//// Uses the native `<dialog open>` element; the consumer owns `is_open`.
+
 import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/result
@@ -7,52 +18,65 @@ import lustre/element/html as h
 import saola/button
 import typeid
 
-/// Configuration for the dialog widget.
-pub type DialogAttrs(msg) {
-  DialogAttrs(
-    title: String,
+/// Presentation options for a dialog. Public for record-update syntax. The
+/// `is_open`/`title`/`content`/`on_close` are the required data (`view`).
+pub type DialogConfig(msg) {
+  DialogConfig(
     description: String,
-    content: List(Element(msg)),
     footer: Option(Element(msg)),
     show_close_button: Bool,
-    on_close: msg,
+    class: String,
   )
 }
 
-/// Render a dialog modal.
-///
-/// Uses the native `<dialog>` element with `open` attribute.
-/// The `::backdrop` overlay is provided by the browser.
-///
-/// NOTE: `is_open` controls visibility. The consumer must dispatch a message
-/// to set `is_open = False` when the dialog should close.
-///
-/// Example:
-/// ```gleam
-/// dialog(
-///   is_open: model.dialog_open,
-///   attrs: DialogAttrs(
-///     title: "Are you sure?",
-///     description: "This action cannot be undone.",
-///     content: [],
-///     footer: Some(h.div([], [button.button_primary("Confirm", UserConfirmed)])),
-///     show_close_button: True,
-///     on_close: CloseDialog,
-///   ),
-/// )
-/// ```
-pub fn dialog(
-  is_open is_open: Bool,
-  attrs attrs: DialogAttrs(msg),
+/// Builder entry point. Defaults: no description/footer, close button shown.
+pub fn new() -> DialogConfig(msg) {
+  DialogConfig(
+    description: "",
+    footer: None,
+    show_close_button: True,
+    class: "",
+  )
+}
+
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> DialogConfig(msg) {
+  new()
+}
+
+/// Set the header description (omitted when empty).
+pub fn description(config: DialogConfig(msg), description: String) -> DialogConfig(msg) {
+  DialogConfig(..config, description: description)
+}
+
+/// Set the footer element.
+pub fn footer(config: DialogConfig(msg), footer: Element(msg)) -> DialogConfig(msg) {
+  DialogConfig(..config, footer: Some(footer))
+}
+
+/// Toggle the top-right close button (default shown).
+pub fn show_close_button(config: DialogConfig(msg), show: Bool) -> DialogConfig(msg) {
+  DialogConfig(..config, show_close_button: show)
+}
+
+/// Append an extra CSS class on the dialog. Additive only.
+pub fn add_class(config: DialogConfig(msg), class: String) -> DialogConfig(msg) {
+  let merged = case config.class {
+    "" -> class
+    existing -> existing <> " " <> class
+  }
+  DialogConfig(..config, class: merged)
+}
+
+/// Render the dialog. `is_open` controls visibility (consumer-owned); the close
+/// button (when shown) dispatches `on_close`.
+pub fn view(
+  config: DialogConfig(msg),
+  is_open: Bool,
+  title: String,
+  content: List(Element(msg)),
+  on_close: msg,
 ) -> Element(msg) {
-  let DialogAttrs(
-    title:,
-    description:,
-    content:,
-    footer:,
-    show_close_button:,
-    on_close:,
-  ) = attrs
   let title_id =
     typeid.new(prefix: "dlg")
     |> result.map(typeid.to_string)
@@ -65,18 +89,22 @@ pub fn dialog(
     "" -> []
     _ -> [a.aria_labelledby(title_id)]
   }
-  let close_btn = case show_close_button {
+  let class_attrs = case config.class {
+    "" -> []
+    c -> [a.class(c)]
+  }
+  let close_btn = case config.show_close_button {
     False -> element.none()
     True -> button.button_close(on_close)
   }
-  let header_el = case title, description {
+  let header_el = case title, config.description {
     "", "" -> element.none()
     _, _ -> {
       let title_el = case title {
         "" -> element.none()
         t -> h.h2([a.id(title_id)], [h.text(t)])
       }
-      let desc_el = case description {
+      let desc_el = case config.description {
         "" -> element.none()
         d -> h.p([], [h.text(d)])
       }
@@ -87,14 +115,23 @@ pub fn dialog(
     [] -> element.none()
     children -> h.section([], children)
   }
-  let footer_el = case footer {
+  let footer_el = case config.footer {
     None -> element.none()
     Some(f) -> h.footer([], [f])
   }
-  h.dialog(list.flatten([[a.class("dialog")], open_attrs, [a.aria_modal(True)], labelledby_attrs]), [
-    h.div([], [close_btn, header_el, content_el, footer_el]),
-  ])
+  h.dialog(
+    list.flatten([
+      [a.class("dialog")],
+      class_attrs,
+      open_attrs,
+      [a.aria_modal(True)],
+      labelledby_attrs,
+    ]),
+    [h.div([], [close_btn, header_el, content_el, footer_el])],
+  )
 }
+
+// --- Convenience shortcuts ---
 
 /// Simple dialog with title, content, and a close button.
 pub fn dialog_simple(
@@ -103,15 +140,5 @@ pub fn dialog_simple(
   content content: List(Element(msg)),
   on_close on_close: msg,
 ) -> Element(msg) {
-  dialog(
-    is_open: is_open,
-    attrs: DialogAttrs(
-      title: title,
-      description: "",
-      content: content,
-      footer: None,
-      show_close_button: True,
-      on_close: on_close,
-    ),
-  )
+  new() |> view(is_open, title, content, on_close)
 }

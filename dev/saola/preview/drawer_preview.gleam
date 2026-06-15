@@ -1,4 +1,3 @@
-import gleam/option.{Some}
 import lustre/attribute as a
 import lustre/element.{type Element, text}
 import lustre/element/html as h
@@ -36,16 +35,9 @@ pub fn view(model: Model) -> Element(Message) {
           ]),
           h.div([a.class("grid gap-4")], [
             h.h2([], [text("With description and footer")]),
-            drawer.drawer(
-              False,
-              "Edit Profile",
-              Some("Make changes to your profile here."),
-              h.div([], [
-                h.p([a.class("text-sm text-muted")], [
-                  text("Profile form goes here."),
-                ]),
-              ]),
-              Some(
+            drawer.new()
+              |> drawer.description("Make changes to your profile here.")
+              |> drawer.footer(
                 h.div([a.class("flex gap-2")], [
                   h.button([a.type_("button"), a.class("btn btn-outline")], [
                     text("Cancel"),
@@ -54,17 +46,23 @@ pub fn view(model: Model) -> Element(Message) {
                     text("Save"),
                   ]),
                 ]),
+              )
+              |> drawer.view(
+                False,
+                "Edit Profile",
+                h.div([], [
+                  h.p([a.class("text-sm text-muted")], [
+                    text("Profile form goes here."),
+                  ]),
+                ]),
+                fn() { DrawerClosed },
               ),
-              fn() { DrawerClosed },
-              drawer.default_attrs,
-            ),
           ]),
         ]),
       ]),
       DocSection("usage", "Usage", [
         doc_page.snippet([
           "import saola/drawer",
-          "import gleam/option.{Some}",
           "",
           "// model.drawer_open : Bool",
           "drawer.drawer_simple(",
@@ -73,6 +71,12 @@ pub fn view(model: Model) -> Element(Message) {
           "  h.div([], [text(\"Content\")]),",
           "  fn() { DrawerClosed },",
           ")",
+          "",
+          "// With options",
+          "drawer.new()",
+          "|> drawer.description(\"Make changes here.\")",
+          "|> drawer.footer(footer_el)",
+          "|> drawer.view(model.drawer_open, \"Edit Profile\", body, fn() { DrawerClosed })",
         ]),
       ]),
     ],

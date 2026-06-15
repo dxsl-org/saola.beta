@@ -359,13 +359,9 @@ pub fn sheet_open_renders_content_test() {
 
 pub fn sheet_side_class_test() {
   let html =
-    sheet.sheet(
-      True,
-      "Left",
-      h.text(""),
-      fn() { Nil },
-      sheet.SheetAttrs(side: sheet.Left, class: ""),
-    )
+    sheet.new()
+    |> sheet.side(sheet.Left)
+    |> sheet.view(True, "Left", h.text(""), fn() { Nil })
     |> element.to_string
   assert string.contains(html, "sheet-left")
 }
