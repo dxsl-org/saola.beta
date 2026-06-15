@@ -22,17 +22,13 @@ pub fn view() -> Element(Message) {
           ]),
           h.div([a.class("grid gap-4")], [
             h.h2([], [h.text("Custom separator")]),
-            breadcrumb.breadcrumb(
-              [
+            breadcrumb.new()
+              |> breadcrumb.separator(">")
+              |> breadcrumb.view([
                 breadcrumb.BreadcrumbLink("Docs", "/docs"),
                 breadcrumb.BreadcrumbLink("API", "/docs/api"),
                 breadcrumb.BreadcrumbPage("Breadcrumb"),
-              ],
-              breadcrumb.BreadcrumbAttrs(
-                ..breadcrumb.default_attrs,
-                separator: ">",
-              ),
-            ),
+              ]),
           ]),
         ]),
       ]),

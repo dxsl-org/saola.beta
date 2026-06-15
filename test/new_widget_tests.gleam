@@ -228,13 +228,19 @@ pub fn avatar_image_renders_test() {
 
 pub fn avatar_sizes_render_test() {
   let sm =
-    avatar.avatar(avatar.Initials("AB"), avatar.Small, "")
+    avatar.new()
+    |> avatar.size(avatar.Small)
+    |> avatar.view(avatar.Initials("AB"))
     |> element.to_string
   let md =
-    avatar.avatar(avatar.Initials("AB"), avatar.Medium, "")
+    avatar.new()
+    |> avatar.size(avatar.Medium)
+    |> avatar.view(avatar.Initials("AB"))
     |> element.to_string
   let lg =
-    avatar.avatar(avatar.Initials("AB"), avatar.Large, "")
+    avatar.new()
+    |> avatar.size(avatar.Large)
+    |> avatar.view(avatar.Initials("AB"))
     |> element.to_string
   assert string.contains(sm, "avatar-sm")
   assert string.contains(md, "avatar-md")
@@ -243,7 +249,9 @@ pub fn avatar_sizes_render_test() {
 
 pub fn avatar_extra_class_renders_test() {
   let html =
-    avatar.avatar(avatar.Initials("XY"), avatar.Medium, "ring-2")
+    avatar.new()
+    |> avatar.add_class("ring-2")
+    |> avatar.view(avatar.Initials("XY"))
     |> element.to_string
   assert string.contains(html, "ring-2")
 }
