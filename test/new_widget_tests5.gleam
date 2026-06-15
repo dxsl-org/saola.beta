@@ -21,17 +21,14 @@ pub fn carousel_simple_renders_test() {
 
 pub fn carousel_orientation_attr_test() {
   let html =
-    carousel.carousel(
+    carousel.new()
+    |> carousel.orientation(carousel.Vertical)
+    |> carousel.view(
       [h.div([], [h.text("S")])],
       0,
       False,
       True,
       fn(i, p, n) { #(i, p, n) },
-      carousel.CarouselAttrs(
-        orientation: carousel.Vertical,
-        loop: False,
-        class: "",
-      ),
     )
     |> element.to_string
   assert string.contains(html, "orientation=\"vertical\"")
@@ -39,17 +36,14 @@ pub fn carousel_orientation_attr_test() {
 
 pub fn carousel_loop_attr_test() {
   let html =
-    carousel.carousel(
+    carousel.new()
+    |> carousel.loop(True)
+    |> carousel.view(
       [h.div([], [h.text("S")])],
       0,
       False,
       True,
       fn(i, p, n) { #(i, p, n) },
-      carousel.CarouselAttrs(
-        orientation: carousel.Horizontal,
-        loop: True,
-        class: "",
-      ),
     )
     |> element.to_string
   assert string.contains(html, " loop")

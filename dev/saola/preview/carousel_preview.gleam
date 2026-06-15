@@ -41,20 +41,17 @@ pub fn view(model: Model) -> Element(Message) {
       ]),
       DocSection("vertical", "Vertical", [
         h.div([a.style("width", "400px; height: 250px")], [
-          carousel.carousel(
-            slides,
-            0,
-            False,
-            True,
-            fn(idx, can_prev, can_next) {
-              CarouselChanged(idx, can_prev, can_next)
-            },
-            carousel.CarouselAttrs(
-              orientation: carousel.Vertical,
-              loop: False,
-              class: "",
+          carousel.new()
+            |> carousel.orientation(carousel.Vertical)
+            |> carousel.view(
+              slides,
+              0,
+              False,
+              True,
+              fn(idx, can_prev, can_next) {
+                CarouselChanged(idx, can_prev, can_next)
+              },
             ),
-          ),
         ]),
       ]),
       DocSection("usage", "Usage", [

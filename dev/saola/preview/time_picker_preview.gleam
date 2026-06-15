@@ -27,40 +27,23 @@ pub fn view(model: Model) -> Element(Message) {
       ]),
       DocSection("12-hour", "12-hour format", [
         h.div([a.class("grid gap-4 mt-4")], [
-          time_picker.time_picker(
-            model.time_picker_value,
-            time_picker.TwelveHour,
-            TimePickerChanged,
-            time_picker.default_attrs,
-          ),
+          time_picker.new()
+            |> time_picker.format(time_picker.TwelveHour)
+            |> time_picker.view(model.time_picker_value, TimePickerChanged),
         ]),
       ]),
       DocSection("with-seconds", "With seconds", [
         h.div([a.class("grid gap-4 mt-4")], [
-          time_picker.time_picker(
-            model.time_picker_value,
-            time_picker.TwentyFourHour,
-            TimePickerChanged,
-            time_picker.TimePickerAttrs(
-              show_seconds: True,
-              disabled: False,
-              class: "",
-            ),
-          ),
+          time_picker.new()
+            |> time_picker.show_seconds(True)
+            |> time_picker.view(model.time_picker_value, TimePickerChanged),
         ]),
       ]),
       DocSection("disabled", "Disabled", [
         h.div([a.class("grid gap-4 mt-4")], [
-          time_picker.time_picker(
-            None,
-            time_picker.TwentyFourHour,
-            TimePickerChanged,
-            time_picker.TimePickerAttrs(
-              show_seconds: False,
-              disabled: True,
-              class: "",
-            ),
-          ),
+          time_picker.new()
+            |> time_picker.disabled(True)
+            |> time_picker.view(None, TimePickerChanged),
           h.div([a.class("mt-4")], [
             h.p([a.class("text-muted-foreground text-sm")], [
               text("Current value: " <> display_value),
@@ -76,10 +59,9 @@ pub fn view(model: Model) -> Element(Message) {
           "time_picker.time_picker_simple(model.time_picker_value, TimePickerChanged)",
           "",
           "// With seconds",
-          "time_picker.time_picker(",
-          "  model.time_picker_value, time_picker.TwentyFourHour, TimePickerChanged,",
-          "  time_picker.TimePickerAttrs(show_seconds: True, disabled: False, class: \"\"),",
-          ")",
+          "time_picker.new()",
+          "|> time_picker.show_seconds(True)",
+          "|> time_picker.view(model.time_picker_value, TimePickerChanged)",
         ]),
       ]),
     ],

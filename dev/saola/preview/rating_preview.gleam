@@ -27,12 +27,9 @@ pub fn view(model: Model) -> Element(Message) {
       ]),
       DocSection("custom-max", "Custom max (10 stars)", [
         h.div([a.class("grid gap-4 mt-4")], [
-          rating.rating(
-            model.rating_value,
-            rating.Interactive,
-            Some(RatingChanged),
-            rating.RatingAttrs(max: 10, class: "", aria_label: "Rating"),
-          ),
+          rating.new()
+            |> rating.max(10)
+            |> rating.view(model.rating_value, rating.Interactive, Some(RatingChanged)),
           h.p([a.class("text-muted-foreground text-sm")], [
             text("Current value: " <> int.to_string(model.rating_value)),
           ]),
@@ -49,10 +46,9 @@ pub fn view(model: Model) -> Element(Message) {
           "rating.rating_interactive(model.rating_value, RatingChanged)",
           "",
           "// Custom max",
-          "rating.rating(",
-          "  model.rating_value, rating.Interactive, Some(RatingChanged),",
-          "  rating.RatingAttrs(max: 10, class: \"\", aria_label: \"Rating\"),",
-          ")",
+          "rating.new()",
+          "|> rating.max(10)",
+          "|> rating.view(model.rating_value, rating.Interactive, Some(RatingChanged))",
         ]),
       ]),
     ],

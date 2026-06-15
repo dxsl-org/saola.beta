@@ -1,3 +1,13 @@
+//// Time picker widget (native selects) — dual-style `Config` (uniform pattern):
+////
+//// ```gleam
+//// time_picker.time_picker_simple(model.time, TimeChanged)           // shortcut (24h)
+//// time_picker.new()
+//// |> time_picker.format(time_picker.TwelveHour)
+//// |> time_picker.show_seconds(True)
+//// |> time_picker.view(model.time, TimeChanged)
+//// ```
+
 import gleam/int
 import gleam/list
 import gleam/option.{type Option, None, Some}
@@ -16,36 +26,75 @@ pub type TimeValue {
   TimeValue(hour: Int, minute: Int, second: Option(Int))
 }
 
-pub type TimePickerAttrs {
-  TimePickerAttrs(show_seconds: Bool, disabled: Bool, class: String)
+/// Presentation options for a time picker. Public for record-update syntax. The
+/// `value` and `on_change` are the required data, passed to `view`.
+pub type TimePickerConfig {
+  TimePickerConfig(
+    format: TimePickerFormat,
+    show_seconds: Bool,
+    disabled: Bool,
+    class: String,
+  )
 }
 
-pub const default_attrs = TimePickerAttrs(
-  show_seconds: False,
-  disabled: False,
-  class: "",
-)
+/// Builder entry point. Defaults: 24-hour, no seconds, enabled, no class.
+pub fn new() -> TimePickerConfig {
+  TimePickerConfig(
+    format: TwentyFourHour,
+    show_seconds: False,
+    disabled: False,
+    class: "",
+  )
+}
 
-/// Time picker using three native selects (hour, minute, optional second).
-pub fn time_picker(
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> TimePickerConfig {
+  new()
+}
+
+/// Set the hour format (TwelveHour, TwentyFourHour — default).
+pub fn format(config: TimePickerConfig, format: TimePickerFormat) -> TimePickerConfig {
+  TimePickerConfig(..config, format: format)
+}
+
+/// Show a seconds select (default off).
+pub fn show_seconds(config: TimePickerConfig, show: Bool) -> TimePickerConfig {
+  TimePickerConfig(..config, show_seconds: show)
+}
+
+/// Set the disabled state.
+pub fn disabled(config: TimePickerConfig, disabled: Bool) -> TimePickerConfig {
+  TimePickerConfig(..config, disabled: disabled)
+}
+
+/// Append an extra CSS class on the root. Additive only.
+pub fn add_class(config: TimePickerConfig, class: String) -> TimePickerConfig {
+  let merged = case config.class {
+    "" -> class
+    existing -> existing <> " " <> class
+  }
+  TimePickerConfig(..config, class: merged)
+}
+
+/// Render the time picker (hour, minute, optional second selects).
+pub fn view(
+  config: TimePickerConfig,
   value: Option(TimeValue),
-  format: TimePickerFormat,
   on_change: fn(TimeValue) -> msg,
-  attrs: TimePickerAttrs,
 ) -> Element(msg) {
   let current = case value {
     None -> TimeValue(0, 0, None)
     Some(v) -> v
   }
-  let root_class = case attrs.class {
+  let root_class = case config.class {
     "" -> "time-picker"
     c -> "time-picker " <> c
   }
-  let max_hour = case format {
+  let max_hour = case config.format {
     TwelveHour -> 12
     TwentyFourHour -> 23
   }
-  let min_hour = case format {
+  let min_hour = case config.format {
     TwelveHour -> 1
     TwentyFourHour -> 0
   }
@@ -53,7 +102,7 @@ pub fn time_picker(
   let minute_opts = range(0, 59)
   let second_opts = range(0, 59)
 
-  let disabled_attrs = case attrs.disabled {
+  let disabled_attrs = case config.disabled {
     True -> [a.disabled(True)]
     False -> []
   }
@@ -116,7 +165,7 @@ pub fn time_picker(
       ),
     ])
 
-  let second_section = case attrs.show_seconds {
+  let second_section = case config.show_seconds {
     False -> []
     True -> {
       let cur_sec = case current.second {
@@ -155,19 +204,16 @@ pub fn time_picker(
     }
   }
 
-  h.div([a.class(root_class)], [
-    hour_select,
-    colon1,
-    minute_select,
-    ..second_section
-  ])
+  h.div([a.class(root_class)], [hour_select, colon1, minute_select, ..second_section])
 }
+
+// --- Convenience shortcuts ---
 
 pub fn time_picker_simple(
   value: Option(TimeValue),
   on_change: fn(TimeValue) -> msg,
 ) -> Element(msg) {
-  time_picker(value, TwentyFourHour, on_change, default_attrs)
+  new() |> view(value, on_change)
 }
 
 fn pad2(n: Int) -> String {

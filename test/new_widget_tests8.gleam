@@ -76,28 +76,17 @@ pub fn time_picker_simple_renders_hour_select_test() {
 
 pub fn time_picker_24h_has_00_option_test() {
   let html =
-    time_picker.time_picker(
-      None,
-      time_picker.TwentyFourHour,
-      fn(_) { Nil },
-      time_picker.default_attrs,
-    )
+    time_picker.new()
+    |> time_picker.view(None, fn(_) { Nil })
     |> element.to_string
   assert string.contains(html, ">00<")
 }
 
 pub fn time_picker_with_seconds_renders_second_select_test() {
   let html =
-    time_picker.time_picker(
-      None,
-      time_picker.TwentyFourHour,
-      fn(_) { Nil },
-      time_picker.TimePickerAttrs(
-        show_seconds: True,
-        disabled: False,
-        class: "",
-      ),
-    )
+    time_picker.new()
+    |> time_picker.show_seconds(True)
+    |> time_picker.view(None, fn(_) { Nil })
     |> element.to_string
   assert string.contains(html, "aria-label=\"Second\"")
 }
