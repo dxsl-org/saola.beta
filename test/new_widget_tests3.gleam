@@ -158,13 +158,9 @@ pub fn button_group_renders_children_test() {
 
 pub fn button_group_vertical_class_test() {
   let html =
-    button_group.button_group(
-      [h.button([], [h.text("X")])],
-      button_group.ButtonGroupAttrs(
-        orientation: button_group.Vertical,
-        class: "",
-      ),
-    )
+    button_group.new()
+    |> button_group.orientation(button_group.Vertical)
+    |> button_group.view([h.button([], [h.text("X")])])
     |> element.to_string
   assert string.contains(html, "button-group-vertical")
 }
@@ -219,12 +215,9 @@ pub fn input_group_no_addons_test() {
 
 pub fn input_group_invalid_has_aria_invalid_test() {
   let html =
-    input_group.input_group(
-      None,
-      h.input([]),
-      None,
-      input_group.InputGroupAttrs(class: "", invalid: True),
-    )
+    input_group.new()
+    |> input_group.invalid(True)
+    |> input_group.view(None, h.input([]), None)
     |> element.to_string
   assert string.contains(html, "aria-invalid=\"true\"")
 }

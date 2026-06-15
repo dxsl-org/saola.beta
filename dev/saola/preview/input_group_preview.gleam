@@ -52,16 +52,17 @@ pub fn view() -> Element(Message) {
       ]),
       DocSection("invalid-state", "Invalid state", [
         h.div([a.class("grid gap-4 mt-4")], [
-          input_group.input_group(
-            Some(h.span([], [text("@")])),
-            h.input([
-              a.type_("text"),
-              a.class("input input-group-control"),
-              a.value("bad value"),
-            ]),
-            None,
-            input_group.InputGroupAttrs(class: "", invalid: True),
-          ),
+          input_group.new()
+            |> input_group.invalid(True)
+            |> input_group.view(
+              Some(h.span([], [text("@")])),
+              h.input([
+                a.type_("text"),
+                a.class("input input-group-control"),
+                a.value("bad value"),
+              ]),
+              None,
+            ),
         ]),
       ]),
       DocSection("usage", "Usage", [

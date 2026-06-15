@@ -1,3 +1,12 @@
+//// Accordion widget — dual-style `Config` (uniform Saola pattern):
+////
+//// ```gleam
+//// accordion.accordion_simple(items: items, open_ids: open, on_toggle: Toggle)  // shortcut
+//// accordion.new()
+//// |> accordion.add_class("my-accordion")
+//// |> accordion.view(items, model.open_sections, ToggleSection)
+//// ```
+
 import gleam/list
 import lustre/attribute as a
 import lustre/element.{type Element}
@@ -9,11 +18,30 @@ pub type AccordionItem(msg) {
   AccordionItem(id: String, title: String, content: Element(msg))
 }
 
-pub type AccordionAttrs {
-  AccordionAttrs(class: String)
+/// Presentation options for an accordion. Public for record-update syntax. The
+/// `items`, `open_ids`, and `on_toggle` are the required data (`view`).
+pub type AccordionConfig {
+  AccordionConfig(class: String)
 }
 
-pub const default_attrs = AccordionAttrs(class: "")
+/// Builder entry point. Default: no extra class.
+pub fn new() -> AccordionConfig {
+  AccordionConfig(class: "")
+}
+
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> AccordionConfig {
+  new()
+}
+
+/// Append an extra CSS class on the root. Additive only.
+pub fn add_class(config: AccordionConfig, class: String) -> AccordionConfig {
+  let merged = case config.class {
+    "" -> class
+    existing -> existing <> " " <> class
+  }
+  AccordionConfig(class: merged)
+}
 
 fn render_item(
   item: AccordionItem(msg),
@@ -47,27 +75,15 @@ fn render_item(
   ])
 }
 
-/// Render an accordion. `open_ids` is the list of currently open item IDs.
-/// `on_toggle` is called with the item ID when a trigger is clicked.
-///
-/// Example:
-/// ```gleam
-/// accordion_simple(
-///   items: [
-///     AccordionItem("q1", "What is Saola?", h.p([], [h.text("A UI library.")])),
-///     AccordionItem("q2", "How to install?", h.p([], [h.text("gleam add saola")])),
-///   ],
-///   open_ids: model.open_sections,
-///   on_toggle: ToggleSection,
-/// )
-/// ```
-pub fn accordion(
-  items items: List(AccordionItem(msg)),
-  open_ids open_ids: List(String),
-  on_toggle on_toggle: fn(String) -> msg,
-  attrs attrs: AccordionAttrs,
+/// Render the accordion. `open_ids` are the currently-open item IDs;
+/// `on_toggle` receives the clicked item's ID.
+pub fn view(
+  config: AccordionConfig,
+  items: List(AccordionItem(msg)),
+  open_ids: List(String),
+  on_toggle: fn(String) -> msg,
 ) -> Element(msg) {
-  let extra_class_attrs = case attrs.class {
+  let extra_class_attrs = case config.class {
     "" -> []
     c -> [a.class(c)]
   }
@@ -79,16 +95,12 @@ pub fn accordion(
   )
 }
 
-/// Simple accordion with default styling.
+// --- Convenience shortcuts ---
+
 pub fn accordion_simple(
   items items: List(AccordionItem(msg)),
   open_ids open_ids: List(String),
   on_toggle on_toggle: fn(String) -> msg,
 ) -> Element(msg) {
-  accordion(
-    items: items,
-    open_ids: open_ids,
-    on_toggle: on_toggle,
-    attrs: default_attrs,
-  )
+  new() |> view(items, open_ids, on_toggle)
 }

@@ -28,8 +28,9 @@ pub fn view() -> Element(Message) {
           ]),
           h.div([a.class("grid gap-4")], [
             h.h2([], [text("Vertical")]),
-            button_group.button_group(
-              [
+            button_group.new()
+              |> button_group.orientation(button_group.Vertical)
+              |> button_group.view([
                 h.button([a.type_("button"), a.class("btn btn-outline")], [
                   text("Top"),
                 ]),
@@ -39,12 +40,7 @@ pub fn view() -> Element(Message) {
                 h.button([a.type_("button"), a.class("btn btn-outline")], [
                   text("Bottom"),
                 ]),
-              ],
-              button_group.ButtonGroupAttrs(
-                orientation: button_group.Vertical,
-                class: "",
-              ),
-            ),
+              ]),
           ]),
           h.div([a.class("grid gap-4")], [
             h.h2([], [text("With primary button")]),
