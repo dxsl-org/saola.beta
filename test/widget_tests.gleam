@@ -72,16 +72,37 @@ pub fn alert_destructive_renders_test() {
 
 pub fn alert_full_with_title_renders_test() {
   let html =
-    alert.alert(
-      alert.Default,
-      title: "Heads up!",
-      description: "A change was made.",
-      icon: None,
-    )
+    alert.view(alert.new(), "Heads up!", "A change was made.")
     |> element.to_string
   assert string.contains(html, "Heads up!")
   assert string.contains(html, "A change was made.")
   assert string.contains(html, "<h2")
+}
+
+pub fn alert_builder_variant_icon_test() {
+  let html =
+    alert.new()
+    |> alert.variant(alert.Destructive)
+    |> alert.icon(element.text("ICON"))
+    |> alert.view("Error", "Boom")
+    |> element.to_string
+  assert string.contains(html, "alert-destructive")
+  assert string.contains(html, "ICON")
+  assert string.contains(html, "Error")
+}
+
+pub fn kbd_builder_add_class_test() {
+  let html =
+    kbd.new() |> kbd.add_class("ml-1") |> kbd.view("⌘K") |> element.to_string
+  assert string.contains(html, "class=\"kbd ml-1\"")
+  assert string.contains(html, "⌘K")
+}
+
+pub fn label_builder_for_test() {
+  let html =
+    label.new() |> label.for_("email") |> label.view("Email") |> element.to_string
+  assert string.contains(html, "for=\"email\"")
+  assert string.contains(html, "Email")
 }
 
 // --- button ---
