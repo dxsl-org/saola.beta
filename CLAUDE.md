@@ -24,8 +24,8 @@ pub fn dropdown_menu(is_open: Bool, on_close: fn() -> msg, ...) -> Element(msg)
 ### 2. Full-options form + convenience shortcuts
 
 Every widget exposes:
-- A **full-options form** — flat `widget(...)` for simple widgets, or `Config` + `view` terminals for widgets with many options (see rule 8)
-- Shortcut functions for common cases (`widget_primary`, `widget_simple`, etc.)
+- A **full-options form** — the dual-style `Config` pattern (rule 8): `new()` + setters + typed `view` terminal(s). This is the **universal** form for every widget, trivial or complex — one mental model across the whole library (`widget.new() |> widget.x(..) |> widget.view(data)`).
+- Shortcut functions for common cases (`widget_primary`, `widget_simple`, etc.) — the ergonomic path, especially for trivial widgets.
 
 Shortcuts delegate to the full-options form using defaults.
 
@@ -41,29 +41,11 @@ Use `pub const default_*` for records whose fields are all scalar (String, Bool,
 
 Use `pub fn default_*() -> T` (a function) for records that contain `Element(msg)` or any polymorphic field — because `pub const` cannot hold generic types.
 
-### 4. Widget `Attrs` types — only for long parameter lists
+### 4. Widget `Attrs` types — LEGACY, migrating to `Config`
 
-Introduce a `WidgetAttrs` record type **only** when `widget` would otherwise take more parameters than is readable (roughly 4+). The sole purpose of `Attrs` is to reduce the number of positional arguments — not to add abstraction for its own sake.
+> **Standard change (uniform API):** `Attrs` records and flat positional forms are **legacy**. The target is the dual-style `Config` pattern (rule 8) for **every** widget — one mental model across the library. Do **not** add new `Attrs` types; new widgets ship as `Config` from the start, and existing `Attrs`/flat widgets are being migrated.
 
-Keep the most important parameters as direct arguments; bundle secondary or optional ones into `Attrs`. The goal is a balanced signature, not collapsing everything into one record.
-
-```gleam
-// CORRECT: two parameters, no need for a wrapper type
-pub fn spinner(size: SpinnerSize, class: String) -> Element(msg)
-
-// CORRECT: primary params stay direct, secondary ones are bundled
-pub type DialogAttrs {
-  DialogAttrs(description: String, icon: Option(Element(msg)), class: String)
-}
-pub fn dialog(open: Bool, title: String, attrs: DialogAttrs) -> Element(msg)
-
-// WRONG: wrapping everything into one record just to reduce to a single parameter
-pub fn dialog(attrs: DialogAttrs) -> Element(msg)
-```
-
-When an `Attrs` type is justified, pair it with a `pub const default_*` (or `pub fn default_*()` for generic fields) so callers can opt in to just the fields they need.
-
-When the option count keeps growing (~6+ optional fields) or the widget needs multiple render targets, upgrade from `Attrs` to the dual-style `Config` pattern (rule 8) instead of widening the positional signature.
+For historical context: `Attrs` was introduced to bundle 4+ positional params into one record. That goal is now served by `Config` (which also gives builder + record-update syntax and typed terminals). When you touch an `Attrs`/flat widget, migrate it to `Config` rather than extending the old shape.
 
 ### 5. Form inputs — InitValue / SyncValue
 
@@ -97,16 +79,9 @@ let class = case variant {
 }
 ```
 
-### 8. Widget API styles — flat for simple, dual-style `Config` for complex
+### 8. Widget API style — dual-style `Config` for EVERY widget (uniform)
 
-**Simple widgets** (few options, one render target) stay flat:
-
-```gleam
-alert(Destructive, title: "Error", description: "...", icon: some_icon)
-alert_danger(title: "Error")
-```
-
-**Complex widgets** (many optional fields, loading/icon variants, multiple render targets) use the **dual-style `Config` pattern** — one public record consumed through two equivalent syntaxes (reference implementation: `saola/button`):
+**Every widget** — trivial or complex — uses the **dual-style `Config` pattern**: one public record consumed through two equivalent syntaxes, plus shortcuts on top. This is the single mental model across the whole library; there is no per-widget "is this flat or Config?" decision to remember. Reference implementation: `saola/button`.
 
 ```gleam
 // Builder style — pipe setters
@@ -121,15 +96,37 @@ button.view(
   "Save",
   Some(SaveClicked),
 )
+
+// Shortcut — the ergonomic path (always available, esp. for trivial widgets)
+button.button_primary("Save", SaveClicked)
+```
+
+```gleam
+// Builder style — pipe setters
+button.new()
+|> button.variant(button.Outline)
+|> button.state(button.Loading)
+|> button.view("Save", "", Some(SaveClicked))
+
+// Config style — record update
+button.view(
+  button.ButtonConfig(..button.default_config(), state: button.Loading),
+  "Save",
+  "",
+  Some(SaveClicked),
+)
 ```
 
 Pattern contract:
 - One **public** (not opaque) `WidgetConfig(msg)` record — public so record-update syntax works for consumers.
 - `new()` (builder entry) and `default_config()` (record-update entry) both return the defaults; each setter is one line of record update.
-- The `Config` holds **presentation options only**. Required data and the render-target decision live in **terminal functions**: `view(config, label, on_click)` → `<button>`, `view_anchor(config, label, href)` → `<a>`. Never make `on_click`/`href` setters — terminals keep render-as type-safe and unmixable.
+- The `Config` holds **presentation options only**. Required data lives in **terminal `view(...)` parameters**, not setters (keeps required data un-defaultable and render decisions explicit).
+- **Render target**, when a widget can render as more than one element, is decided by a terminal **parameter**, not separate terminals: `button` takes an `href` string — non-empty → `<a href>`, empty → `<button>` — so conditional `<a>`-vs-`<button>` is one call. (This supersedes the earlier two-terminal `view`/`view_anchor` design.)
 - Shortcuts (rule 2) are implemented as `new() |> ... |> view(...)`.
 
-Free-floating builder chains without typed terminals (e.g. a single `view()` that guesses the element from whichever setters were called) are still banned. Existing flat widgets stay valid; migrate to `Config` only when their option count grows.
+A `view()` that infers the element from which *setters* were called is still banned — the deciding input must be an explicit terminal **parameter** (like `href`), not hidden config state.
+
+**Trivial widgets** (0–1 option, e.g. `kbd`, `separator`, `spinner`) still follow the pattern — `new()` + `view()` (+ a `class` setter if applicable) — even though the shortcut is the path consumers actually use. Uniformity is the point: the cost is authoring-time boilerplate, paid once, in exchange for zero per-widget cognitive load.
 
 ### 9. ARIA attributes — explicit, no Radix dependency
 

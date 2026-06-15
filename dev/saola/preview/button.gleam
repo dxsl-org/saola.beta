@@ -11,7 +11,7 @@ import saola/preview/view/doc_page.{DocSection}
 pub fn view() -> Element(Message) {
   doc_page.doc_page(
     "Buttons",
-    "Showcase of different button styles and sizes.",
+    "Showcase of different button styles, sizes, and states.",
     [
       DocSection("variants", "Variants", [
         h.div([a.class("button-grid")], [
@@ -20,9 +20,7 @@ pub fn view() -> Element(Message) {
           button.button_outline("Outline", OnRouteChange(Home)),
           button.button_ghost("Ghost", OnRouteChange(Home)),
           button.button_destructive("Destructive", OnRouteChange(Home)),
-          button.new()
-            |> button.variant(button.Link)
-            |> button.view("Link", Some(OnRouteChange(Home))),
+          button.button_link("Link", OnRouteChange(Home)),
         ]),
       ]),
       DocSection("with-icon", "With Icon", [
@@ -30,16 +28,15 @@ pub fn view() -> Element(Message) {
           button.new()
             |> button.variant(button.Outline)
             |> button.icon_start(lc.check([]))
-            |> button.view("Check", Some(OnRouteChange(Home))),
+            |> button.view("Check", "", Some(OnRouteChange(Home))),
           button.new()
             |> button.variant(button.Secondary)
             |> button.icon_end(lc.chevron_down([]))
             |> button.aria(button.ButtonAria("Expand menu", Some(True)))
-            |> button.view("Menu", Some(OnRouteChange(Home))),
+            |> button.view("Menu", "", Some(OnRouteChange(Home))),
           button.new()
-            |> button.variant(button.Primary)
             |> button.icon_end(lc.circle_arrow_right([]))
-            |> button.view("Continue", Some(OnRouteChange(Home))),
+            |> button.view("Continue", "", Some(OnRouteChange(Home))),
           button.button_close(OnRouteChange(Home)),
         ]),
       ]),
@@ -47,57 +44,58 @@ pub fn view() -> Element(Message) {
         h.p([a.class("text-muted-foreground text-sm")], [
           element.text(
             "before/after take arbitrary children lists (not just one icon). "
-            <> "icon_start/icon_end are single-element shortcuts. loading/loaded "
-            <> "are just an element placed in a slot.",
+            <> "icon_start/icon_end are single-element shortcuts.",
           ),
         ]),
         h.div([a.class("button-grid")], [
           button.new()
             |> button.before([lc.check([]), lc.check([])])
             |> button.after([lc.circle_arrow_right([])])
-            |> button.view("Multi", Some(OnRouteChange(Home))),
+            |> button.view("Multi", "", Some(OnRouteChange(Home))),
           button.new()
             |> button.variant(button.Outline)
             |> button.after([lc.chevron_down([])])
-            |> button.view("After only", Some(OnRouteChange(Home))),
+            |> button.view("After only", "", Some(OnRouteChange(Home))),
         ]),
       ]),
       DocSection("sizes", "Sizes", [
         h.div([a.class("button-grid")], [
           button.new()
             |> button.size(button.Small)
-            |> button.view("Small", None),
-          button.new() |> button.view("Medium (default)", None),
+            |> button.view("Small", "", None),
+          button.new() |> button.view("Medium (default)", "", None),
           button.new()
             |> button.size(button.Large)
-            |> button.view("Large", None),
+            |> button.view("Large", "", None),
         ]),
       ]),
-      DocSection("loading", "Loading", [
-        h.div([a.class("button-grid")], [
-          button.new()
-            |> button.loading(True)
-            |> button.view("Saving", Some(OnRouteChange(Home))),
-          button.new()
-            |> button.variant(button.Outline)
-            |> button.loading(True)
-            |> button.view("Loading", None),
+      DocSection("states", "States", [
+        h.p([a.class("text-muted-foreground text-sm")], [
+          element.text(
+            "One mutually-exclusive ButtonState: Idle / Loading / Loaded / "
+            <> "Failed / Suspended / Disabled. Suspended is a system hold "
+            <> "(checkout), distinct from Disabled. Each emits data-state for "
+            <> "styling + transitions.",
+          ),
         ]),
-      ]),
-      DocSection("disabled", "Disabled", [
         h.div([a.class("button-grid")], [
           button.new()
-            |> button.disabled(True)
-            |> button.view("Disabled Primary", None),
+            |> button.state(button.Loading)
+            |> button.view("Loading", "", Some(OnRouteChange(Home))),
           button.new()
-            |> button.variant(button.Secondary)
-            |> button.disabled(True)
-            |> button.view("Disabled Secondary", None),
+            |> button.state(button.Loaded)
+            |> button.before([lc.check([])])
+            |> button.view("Loaded", "", Some(OnRouteChange(Home))),
           button.new()
-            |> button.variant(button.Outline)
-            |> button.icon_start(lc.check([]))
-            |> button.disabled(True)
-            |> button.view("Disabled Icon", None),
+            |> button.variant(button.Destructive)
+            |> button.state(button.Failed)
+            |> button.view("Failed", "", Some(OnRouteChange(Home))),
+          button.new()
+            |> button.state(button.Suspended)
+            |> button.view("Suspended", "", Some(OnRouteChange(Home))),
+          button.new()
+            |> button.state(button.Disabled)
+            |> button.view("Disabled", "", None),
         ]),
       ]),
       DocSection("form-types", "Form Types", [
@@ -105,7 +103,7 @@ pub fn view() -> Element(Message) {
           button.button_submit("Submit"),
           button.new()
             |> button.type_(button.Reset)
-            |> button.view("Reset", None),
+            |> button.view("Reset", "", None),
         ]),
       ]),
       DocSection("anchor", "Anchor (Navigation)", [
@@ -113,41 +111,34 @@ pub fn view() -> Element(Message) {
           button.button_primary_anchor("Primary Link", "#"),
           button.button_secondary_anchor("Secondary Link", "#"),
           button.button_outline_anchor("Outline Link", "#"),
-          button.button_ghost_anchor("Ghost Link", "#"),
+          button.button_link_anchor("Link", "#"),
           button.new()
             |> button.icon_end(lc.circle_arrow_right([]))
-            |> button.view_anchor("With Icon", "#"),
+            |> button.view("With Icon", "#", None),
           button.new()
             |> button.variant(button.Outline)
-            |> button.disabled(True)
-            |> button.view_anchor("Disabled", "#"),
-        ]),
-      ]),
-      DocSection("accessibility", "Accessibility (ARIA)", [
-        h.div([a.class("button-grid")], [
-          button.new()
-            |> button.aria(button.ButtonAria("Save changes", None))
-            |> button.view("Save", None),
+            |> button.state(button.Disabled)
+            |> button.view("Disabled", "#", None),
         ]),
       ]),
       DocSection("accent", "Custom Accent", [
         h.p([a.class("text-muted-foreground text-sm")], [
           element.text(
             "accent recolors the solid look by overriding --color-primary inline "
-            <> "— Basecoat's hover/focus follow automatically. Pass any CSS color, "
-            <> "or a theme token (var(--chart-N)) to stay theme-coherent.",
+            <> "— Basecoat's hover/focus follow. Pass any CSS color, or a theme "
+            <> "token (var(--chart-N)) to stay theme-coherent.",
           ),
         ]),
         h.div([a.class("button-grid")], [
           button.new()
             |> button.accent(button.Accent("var(--chart-2)", "var(--background)"))
-            |> button.view("Theme token", Some(OnRouteChange(Home))),
+            |> button.view("Theme token", "", Some(OnRouteChange(Home))),
           button.new()
             |> button.accent(button.Accent("oklch(0.55 0.22 263)", "white"))
-            |> button.view("Custom oklch", Some(OnRouteChange(Home))),
+            |> button.view("Custom oklch", "", Some(OnRouteChange(Home))),
           button.new()
             |> button.accent(button.Accent("var(--chart-5)", "white"))
-            |> button.view_anchor("As anchor", "#"),
+            |> button.view("As anchor", "#", None),
         ]),
       ]),
       DocSection("usage", "Usage", [
@@ -157,22 +148,23 @@ pub fn view() -> Element(Message) {
           "// Shortcuts — 80% of cases",
           "button.button_primary(\"Save\", UserClickSave)",
           "button.button_submit(\"Submit\")",
-          "button.button_close(UserClickClose)",
+          "button.button_primary_anchor(\"Docs\", \"/docs\")  // <a href>",
           "",
-          "// Builder style — pipe setters, terminal decides <button> vs <a>",
+          "// Builder — view(config, label, href, on_click).",
+          "// Empty href -> <button>; non-empty href -> <a>.",
           "button.new()",
           "|> button.variant(button.Outline)",
-          "|> button.icon_end(lc.arrow_right([]))",
-          "|> button.loading(model.saving)",
-          "|> button.view(\"Save\", Some(SaveClicked))",
+          "|> button.state(button.Loading)",
+          "|> button.view(\"Save\", \"\", Some(SaveClicked))",
           "",
-          "button.new()",
-          "|> button.view_anchor(\"Docs\", \"/docs\")  // <a href> — navigation",
+          "// Navigation: just pass the href.",
+          "button.new() |> button.view(\"Docs\", \"/docs\", None)",
           "",
           "// Config style — record update",
           "button.view(",
-          "  button.ButtonConfig(..button.default_config(), loading: model.saving),",
+          "  button.ButtonConfig(..button.default_config(), state: button.Loading),",
           "  \"Save\",",
+          "  \"\",",
           "  Some(SaveClicked),",
           ")",
         ]),
@@ -180,9 +172,8 @@ pub fn view() -> Element(Message) {
       DocSection("customizing", "Customizing Styles", [
         h.p([a.class("text-muted-foreground text-sm")], [
           element.text(
-            "src/saola/button.css is @generated from Basecoat — do not edit it "
-            <> "(just build-css overwrites it). Customize from your own CSS "
-            <> "instead, in one of three layers:",
+            "src/saola/button.css is @generated from Basecoat — do not edit it. "
+            <> "Customize from your own CSS in one of three layers:",
           ),
         ]),
         h.p([a.class("text-muted-foreground text-sm")], [
@@ -204,21 +195,18 @@ pub fn view() -> Element(Message) {
         ]),
         doc_page.snippet([
           "/* your app.css — beats @layer saola.components automatically */",
-          ".btn-lg-primary {",
-          "  background: #ff5722;",
-          "  text-transform: uppercase;",
+          ".btn-primary {", "  background: #ff5722;", "  text-transform: uppercase;",
           "}",
         ]),
         h.p([a.class("text-muted-foreground text-sm")], [
           element.text(
-            "3. One-off, no CSS file — add_class appends a utility/custom class "
-            <> "after the variant class:",
+            "3. One-off, no CSS file — add_class appends a utility/custom class:",
           ),
         ]),
         doc_page.snippet([
           "button.new()",
           "|> button.add_class(\"w-full shadow-lg\")",
-          "|> button.view(\"Save\", Some(SaveClicked))",
+          "|> button.view(\"Save\", \"\", Some(SaveClicked))",
         ]),
       ]),
     ],

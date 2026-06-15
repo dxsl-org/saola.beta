@@ -1376,8 +1376,17 @@
      aria-disabled (an <a> has no native disabled). Basecoat's :disabled visual
      reaches neither, so mirror it here — dim + inert. Scoped to button/a with a
      btn- class; layered so unlayered consumer CSS still wins. */
-  :where(button, a)[class*="btn-"][aria-disabled="true"],
-  :where(button, a)[class*="btn-"][aria-busy="true"] {
+  :where(button, a)[class*="btn-"][aria-busy="true"],
+  :where(button, a)[class*="btn-"][aria-disabled="true"]:not([data-state="suspended"]) {
+    pointer-events: none;
+    opacity: 50%;
+  }
+
+  /* Suspended = a system hold (e.g. checkout), distinct STATE from disabled.
+     Governed solely by this rule (excluded from the generic inert rule above)
+     so a consumer can fully restyle it by overriding this one selector.
+     Default mirrors disabled (inert + dimmed); set it apart if you want. */
+  :where(button, a)[class*="btn-"][data-state="suspended"] {
     pointer-events: none;
     opacity: 50%;
   }

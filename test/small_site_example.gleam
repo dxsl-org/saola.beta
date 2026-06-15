@@ -69,7 +69,7 @@ fn hero() -> Element(Msg) {
       button.button_primary("Start trial", StartedTrial),
       button.new()
         |> button.variant(button.Secondary)
-        |> button.view("Read docs", None),
+        |> button.view("Read docs", "", None),
     ]),
   ])
 }

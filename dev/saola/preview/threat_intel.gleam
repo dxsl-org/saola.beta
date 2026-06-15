@@ -111,10 +111,9 @@ fn map_overlay_header(model: Model) -> Element(Message) {
           Some(actor) ->
             h.div([a.class("threat-intel-hover-label")], [
               h.text(actor.name <> " · "),
-              badge.badge(
-                threat_intel_data.severity_label(actor.severity),
-                severity_badge_variant(actor.severity),
-              ),
+              badge.new()
+                |> badge.variant(severity_badge_variant(actor.severity))
+                |> badge.view(threat_intel_data.severity_label(actor.severity)),
             ])
         }
     },
@@ -238,7 +237,7 @@ fn metric_pill(
   variant: badge.BadgeVariant,
 ) -> Element(Message) {
   h.div([a.class("threat-metric-pill")], [
-    badge.badge(label, variant),
+    badge.new() |> badge.variant(variant) |> badge.view(label),
     h.span([a.class("threat-metric-count")], [h.text(int.to_string(count))]),
     progress.progress(
       count,
@@ -358,10 +357,9 @@ fn actor_columns() -> List(data_table.DataTableColumn(ThreatActor, Message)) {
     data_table.DataTableColumn(
       header: "Sev",
       cell: fn(actor: ThreatActor) {
-        badge.badge(
-          threat_intel_data.severity_label(actor.severity),
-          severity_badge_variant(actor.severity),
-        )
+        badge.new()
+        |> badge.variant(severity_badge_variant(actor.severity))
+        |> badge.view(threat_intel_data.severity_label(actor.severity))
       },
       sort_key: Some("severity"),
     ),

@@ -32,6 +32,27 @@ pub fn badge_outline_renders_test() {
   assert string.contains(html, "badge-outline")
 }
 
+pub fn badge_config_style_renders_test() {
+  let html =
+    badge.view(
+      badge.BadgeConfig(..badge.default_config(), variant: badge.Secondary),
+      "Beta",
+    )
+    |> element.to_string
+  assert string.contains(html, "badge-secondary")
+  assert string.contains(html, "Beta")
+}
+
+pub fn badge_builder_add_class_test() {
+  let html =
+    badge.new()
+    |> badge.variant(badge.Outline)
+    |> badge.add_class("ml-2")
+    |> badge.view("Draft")
+    |> element.to_string
+  assert string.contains(html, "badge-outline ml-2")
+}
+
 // --- alert ---
 
 pub fn alert_default_renders_test() {
@@ -92,7 +113,7 @@ pub fn button_medium_explicit_renders_test() {
     button.new()
     |> button.size(button.Medium)
     |> button.variant(button.Outline)
-    |> button.view("M", None)
+    |> button.view("M", "", None)
     |> element.to_string
   assert string.contains(html, "class=\"btn-outline\"")
 }
@@ -122,7 +143,7 @@ pub fn button_disabled_renders_test() {
   let html =
     button.new()
     |> button.disabled(True)
-    |> button.view("Save", None)
+    |> button.view("Save", "", None)
     |> element.to_string
   assert string.contains(html, "disabled")
 }
@@ -133,7 +154,7 @@ pub fn button_with_aria_label_renders_test() {
     |> button.variant(button.Ghost)
     |> button.size(button.Small)
     |> button.aria(button.ButtonAria("Close dialog", None))
-    |> button.view("", None)
+    |> button.view("", "", None)
     |> element.to_string
   assert string.contains(html, "aria-label=\"Close dialog\"")
 }
@@ -143,7 +164,7 @@ pub fn button_small_renders_test() {
     button.new()
     |> button.variant(button.Secondary)
     |> button.size(button.Small)
-    |> button.view("Edit", Some(Nil))
+    |> button.view("Edit", "", Some(Nil))
     |> element.to_string
   assert string.contains(html, "btn-sm-secondary")
 }
@@ -151,8 +172,9 @@ pub fn button_small_renders_test() {
 pub fn button_config_style_renders_test() {
   let html =
     button.view(
-      button.ButtonConfig(..button.default_config(), disabled: True),
+      button.ButtonConfig(..button.default_config(), state: button.Disabled),
       "Save",
+      "",
       None,
     )
     |> element.to_string
@@ -164,7 +186,7 @@ pub fn button_loading_renders_spinner_and_busy_test() {
   let html =
     button.new()
     |> button.loading(True)
-    |> button.view("Saving", Some(Nil))
+    |> button.view("Saving", "", Some(Nil))
     |> element.to_string
   assert string.contains(html, "aria-busy=\"true\"")
   assert string.contains(html, "spinner")
@@ -179,10 +201,49 @@ pub fn button_loading_replaces_before_slot_test() {
     button.new()
     |> button.icon_start(element.text("ICONMARK"))
     |> button.loading(True)
-    |> button.view("Saving", None)
+    |> button.view("Saving", "", None)
     |> element.to_string
   assert string.contains(html, "spinner")
   assert !string.contains(html, "ICONMARK")
+}
+
+pub fn button_suspended_uses_aria_not_native_disabled_test() {
+  // Suspended is a system hold (checkout), distinct from Disabled: it stays in
+  // the a11y tree via aria-disabled and carries data-state, not native disabled.
+  let html =
+    button.new()
+    |> button.state(button.Suspended)
+    |> button.view("Pay", "", Some(Nil))
+    |> element.to_string
+  assert string.contains(html, "aria-disabled=\"true\"")
+  assert string.contains(html, "data-state=\"suspended\"")
+  let without_aria = string.replace(html, "aria-disabled", "")
+  assert !string.contains(without_aria, "disabled")
+}
+
+pub fn button_loaded_state_emits_data_state_test() {
+  let html =
+    button.new()
+    |> button.state(button.Loaded)
+    |> button.view("Saved", "", Some(Nil))
+    |> element.to_string
+  assert string.contains(html, "data-state=\"loaded\"")
+  // Loaded is interactive — not inert (no aria-disabled).
+  assert !string.contains(html, "aria-disabled")
+}
+
+pub fn button_empty_href_renders_button_test() {
+  let html =
+    button.new() |> button.view("Go", "", Some(Nil)) |> element.to_string
+  assert string.contains(html, "<button")
+  assert !string.contains(html, "<a")
+}
+
+pub fn button_nonempty_href_renders_anchor_test() {
+  let html =
+    button.new() |> button.view("Go", "/path", None) |> element.to_string
+  assert string.contains(html, "<a")
+  assert string.contains(html, "href=\"/path\"")
 }
 
 pub fn button_before_after_render_multiple_children_test() {
@@ -191,7 +252,7 @@ pub fn button_before_after_render_multiple_children_test() {
     button.new()
     |> button.before([element.text("A1"), element.text("A2")])
     |> button.after([element.text("Z1"), element.text("Z2")])
-    |> button.view("Mid", None)
+    |> button.view("Mid", "", None)
     |> element.to_string
   assert string.contains(html, "A1")
   assert string.contains(html, "A2")
@@ -204,7 +265,7 @@ pub fn button_add_class_appends_test() {
   let html =
     button.new()
     |> button.add_class("w-full")
-    |> button.view("Save", None)
+    |> button.view("Save", "", None)
     |> element.to_string
   assert string.contains(html, "btn-primary w-full")
 }
@@ -213,7 +274,7 @@ pub fn button_anchor_renders_href_test() {
   let html =
     button.new()
     |> button.variant(button.Outline)
-    |> button.view_anchor("Docs", "/docs")
+    |> button.view("Docs", "/docs", None)
     |> element.to_string
   assert string.contains(html, "<a")
   assert string.contains(html, "href=\"/docs\"")
@@ -224,7 +285,7 @@ pub fn button_anchor_disabled_uses_aria_test() {
   let html =
     button.new()
     |> button.disabled(True)
-    |> button.view_anchor("Docs", "/docs")
+    |> button.view("Docs", "/docs", None)
     |> element.to_string
   assert string.contains(html, "aria-disabled=\"true\"")
   assert string.contains(html, "tabindex=\"-1\"")
@@ -241,7 +302,7 @@ pub fn button_icon_only_uses_icon_variant_test() {
   let labeled =
     button.new()
     |> button.icon_start(element.text("I"))
-    |> button.view("Save", None)
+    |> button.view("Save", "", None)
     |> element.to_string
   assert string.contains(labeled, "btn-primary")
   assert !string.contains(labeled, "btn-icon")
@@ -252,7 +313,7 @@ pub fn button_icon_end_only_uses_icon_variant_test() {
   let html =
     button.new()
     |> button.icon_end(element.text("X"))
-    |> button.view("", None)
+    |> button.view("", "", None)
     |> element.to_string
   assert string.contains(html, "btn-icon-primary")
 }
@@ -263,7 +324,7 @@ pub fn button_loading_icon_only_uses_icon_variant_test() {
     button.new()
     |> button.size(button.Small)
     |> button.loading(True)
-    |> button.view("", None)
+    |> button.view("", "", None)
     |> element.to_string
   assert string.contains(html, "btn-sm-icon-primary")
 }
@@ -274,7 +335,7 @@ pub fn button_accent_overrides_color_var_test() {
   let html =
     button.new()
     |> button.accent(button.Accent("var(--chart-2)", "white"))
-    |> button.view("Brand", None)
+    |> button.view("Brand", "", None)
     |> element.to_string
   assert string.contains(html, "style=")
   assert string.contains(html, "--color-primary")

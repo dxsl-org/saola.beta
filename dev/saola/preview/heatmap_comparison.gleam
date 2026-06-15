@@ -303,7 +303,7 @@ fn size_btn(size: Int, current: Int) -> Element(Message) {
   button.new()
   |> button.variant(active_variant)
   |> button.size(button.Small)
-  |> button.view(label, Some(HeatmapSizeChanged(size)))
+  |> button.view(label, "", Some(HeatmapSizeChanged(size)))
 }
 
 fn scheme_btn(scheme: String, current: String) -> Element(Message) {
@@ -314,7 +314,7 @@ fn scheme_btn(scheme: String, current: String) -> Element(Message) {
   button.new()
   |> button.variant(active_variant)
   |> button.size(button.Small)
-  |> button.view(scheme, Some(HeatmapSchemeChanged(scheme)))
+  |> button.view(scheme, "", Some(HeatmapSchemeChanged(scheme)))
 }
 
 fn info_panel(model: Model) -> Element(Message) {
