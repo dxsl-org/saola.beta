@@ -228,6 +228,20 @@ pub fn button_loading_icon_only_uses_icon_variant_test() {
   assert string.contains(html, "btn-sm-icon-primary")
 }
 
+pub fn button_accent_overrides_color_var_test() {
+  // accent injects an inline --color-primary override so Basecoat's solid
+  // machinery recolors; value can reference a theme token.
+  let html =
+    button.new()
+    |> button.accent(button.Accent("var(--chart-2)", "white"))
+    |> button.view("Brand", None)
+    |> element.to_string
+  assert string.contains(html, "style=")
+  assert string.contains(html, "--color-primary")
+  assert string.contains(html, "var(--chart-2)")
+  assert string.contains(html, "white")
+}
+
 pub fn button_link_shortcut_renders_test() {
   let html = button.button_link("More", Nil) |> element.to_string
   assert string.contains(html, "btn-lg-link")

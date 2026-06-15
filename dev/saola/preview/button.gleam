@@ -108,6 +108,26 @@ pub fn view() -> Element(Message) {
             |> button.view("Save", None),
         ]),
       ]),
+      DocSection("accent", "Custom Accent", [
+        h.p([a.class("text-muted-foreground text-sm")], [
+          element.text(
+            "accent recolors the solid look by overriding --color-primary inline "
+            <> "— Basecoat's hover/focus follow automatically. Pass any CSS color, "
+            <> "or a theme token (var(--chart-N)) to stay theme-coherent.",
+          ),
+        ]),
+        h.div([a.class("button-grid")], [
+          button.new()
+            |> button.accent(button.Accent("var(--chart-2)", "var(--background)"))
+            |> button.view("Theme token", Some(OnRouteChange(Home))),
+          button.new()
+            |> button.accent(button.Accent("oklch(0.55 0.22 263)", "white"))
+            |> button.view("Custom oklch", Some(OnRouteChange(Home))),
+          button.new()
+            |> button.accent(button.Accent("var(--chart-5)", "white"))
+            |> button.view_anchor("As anchor", "#"),
+        ]),
+      ]),
       DocSection("usage", "Usage", [
         doc_page.snippet([
           "import saola/button",

@@ -83,6 +83,36 @@ Contract:
 - A single `view()` that infers the element from which setters were called is banned.
 - Existing flat widgets stay valid; migrate only when option count grows.
 
+### 3c. Custom Accent via CSS-Variable Override (theme-borrowing)
+
+Saola is a category-A library (typed, installed, consumed) that **borrows** Basecoat/shadcn's CSS + theme. Because Basecoat reads every solid color through a CSS variable (`background: var(--color-primary)`, and even `hover` via `color-mix(var(--color-primary) ...)`), a widget can offer an **arbitrary accent color without authoring any parallel CSS** — just override the variable inline on the element.
+
+This is the sanctioned "near two-axis" mechanism (variant × color) — do NOT introduce a second color/token system to get it.
+
+```gleam
+// Typed color holder — values are CSS colors or theme-token references.
+pub type Accent { Accent(bg: String, fg: String) }
+
+pub fn accent(config: WidgetConfig(msg), accent: Accent) -> WidgetConfig(msg)
+
+// Render: emit per-property style overrides (Lustre's a.style is singular).
+fn accent_attrs(config) -> List(a.Attribute(msg)) {
+  case config.accent {
+    None -> []
+    Some(acc) -> [
+      a.style("--color-primary", acc.bg),
+      a.style("--color-primary-foreground", acc.fg),
+    ]
+  }
+}
+```
+
+Rules:
+- **Reuse the existing token** the Basecoat solid rule reads (`--color-primary` + `-foreground`). Never invent a new token or hand-author color CSS.
+- Encourage theme-token values (`var(--chart-2)`) so custom colors stay sourced from the active theme.
+- Cleanest for the **solid** look (default `Primary`); outline/ghost arbitrary colors still go through `add_class` (border/text aren't a single variable). Document this limit.
+- Reference implementation: `saola/button` `Accent` + `accent`.
+
 ### 4. Variants as ADTs (Not Strings)
 
 ```gleam

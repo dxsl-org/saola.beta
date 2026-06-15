@@ -42,6 +42,14 @@
 ////    ```gleam
 ////    button.new() |> button.add_class("w-full") |> button.view("Save", Some(Msg))
 ////    ```
+//// 4. **Custom accent (typed, in-Gleam)** — `accent` recolors the solid look by
+////    overriding `--color-primary` inline; Basecoat's hover/focus follow. Point
+////    it at a theme token to stay theme-coherent:
+////    ```gleam
+////    button.new()
+////    |> button.accent(button.Accent("var(--chart-2)", "var(--background)"))
+////    |> button.view("Brand", Some(Msg))
+////    ```
 
 import gleam/list
 import gleam/option.{type Option, None, Some}
@@ -70,6 +78,15 @@ pub type ButtonSize {
 
 pub type ButtonAria {
   ButtonAria(label: String, expanded: Option(Bool))
+}
+
+/// Custom accent color for the SOLID look. Overrides the `--color-primary`
+/// pair inline so Basecoat's existing background / hover (`color-mix`) / focus
+/// machinery recolors itself — no parallel CSS. `bg`/`fg` accept any CSS color
+/// (`oklch(...)`, `#hex`) or a theme token reference (`var(--chart-2)`), which
+/// keeps custom colors sourced from the active theme.
+pub type Accent {
+  Accent(bg: String, fg: String)
 }
 
 pub type ButtonRoleType {
@@ -102,6 +119,7 @@ pub type ButtonConfig(msg) {
     disabled: Bool,
     type_: Option(ButtonRoleType),
     aria: ButtonAria,
+    accent: Option(Accent),
     class: String,
   )
 }
@@ -120,6 +138,7 @@ pub fn new() -> ButtonConfig(msg) {
     disabled: False,
     type_: None,
     aria: default_aria,
+    accent: None,
     class: "",
   )
 }
@@ -187,6 +206,13 @@ pub fn aria(config: ButtonConfig(msg), aria: ButtonAria) -> ButtonConfig(msg) {
   ButtonConfig(..config, aria: aria)
 }
 
+/// Custom accent color for the solid look — see `Accent`. Best with the
+/// default `Primary` variant; on outline/ghost the override is inert because
+/// those variants don't read `--color-primary` for their fill.
+pub fn accent(config: ButtonConfig(msg), accent: Accent) -> ButtonConfig(msg) {
+  ButtonConfig(..config, accent: Some(accent))
+}
+
 /// Append an extra CSS class after the Basecoat variant class.
 /// Additive only — the default class cannot be removed.
 pub fn add_class(config: ButtonConfig(msg), class: String) -> ButtonConfig(msg) {
@@ -227,6 +253,7 @@ pub fn view(
   h.button(
     list.flatten([
       [a.class(css_class(config, label))],
+      accent_attrs(config),
       busy_attrs(config),
       click_attrs,
       disabled_attrs,
@@ -263,6 +290,7 @@ pub fn view_anchor(
     list.flatten([
       [a.class(css_class(config, label))],
       href_attrs,
+      accent_attrs(config),
       busy_attrs(config),
       non_interactive_attrs,
       aria_attrs(config),
@@ -313,6 +341,19 @@ fn busy_attrs(config: ButtonConfig(msg)) -> List(a.Attribute(msg)) {
   case config.loading {
     True -> [a.attribute("aria-busy", "true")]
     False -> []
+  }
+}
+
+/// Inline override of the `--color-primary` pair so Basecoat's solid machinery
+/// recolors to the custom accent. Two `a.style` attributes (Lustre's style is
+/// per-property) that merge into the element's `style`.
+fn accent_attrs(config: ButtonConfig(msg)) -> List(a.Attribute(msg)) {
+  case config.accent {
+    None -> []
+    Some(acc) -> [
+      a.style("--color-primary", acc.bg),
+      a.style("--color-primary-foreground", acc.fg),
+    ]
   }
 }
 

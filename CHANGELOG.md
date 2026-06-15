@@ -11,6 +11,7 @@ Full per-batch history lives in [`docs/project-changelog.md`](docs/project-chang
 - **CSS build pipeline** — `scripts/build-css.mjs` (selector-set slicer with fail-loud guards, `@generated`/`saola:custom` region contract) + `scripts/bundle-css.mjs` (ordered-manifest concatenation), runnable via `just build-css`; idempotent and re-runnable after Basecoat submodule syncs.
 - **Button styling guide** — the button preview page (a "Customizing Styles" section) and the `saola/button` module docs now spell out the three CSS customization layers: theme tokens (`--color-*`/`--radius-*`), per-widget override (unlayered rules beat `@layer saola.*` without `!important`), and `add_class` for one-offs. Clarifies that `@generated` only forbids editing the sliced `src/saola/*.css`, not customizing from your own stylesheet.
 - **Button shortcut symmetry** — `button_link` (Link-variant `<button>`), `button_destructive_anchor` and `button_link_anchor` complete full 6-variant coverage across both the `<button>` and `<a href>` shortcut families.
+- **Button custom accent** — `accent(Accent(bg, fg))` recolors the solid look by overriding the `--color-primary` pair inline, reusing Basecoat's background/hover/focus machinery with no parallel CSS. Values accept any CSS color or a theme token (`var(--chart-2)`), keeping custom colors theme-coherent. The sanctioned "near two-axis" mechanism (variant × color) — documented as a reusable widget technique in `docs/code-standards.md` §3c.
 
 ### Fixed
 
