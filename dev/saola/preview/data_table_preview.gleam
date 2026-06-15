@@ -87,7 +87,8 @@ pub fn view(model: Model) -> Element(Message) {
     "Sortable, filterable table with pagination and row selection. Click a row to select it.",
     [
       DocSection("full-featured", "Full-featured Table", [
-        data_table.data_table(
+        data_table.new()
+        |> data_table.view(
           full_columns(),
           sample_rows(),
           model.data_table_state,
@@ -96,7 +97,6 @@ pub fn view(model: Model) -> Element(Message) {
           fn(p) { DataTablePageChanged(p) },
           fn(ids) { DataTableSelectChanged(ids) },
           fn(row) { row.id },
-          data_table.default_attrs,
         ),
       ]),
       DocSection("simple", "Simple Read-only", [
@@ -114,14 +114,14 @@ pub fn view(model: Model) -> Element(Message) {
           "data_table.data_table_simple(columns, rows)",
           "",
           "// Full-featured:",
-          "data_table.data_table(",
+          "data_table.new()",
+          "|> data_table.view(",
           "  columns, rows, model.data_table_state,",
           "  fn(key) { DataTableSortChanged(key) },",
           "  fn(q) { DataTableFilterChanged(q) },",
           "  fn(p) { DataTablePageChanged(p) },",
           "  fn(ids) { DataTableSelectChanged(ids) },",
           "  fn(row) { row.id },",
-          "  data_table.default_attrs,",
           ")",
         ]),
       ]),

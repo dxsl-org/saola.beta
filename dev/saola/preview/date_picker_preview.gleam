@@ -33,7 +33,9 @@ pub fn view(model: Model) -> Element(Message) {
         ]),
         DocSection("custom-placeholder", "Custom placeholder", [
           h.div([a.class("grid gap-4 mt-4")], [
-            date_picker.date_picker(
+            date_picker.new()
+            |> date_picker.placeholder("Select a date...")
+            |> date_picker.view(
               model.date_picker_2_selected,
               model.date_picker_2_open,
               model.date_picker_2_view_year,
@@ -41,10 +43,6 @@ pub fn view(model: Model) -> Element(Message) {
               DatePicker2DateSelected,
               DatePicker2MonthChanged,
               DatePicker2OpenChanged,
-              date_picker.DatePickerAttrs(
-                ..date_picker.default_attrs,
-                placeholder: "Select a date...",
-              ),
             ),
           ]),
         ]),

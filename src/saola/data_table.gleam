@@ -1,3 +1,14 @@
+//// Data table widget (sortable / filterable / paginated) — dual-style `Config`:
+////
+//// ```gleam
+//// data_table.data_table_simple(columns, rows)                       // shortcut (static)
+//// data_table.new()
+//// |> data_table.show_filter(False)
+//// |> data_table.view(columns, rows, state, OnSort, OnFilter, OnPage, OnSelect, row_id)
+//// ```
+//// State (sort/filter/page/selection) is consumer-owned via `DataTableState`;
+//// use the `toggle_sort`/`set_filter`/`set_page`/`toggle_row` helpers in update.
+
 import gleam/int
 import gleam/list
 import gleam/option.{type Option, None, Some}
@@ -42,15 +53,40 @@ pub type DataTableColumn(row, msg) {
   )
 }
 
-pub type DataTableAttrs {
-  DataTableAttrs(show_filter: Bool, show_pagination: Bool, class: String)
+/// Presentation options for a data table. Public for record-update syntax. The
+/// columns/rows/state/handlers/row_id are the required data, passed to `view`.
+pub type DataTableConfig {
+  DataTableConfig(show_filter: Bool, show_pagination: Bool, class: String)
 }
 
-pub const default_attrs = DataTableAttrs(
-  show_filter: True,
-  show_pagination: True,
-  class: "",
-)
+/// Builder entry point. Defaults: filter + pagination shown, no extra class.
+pub fn new() -> DataTableConfig {
+  DataTableConfig(show_filter: True, show_pagination: True, class: "")
+}
+
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> DataTableConfig {
+  new()
+}
+
+/// Toggle the filter toolbar (default shown).
+pub fn show_filter(config: DataTableConfig, show: Bool) -> DataTableConfig {
+  DataTableConfig(..config, show_filter: show)
+}
+
+/// Toggle the pagination footer (default shown).
+pub fn show_pagination(config: DataTableConfig, show: Bool) -> DataTableConfig {
+  DataTableConfig(..config, show_pagination: show)
+}
+
+/// Append an extra CSS class on the root. Additive only.
+pub fn add_class(config: DataTableConfig, class: String) -> DataTableConfig {
+  let merged = case config.class {
+    "" -> class
+    existing -> existing <> " " <> class
+  }
+  DataTableConfig(..config, class: merged)
+}
 
 // ── State helpers (for consumer use) ─────────────────────────────────────────
 
@@ -167,10 +203,7 @@ fn render_data_row(
   )
 }
 
-fn render_toolbar(
-  filter: String,
-  on_filter: fn(String) -> msg,
-) -> Element(msg) {
+fn render_toolbar(filter: String, on_filter: fn(String) -> msg) -> Element(msg) {
   h.div([a.class("data-table-toolbar")], [
     h.input([
       a.type_("text"),
@@ -205,7 +238,10 @@ fn render_footer(
 
 // ── Public API ────────────────────────────────────────────────────────────────
 
-pub fn data_table(
+/// Render the data table. `state` is consumer-owned; the handlers fire on
+/// sort/filter/page/row-select; `row_id` derives a stable id per row.
+pub fn view(
+  config: DataTableConfig,
   columns: List(DataTableColumn(row, msg)),
   rows: List(row),
   state: DataTableState,
@@ -214,14 +250,13 @@ pub fn data_table(
   on_page: fn(Int) -> msg,
   on_select: fn(List(String)) -> msg,
   row_id: fn(row) -> String,
-  attrs: DataTableAttrs,
 ) -> Element(msg) {
   let total = list.length(rows)
-  let extra_class_attrs = case attrs.class {
+  let extra_class_attrs = case config.class {
     "" -> []
     c -> [a.class(c)]
   }
-  let paged_rows = case attrs.show_pagination {
+  let paged_rows = case config.show_pagination {
     False -> rows
     True ->
       rows
@@ -229,7 +264,7 @@ pub fn data_table(
       |> list.take(state.page_size)
   }
   h.div(list.flatten([[a.class("data-table-root")], extra_class_attrs]), [
-    case attrs.show_filter {
+    case config.show_filter {
       False -> h.text("")
       True -> render_toolbar(state.filter, on_filter)
     },
@@ -239,24 +274,21 @@ pub fn data_table(
         h.tbody(
           [],
           list.map(paged_rows, fn(row) {
-            render_data_row(
-              row,
-              row_id(row),
-              columns,
-              state.selected,
-              on_select,
-            )
+            render_data_row(row, row_id(row), columns, state.selected, on_select)
           }),
         ),
       ]),
     ]),
-    case attrs.show_pagination {
+    case config.show_pagination {
       False -> h.text("")
       True -> render_footer(total, state, on_page)
     },
   ])
 }
 
+// --- Convenience shortcuts ---
+
+/// A static (non-interactive) table: headers + cells, no sort/filter/paginate.
 pub fn data_table_simple(
   columns: List(DataTableColumn(row, msg)),
   rows: List(row),

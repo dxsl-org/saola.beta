@@ -48,14 +48,15 @@ pub fn view(model: Model) -> Element(Message) {
     ]),
     DocSection("today-highlighted", "With today highlighted", [
       h.div([a.class("grid gap-4 mt-4")], [
-        cal.calendar(
+        cal.new()
+        |> cal.today(cal.today_date())
+        |> cal.view(
           model.calendar_selected,
           model.calendar_view_year,
           model.calendar_view_month,
           CalendarDateSelected,
           CalendarMonthChanged(prev_y, prev_m),
           CalendarMonthChanged(next_y, next_m),
-          cal.CalendarAttrs(..cal.default_attrs, today: Some(cal.today())),
         ),
       ]),
     ]),

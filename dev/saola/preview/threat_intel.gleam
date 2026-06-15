@@ -310,7 +310,9 @@ fn table_panel(model: Model) -> Element(Message) {
         empty.new()
         |> empty.view("No actors match", [h.text("Adjust the filters or search query.")], [])
       _ ->
-        data_table.data_table(
+        data_table.new()
+        |> data_table.show_filter(False)
+        |> data_table.view(
           actor_columns(),
           rows,
           model.threat_table_state,
@@ -319,11 +321,6 @@ fn table_panel(model: Model) -> Element(Message) {
           ThreatTablePageChanged,
           ThreatTableRowSelected,
           fn(actor: ThreatActor) { actor.id },
-          data_table.DataTableAttrs(
-            show_filter: False,
-            show_pagination: True,
-            class: "",
-          ),
         )
     },
   ])

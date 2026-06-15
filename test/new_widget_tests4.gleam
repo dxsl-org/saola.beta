@@ -383,7 +383,8 @@ pub fn data_table_simple_renders_header_test() {
 
 pub fn data_table_full_renders_filter_test() {
   let html =
-    data_table.data_table(
+    data_table.new()
+    |> data_table.view(
       [
         data_table.DataTableColumn(
           header: "Name",
@@ -398,7 +399,6 @@ pub fn data_table_full_renders_filter_test() {
       fn(_p) { "" },
       fn(_ids) { "" },
       fn(r) { r },
-      data_table.default_attrs,
     )
     |> element.to_string
   assert string.contains(html, "data-table-filter")
@@ -406,7 +406,8 @@ pub fn data_table_full_renders_filter_test() {
 
 pub fn data_table_sort_button_renders_test() {
   let html =
-    data_table.data_table(
+    data_table.new()
+    |> data_table.view(
       [
         data_table.DataTableColumn(
           header: "Name",
@@ -421,7 +422,6 @@ pub fn data_table_sort_button_renders_test() {
       fn(_p) { "" },
       fn(_ids) { "" },
       fn(r) { r },
-      data_table.default_attrs,
     )
     |> element.to_string
   assert string.contains(html, "data-table-sort-btn")
@@ -455,7 +455,8 @@ pub fn data_table_total_pages_test() {
 
 pub fn data_table_full_pagination_renders_test() {
   let html =
-    data_table.data_table(
+    data_table.new()
+    |> data_table.view(
       [
         data_table.DataTableColumn(
           header: "Name",
@@ -470,7 +471,6 @@ pub fn data_table_full_pagination_renders_test() {
       fn(_p) { "" },
       fn(_ids) { "" },
       fn(r) { r },
-      data_table.default_attrs,
     )
     |> element.to_string
   assert string.contains(html, "data-table-footer")

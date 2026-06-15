@@ -1,3 +1,12 @@
+//// Calendar widget — dual-style `Config` (uniform Saola pattern):
+////
+//// ```gleam
+//// calendar.calendar_simple(sel, yr, mo, OnSelect, OnPrev, OnNext)    // shortcut
+//// calendar.new()
+//// |> calendar.today(calendar.today_date())
+//// |> calendar.view(sel, yr, mo, OnSelect, OnPrev, OnNext)
+//// ```
+
 import gleam/int
 import gleam/list
 import gleam/option.{type Option, None, Some}
@@ -11,15 +20,40 @@ import lustre/element.{type Element}
 import lustre/element/html as h
 import lustre/event as e
 
-pub type CalendarAttrs {
-  CalendarAttrs(today: Option(Date), show_outside_days: Bool, class: String)
+/// Presentation options for a calendar. Public for record-update syntax. The
+/// selected/view_year/view_month/handlers are the required data (`view`).
+pub type CalendarConfig {
+  CalendarConfig(today: Option(Date), show_outside_days: Bool, class: String)
 }
 
-pub const default_attrs = CalendarAttrs(
-  today: None,
-  show_outside_days: True,
-  class: "",
-)
+/// Builder entry point. Defaults: no "today" marker, show outside days.
+pub fn new() -> CalendarConfig {
+  CalendarConfig(today: None, show_outside_days: True, class: "")
+}
+
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> CalendarConfig {
+  new()
+}
+
+/// Mark a date as "today" (highlighted).
+pub fn today(config: CalendarConfig, date: Date) -> CalendarConfig {
+  CalendarConfig(..config, today: Some(date))
+}
+
+/// Toggle rendering of days from adjacent months (default on).
+pub fn show_outside_days(config: CalendarConfig, show: Bool) -> CalendarConfig {
+  CalendarConfig(..config, show_outside_days: show)
+}
+
+/// Append an extra CSS class on the root. Additive only.
+pub fn add_class(config: CalendarConfig, class: String) -> CalendarConfig {
+  let merged = case config.class {
+    "" -> class
+    existing -> existing <> " " <> class
+  }
+  CalendarConfig(..config, class: merged)
+}
 
 // ── Date helpers ──────────────────────────────────────────
 
@@ -87,7 +121,7 @@ pub fn next_month(year: Int, month: Month) -> #(Int, Month) {
 }
 
 /// Return the current local date. Uses the system clock.
-pub fn today() -> Date {
+pub fn today_date() -> Date {
   let #(date, _) =
     timestamp.to_calendar(timestamp.system_time(), calendar.local_offset())
   date
@@ -136,7 +170,7 @@ fn render_day_cell(
   date: Date,
   is_current_month: Bool,
   selected: Option(Date),
-  today: Option(Date),
+  today_opt: Option(Date),
   show_outside: Bool,
   on_select: fn(Date) -> msg,
 ) -> Element(msg) {
@@ -144,7 +178,7 @@ fn render_day_cell(
     Some(s) -> dates_equal(date, s)
     None -> False
   }
-  let is_today = case today {
+  let is_today = case today_opt {
     Some(t) -> dates_equal(date, t)
     None -> False
   }
@@ -195,18 +229,20 @@ fn render_day_cell(
   }
 }
 
-pub fn calendar(
+/// Render the calendar grid for `view_year`/`view_month`. `on_prev_month`/
+/// `on_next_month` fire on the header nav buttons.
+pub fn view(
+  config: CalendarConfig,
   selected: Option(Date),
   view_year: Int,
   view_month: Month,
   on_select: fn(Date) -> msg,
   on_prev_month: msg,
   on_next_month: msg,
-  attrs: CalendarAttrs,
 ) -> Element(msg) {
   let dim = days_in_month(view_year, view_month)
   let first_dow = day_of_week(view_year, view_month)
-  let extra_class_attrs = case attrs.class {
+  let extra_class_attrs = case config.class {
     "" -> []
     c -> [a.class(c)]
   }
@@ -222,8 +258,8 @@ pub fn calendar(
         date,
         is_current,
         selected,
-        attrs.today,
-        attrs.show_outside_days,
+        config.today,
+        config.show_outside_days,
         on_select,
       )
     })
@@ -255,6 +291,8 @@ pub fn calendar(
   ])
 }
 
+// --- Convenience shortcuts ---
+
 pub fn calendar_simple(
   selected: Option(Date),
   view_year: Int,
@@ -263,13 +301,6 @@ pub fn calendar_simple(
   on_prev_month: msg,
   on_next_month: msg,
 ) -> Element(msg) {
-  calendar(
-    selected,
-    view_year,
-    view_month,
-    on_select,
-    on_prev_month,
-    on_next_month,
-    default_attrs,
-  )
+  new()
+  |> view(selected, view_year, view_month, on_select, on_prev_month, on_next_month)
 }

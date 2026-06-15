@@ -46,7 +46,7 @@ pub fn next_month_mid_year_test() {
 }
 
 pub fn today_returns_date_test() {
-  let d = cal.today()
+  let d = cal.today_date()
   let assert True = d.year >= 2024
   let assert True = d.day >= 1
   let assert True = d.day <= 31
@@ -114,30 +114,18 @@ pub fn calendar_selected_date_test() {
 pub fn calendar_today_highlight_test() {
   let today = Date(2026, January, 10)
   let html =
-    cal.calendar(
-      None,
-      2026,
-      January,
-      on_select,
-      on_prev(),
-      on_next(),
-      cal.CalendarAttrs(..cal.default_attrs, today: Some(today)),
-    )
+    cal.new()
+    |> cal.today(today)
+    |> cal.view(None, 2026, January, on_select, on_prev(), on_next())
     |> element.to_string()
   let assert True = string.contains(html, "calendar-day-today")
 }
 
 pub fn calendar_outside_days_hidden_test() {
   let html =
-    cal.calendar(
-      None,
-      2026,
-      January,
-      on_select,
-      on_prev(),
-      on_next(),
-      cal.CalendarAttrs(..cal.default_attrs, show_outside_days: False),
-    )
+    cal.new()
+    |> cal.show_outside_days(False)
+    |> cal.view(None, 2026, January, on_select, on_prev(), on_next())
     |> element.to_string()
   let assert True = string.contains(html, "calendar-day-empty")
 }
@@ -166,15 +154,9 @@ pub fn calendar_aria_label_on_day_test() {
 
 pub fn calendar_custom_class_test() {
   let html =
-    cal.calendar(
-      None,
-      2026,
-      January,
-      on_select,
-      on_prev(),
-      on_next(),
-      cal.CalendarAttrs(..cal.default_attrs, class: "my-custom"),
-    )
+    cal.new()
+    |> cal.add_class("my-custom")
+    |> cal.view(None, 2026, January, on_select, on_prev(), on_next())
     |> element.to_string()
   let assert True = string.contains(html, "my-custom")
 }
@@ -306,7 +288,9 @@ pub fn date_picker_aria_expanded_true_when_open_test() {
 
 pub fn date_picker_custom_placeholder_test() {
   let html =
-    date_picker.date_picker(
+    date_picker.new()
+    |> date_picker.placeholder("Select a date...")
+    |> date_picker.view(
       None,
       False,
       2026,
@@ -314,10 +298,6 @@ pub fn date_picker_custom_placeholder_test() {
       dp_on_select,
       dp_on_month,
       dp_on_open,
-      date_picker.DatePickerAttrs(
-        ..date_picker.default_attrs,
-        placeholder: "Select a date...",
-      ),
     )
     |> element.to_string()
   let assert True = string.contains(html, "Select a date...")
@@ -325,7 +305,9 @@ pub fn date_picker_custom_placeholder_test() {
 
 pub fn date_picker_disabled_test() {
   let html =
-    date_picker.date_picker(
+    date_picker.new()
+    |> date_picker.disabled(True)
+    |> date_picker.view(
       None,
       False,
       2026,
@@ -333,7 +315,6 @@ pub fn date_picker_disabled_test() {
       dp_on_select,
       dp_on_month,
       dp_on_open,
-      date_picker.DatePickerAttrs(..date_picker.default_attrs, disabled: True),
     )
     |> element.to_string()
   let assert True = string.contains(html, "disabled")
