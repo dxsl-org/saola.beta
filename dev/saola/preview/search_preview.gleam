@@ -27,24 +27,16 @@ pub fn view(model: Model) -> Element(Message) {
       ]),
       DocSection("small", "Small size", [
         h.div([a.class("max-w-sm mt-4")], [
-          search.search(
-            search.Small,
-            model.search_query,
-            SearchQueryChanged,
-            None,
-            search.default_attrs,
-          ),
+          search.new()
+          |> search.size(search.Small)
+          |> search.view(model.search_query, SearchQueryChanged, None),
         ]),
       ]),
       DocSection("disabled", "Disabled", [
         h.div([a.class("max-w-sm mt-4")], [
-          search.search(
-            search.Large,
-            "",
-            SearchQueryChanged,
-            None,
-            search.SearchAttrs(..search.default_attrs, disabled: True),
-          ),
+          search.new()
+          |> search.disabled(True)
+          |> search.view("", SearchQueryChanged, None),
         ]),
         h.div([a.class("mt-4")], [
           h.p([a.class("text-muted-foreground text-sm")], [
@@ -63,10 +55,9 @@ pub fn view(model: Model) -> Element(Message) {
           "search.search_clearable(model.search_query, SearchQueryChanged, SearchQueryChanged(\"\"))",
           "",
           "// Disabled",
-          "search.search(",
-          "  search.Large, \"\", SearchQueryChanged, None,",
-          "  search.SearchAttrs(..search.default_attrs, disabled: True),",
-          ")",
+          "search.new()",
+          "  |> search.disabled(True)",
+          "  |> search.view(\"\", SearchQueryChanged, None)",
         ]),
       ]),
     ],

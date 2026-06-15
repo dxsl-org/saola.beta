@@ -1,3 +1,13 @@
+//// Native select widget (styled `<select>` with optgroups) — dual-style
+//// `Config` (uniform Saola pattern):
+////
+//// ```gleam
+//// native_select.native_select_simple(opts, model.v, "country", Picked)  // shortcut
+//// native_select.new()
+//// |> native_select.size(native_select.Small)
+//// |> native_select.view(opts, model.v, "country", Picked)
+//// ```
+
 import gleam/list
 import lustre/attribute as a
 import lustre/element.{type Element}
@@ -14,20 +24,42 @@ pub type NativeSelectSize {
   Small
 }
 
-pub type NativeSelectAttrs {
-  NativeSelectAttrs(size: NativeSelectSize, disabled: Bool, class: String)
+/// Presentation options for a native select. Public for record-update syntax.
+/// The `options`, `value`, `name`, and `on_change` are required data (`view`).
+pub type NativeSelectConfig {
+  NativeSelectConfig(size: NativeSelectSize, disabled: Bool, class: String)
 }
 
-pub const default_attrs = NativeSelectAttrs(
-  size: Default,
-  disabled: False,
-  class: "",
-)
+/// Builder entry point. Defaults: Default size, enabled, no extra class.
+pub fn new() -> NativeSelectConfig {
+  NativeSelectConfig(size: Default, disabled: False, class: "")
+}
 
-fn render_option(
-  opt: NativeSelectOption,
-  current_value: String,
-) -> Element(msg) {
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> NativeSelectConfig {
+  new()
+}
+
+/// Set the size (Default, Small).
+pub fn size(config: NativeSelectConfig, size: NativeSelectSize) -> NativeSelectConfig {
+  NativeSelectConfig(..config, size: size)
+}
+
+/// Set the disabled state.
+pub fn disabled(config: NativeSelectConfig, disabled: Bool) -> NativeSelectConfig {
+  NativeSelectConfig(..config, disabled: disabled)
+}
+
+/// Append an extra CSS class on the wrapper. Additive only.
+pub fn add_class(config: NativeSelectConfig, class: String) -> NativeSelectConfig {
+  let merged = case config.class {
+    "" -> class
+    existing -> existing <> " " <> class
+  }
+  NativeSelectConfig(..config, class: merged)
+}
+
+fn render_option(opt: NativeSelectOption, current_value: String) -> Element(msg) {
   case opt {
     NativeSelectOption(value, label) ->
       h.option([a.value(value), a.selected(value == current_value)], label)
@@ -39,22 +71,24 @@ fn render_option(
   }
 }
 
-pub fn native_select(
+/// Render the styled native `<select>`. `value` marks the selected option;
+/// `name` sets the form name; `on_change` wires the change handler.
+pub fn view(
+  config: NativeSelectConfig,
   options: List(NativeSelectOption),
   value: String,
   name: String,
   on_change: fn(String) -> msg,
-  attrs: NativeSelectAttrs,
 ) -> Element(msg) {
-  let size_class = case attrs.size {
+  let size_class = case config.size {
     Default -> "native-select"
     Small -> "native-select native-select-sm"
   }
-  let extra_class_attrs = case attrs.class {
+  let extra_class_attrs = case config.class {
     "" -> []
     c -> [a.class(c)]
   }
-  let disabled_attrs = case attrs.disabled {
+  let disabled_attrs = case config.disabled {
     True -> [a.disabled(True)]
     False -> []
   }
@@ -77,11 +111,13 @@ pub fn native_select(
   )
 }
 
+// --- Convenience shortcuts ---
+
 pub fn native_select_simple(
   options: List(NativeSelectOption),
   value: String,
   name: String,
   on_change: fn(String) -> msg,
 ) -> Element(msg) {
-  native_select(options, value, name, on_change, default_attrs)
+  new() |> view(options, value, name, on_change)
 }

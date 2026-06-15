@@ -1,3 +1,13 @@
+//// Search input widget — dual-style `Config` (uniform Saola pattern):
+////
+//// ```gleam
+//// search.search_simple(model.q, QueryChanged)                       // shortcut
+//// search.search_clearable(model.q, QueryChanged, QueryCleared)      // shortcut + X
+//// search.new()
+//// |> search.size(search.Small)
+//// |> search.view(model.q, QueryChanged, Some(QueryCleared))
+//// ```
+
 import gleam/list
 import gleam/option.{type Option, None, Some}
 import lustre/attribute as a
@@ -10,32 +20,76 @@ pub type SearchSize {
   Large
 }
 
-pub type SearchAttrs {
-  SearchAttrs(placeholder: String, disabled: Bool, name: String, class: String)
+/// Presentation options for a search input. Public for record-update syntax.
+/// The `value`, `on_input`, and `on_clear` are required data, passed to `view`.
+pub type SearchConfig {
+  SearchConfig(
+    size: SearchSize,
+    placeholder: String,
+    disabled: Bool,
+    name: String,
+    class: String,
+  )
 }
 
-pub const default_attrs = SearchAttrs(
-  placeholder: "Search…",
-  disabled: False,
-  name: "",
-  class: "",
-)
+/// Builder entry point. Defaults: Large, "Search…" placeholder, enabled.
+pub fn new() -> SearchConfig {
+  SearchConfig(
+    size: Large,
+    placeholder: "Search…",
+    disabled: False,
+    name: "",
+    class: "",
+  )
+}
 
-/// Search input with optional clear button.
-///
-/// - `on_clear`: when `Some(msg)`, an X button appears and dispatches `msg` on click.
-pub fn search(
-  size: SearchSize,
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> SearchConfig {
+  new()
+}
+
+/// Set the size (Large — default, Small).
+pub fn size(config: SearchConfig, size: SearchSize) -> SearchConfig {
+  SearchConfig(..config, size: size)
+}
+
+/// Set the placeholder text.
+pub fn placeholder(config: SearchConfig, placeholder: String) -> SearchConfig {
+  SearchConfig(..config, placeholder: placeholder)
+}
+
+/// Set the disabled state.
+pub fn disabled(config: SearchConfig, disabled: Bool) -> SearchConfig {
+  SearchConfig(..config, disabled: disabled)
+}
+
+/// Set the `name` attribute.
+pub fn name(config: SearchConfig, name: String) -> SearchConfig {
+  SearchConfig(..config, name: name)
+}
+
+/// Append an extra CSS class on the wrapper. Additive only.
+pub fn add_class(config: SearchConfig, class: String) -> SearchConfig {
+  let merged = case config.class {
+    "" -> class
+    existing -> existing <> " " <> class
+  }
+  SearchConfig(..config, class: merged)
+}
+
+/// Render the search input. When `on_clear` is `Some(msg)`, an X button appears
+/// and dispatches `msg` on click.
+pub fn view(
+  config: SearchConfig,
   value: String,
   on_input: fn(String) -> msg,
   on_clear: Option(msg),
-  attrs: SearchAttrs,
 ) -> Element(msg) {
-  let size_class = case size {
+  let size_class = case config.size {
     Small -> " input-sm"
     Large -> ""
   }
-  let extra_class = case attrs.class {
+  let extra_class = case config.class {
     "" -> ""
     c -> " " <> c
   }
@@ -69,15 +123,15 @@ pub fn search(
             ),
             a.value(value),
           ],
-          case attrs.placeholder {
+          case config.placeholder {
             "" -> []
             p -> [a.placeholder(p)]
           },
-          case attrs.name {
+          case config.name {
             "" -> []
             n -> [a.name(n)]
           },
-          case attrs.disabled {
+          case config.disabled {
             True -> [a.disabled(True)]
             False -> []
           },
@@ -89,11 +143,10 @@ pub fn search(
   )
 }
 
-pub fn search_simple(
-  value: String,
-  on_input: fn(String) -> msg,
-) -> Element(msg) {
-  search(Large, value, on_input, None, default_attrs)
+// --- Convenience shortcuts ---
+
+pub fn search_simple(value: String, on_input: fn(String) -> msg) -> Element(msg) {
+  new() |> view(value, on_input, None)
 }
 
 pub fn search_clearable(
@@ -101,5 +154,5 @@ pub fn search_clearable(
   on_input: fn(String) -> msg,
   on_clear: msg,
 ) -> Element(msg) {
-  search(Large, value, on_input, Some(on_clear), default_attrs)
+  new() |> view(value, on_input, Some(on_clear))
 }

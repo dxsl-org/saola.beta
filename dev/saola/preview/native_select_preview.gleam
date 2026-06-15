@@ -1,5 +1,5 @@
 import lustre/attribute as a
-import lustre/element.{type Element, text}
+import lustre/element.{type Element}
 import lustre/element/html as h
 import saola/native_select
 import saola/preview/model.{type Message, type Model, NativeSelectChanged}
@@ -42,7 +42,9 @@ pub fn view(model: Model) -> Element(Message) {
     ]),
     DocSection("small", "Small", [
       h.div([a.class("grid gap-4 mt-4")], [
-        native_select.native_select(
+        native_select.new()
+        |> native_select.size(native_select.Small)
+        |> native_select.view(
           [
             native_select.NativeSelectOption("xs", "Extra Small"),
             native_select.NativeSelectOption("sm", "Small"),
@@ -51,17 +53,14 @@ pub fn view(model: Model) -> Element(Message) {
           "sm",
           "size",
           fn(v) { NativeSelectChanged(v) },
-          native_select.NativeSelectAttrs(
-            size: native_select.Small,
-            disabled: False,
-            class: "",
-          ),
         ),
       ]),
     ]),
     DocSection("disabled", "Disabled", [
       h.div([a.class("grid gap-4 mt-4")], [
-        native_select.native_select(
+        native_select.new()
+        |> native_select.disabled(True)
+        |> native_select.view(
           [
             native_select.NativeSelectOption("a", "Option A"),
             native_select.NativeSelectOption("b", "Option B"),
@@ -69,11 +68,6 @@ pub fn view(model: Model) -> Element(Message) {
           "a",
           "disabled-demo",
           fn(v) { NativeSelectChanged(v) },
-          native_select.NativeSelectAttrs(
-            size: native_select.Default,
-            disabled: True,
-            class: "",
-          ),
         ),
       ]),
     ]),

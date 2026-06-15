@@ -56,7 +56,9 @@ pub fn search_clearable_has_clear_button_test() {
 
 pub fn search_small_has_input_sm_class_test() {
   let html =
-    search.search(search.Small, "", fn(_) { Nil }, None, search.default_attrs)
+    search.new()
+    |> search.size(search.Small)
+    |> search.view("", fn(_) { Nil }, None)
     |> element.to_string
   assert string.contains(html, "input-sm")
 }

@@ -332,11 +332,9 @@ pub fn input_otp_renders_slots_test() {
 
 pub fn input_otp_custom_length_test() {
   let html =
-    input_otp.input_otp(
-      "",
-      fn(v) { v },
-      input_otp.InputOtpAttrs(..input_otp.default_attrs, length: 4),
-    )
+    input_otp.new()
+    |> input_otp.length(4)
+    |> input_otp.view("", fn(v) { v })
     |> element.to_string
   assert string.contains(html, "otp-slot-3")
   assert !string.contains(html, "otp-slot-4")

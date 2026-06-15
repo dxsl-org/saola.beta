@@ -23,11 +23,9 @@ pub fn view(model: Model) -> Element(Message) {
     ]),
     DocSection("four-digit", "4-digit PIN", [
       h.div([a.class("grid gap-4 mt-4")], [
-        input_otp.input_otp(
-          model.input_otp_value,
-          InputOtpChanged,
-          input_otp.InputOtpAttrs(..input_otp.default_attrs, length: 4),
-        ),
+        input_otp.new()
+        |> input_otp.length(4)
+        |> input_otp.view(model.input_otp_value, InputOtpChanged),
       ]),
     ]),
     DocSection("usage", "Usage", [
@@ -38,11 +36,9 @@ pub fn view(model: Model) -> Element(Message) {
         "input_otp.input_otp_simple(model.input_otp_value, InputOtpChanged)",
         "",
         "// 4-digit PIN",
-        "input_otp.input_otp(",
-        "  model.input_otp_value,",
-        "  InputOtpChanged,",
-        "  input_otp.InputOtpAttrs(..input_otp.default_attrs, length: 4),",
-        ")",
+        "input_otp.new()",
+        "  |> input_otp.length(4)",
+        "  |> input_otp.view(model.input_otp_value, InputOtpChanged)",
       ]),
     ]),
   ])

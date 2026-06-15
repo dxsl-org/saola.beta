@@ -23,24 +23,22 @@ pub fn view(volume: Int, brightness: Int) -> Element(Message) {
             h.label([a.class("label")], [
               text("Brightness: " <> int.to_string(brightness) <> "%"),
             ]),
-            slider.slider(
+            slider.new()
+              |> slider.min(10)
+              |> slider.step(10)
+              |> slider.aria_label("Brightness")
+              |> slider.view(
               slider.SyncValue(brightness),
-              on_input: fn(v) { SliderChanged("brightness", v) },
-              attrs: slider.SliderAttrs(
-                ..slider.default_attrs,
-                min: 10,
-                max: 100,
-                step: 10,
-                aria_label: "Brightness",
-              ),
+              fn(v) { SliderChanged("brightness", v) },
             ),
           ]),
           h.div([a.class("grid gap-2")], [
             h.label([a.class("label")], [text("Disabled slider")]),
-            slider.slider(
+            slider.new()
+              |> slider.disabled(True)
+              |> slider.view(
               slider.SyncValue(40),
-              on_input: fn(v) { SliderChanged("disabled", v) },
-              attrs: slider.SliderAttrs(..slider.default_attrs, disabled: True),
+              fn(v) { SliderChanged("disabled", v) },
             ),
           ]),
         ]),
@@ -53,11 +51,11 @@ pub fn view(volume: Int, brightness: Int) -> Element(Message) {
           "slider.slider_simple(model.volume, fn(v) { SliderChanged(\"volume\", v) })",
           "",
           "// Full — custom range and step",
-          "slider.slider(",
-          "  slider.SyncValue(model.brightness),",
-          "  on_input: fn(v) { SliderChanged(\"brightness\", v) },",
-          "  attrs: slider.SliderAttrs(..slider.default_attrs, min: 10, max: 100, step: 10),",
-          ")",
+          "slider.new()",
+          "  |> slider.min(10)",
+          "  |> slider.step(10)",
+          "  |> slider.aria_label(\"Brightness\")",
+          "  |> slider.view(slider.SyncValue(model.brightness), fn(v) { SliderChanged(\"brightness\", v) })",
         ]),
       ]),
     ],

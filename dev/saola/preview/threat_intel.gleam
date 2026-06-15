@@ -172,18 +172,11 @@ fn data_column(model: Model) -> Element(Message) {
 fn controls_panel(model: Model) -> Element(Message) {
   let actors = threat_intel_data.all_actors()
   h.div([a.class("threat-intel-controls")], [
-    search.search(
-      search.Small,
-      model.threat_search,
-      ThreatSearchChanged,
-      Some(ThreatSearchCleared),
-      search.SearchAttrs(
-        placeholder: "Search actors…",
-        disabled: False,
-        name: "",
-        class: "threat-intel-search",
-      ),
-    ),
+    search.new()
+    |> search.size(search.Small)
+    |> search.placeholder("Search actors…")
+    |> search.add_class("threat-intel-search")
+    |> search.view(model.threat_search, ThreatSearchChanged, Some(ThreatSearchCleared)),
     multi_select.element([
       a.property(
         "choices",

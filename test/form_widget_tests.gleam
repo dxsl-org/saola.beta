@@ -205,19 +205,13 @@ pub fn slider_simple_renders_test() {
 
 pub fn slider_custom_range_renders_test() {
   let html =
-    slider.slider(
-      slider.SyncValue(30),
-      on_input: fn(_) { Nil },
-      attrs: slider.SliderAttrs(
-        min: 10,
-        max: 60,
-        step: 5,
-        disabled: False,
-        name: "volume",
-        class: "",
-        aria_label: "Volume",
-      ),
-    )
+    slider.new()
+    |> slider.min(10)
+    |> slider.max(60)
+    |> slider.step(5)
+    |> slider.name("volume")
+    |> slider.aria_label("Volume")
+    |> slider.view(slider.SyncValue(30), fn(_) { Nil })
     |> element.to_string
   assert string.contains(html, "min=\"10\"")
   assert string.contains(html, "max=\"60\"")

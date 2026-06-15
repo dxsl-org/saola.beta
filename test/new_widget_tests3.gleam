@@ -93,16 +93,13 @@ pub fn native_select_optgroup_renders_test() {
 
 pub fn native_select_disabled_test() {
   let html =
-    native_select.native_select(
+    native_select.new()
+    |> native_select.disabled(True)
+    |> native_select.view(
       [native_select.NativeSelectOption("a", "A")],
       "a",
       "n",
       fn(v) { v },
-      native_select.NativeSelectAttrs(
-        size: native_select.Default,
-        disabled: True,
-        class: "",
-      ),
     )
     |> element.to_string
   assert string.contains(html, "disabled")
@@ -110,16 +107,13 @@ pub fn native_select_disabled_test() {
 
 pub fn native_select_small_class_test() {
   let html =
-    native_select.native_select(
+    native_select.new()
+    |> native_select.size(native_select.Small)
+    |> native_select.view(
       [native_select.NativeSelectOption("a", "A")],
       "a",
       "n",
       fn(v) { v },
-      native_select.NativeSelectAttrs(
-        size: native_select.Small,
-        disabled: False,
-        class: "",
-      ),
     )
     |> element.to_string
   assert string.contains(html, "native-select-sm")
