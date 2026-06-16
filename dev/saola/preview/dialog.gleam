@@ -1,5 +1,5 @@
 import lustre/attribute as a
-import lustre/element.{type Element, text}
+import lustre/element.{type Element}
 import lustre/element/html as h
 import saola/button
 import saola/dialog
