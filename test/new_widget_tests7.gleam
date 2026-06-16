@@ -73,6 +73,40 @@ pub fn field_required_and_hint_together_test() {
   assert string.contains(html, "Include country code.")
 }
 
+// --- field accessibility wiring (field_id) ---
+
+pub fn field_id_wires_label_for_test() {
+  let html =
+    field.new()
+    |> field.label("Email")
+    |> field.field_id("email-1")
+    |> field.view(h.input([]))
+    |> element.to_string
+  assert string.contains(html, "for=\"email-1\"")
+}
+
+pub fn field_id_sets_hint_and_error_ids_test() {
+  let html =
+    field.new()
+    |> field.label("Email")
+    |> field.hint("We won't spam.")
+    |> field.error("Required.")
+    |> field.field_id("email-1")
+    |> field.view(h.input([]))
+    |> element.to_string
+  assert string.contains(html, "id=\"email-1-hint\"")
+  assert string.contains(html, "id=\"email-1-error\"")
+}
+
+pub fn field_without_id_omits_for_test() {
+  let html =
+    field.new()
+    |> field.label("Email")
+    |> field.view(h.input([]))
+    |> element.to_string
+  assert !string.contains(html, "for=")
+}
+
 // --- watch_system_dark ---
 
 pub fn watch_system_dark_creates_effect_test() {

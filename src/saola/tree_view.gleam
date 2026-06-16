@@ -6,8 +6,11 @@
 //// |> tree_view.add_class("my-tree")
 //// |> tree_view.view(items, model.open, OnToggle, Some(OnSelect))
 //// ```
-//// Consumer owns which node IDs are open (`open_ids`).
+//// Consumer owns which node IDs are open (`open_ids`). Nodes are keyboard
+//// reachable (`tabindex="0"`) and activate on `Enter` (toggle a branch /
+//// select a leaf); `aria-expanded` sits on each `role="treeitem"`.
 
+import gleam/dynamic/decode
 import gleam/int
 import gleam/list
 import gleam/option.{type Option, None, Some}
@@ -109,10 +112,6 @@ fn render_node(
     True -> [
       a.class("tree-node-row"),
       a.style("padding-left", calc_indent(depth)),
-      a.attribute("aria-expanded", case is_open {
-        True -> "true"
-        False -> "false"
-      }),
       e.on_click(on_toggle(item.id)),
     ]
     False -> {
@@ -126,7 +125,28 @@ fn render_node(
       ])
     }
   }
-  h.li([a.class(node_class), a.role("treeitem")], [
+  // `aria-expanded` belongs on the treeitem itself (the <li>), not the inner
+  // row; the same <li> is the focusable, keyboard-activatable node.
+  let aria_expanded_attrs = case has_children {
+    True -> [
+      a.attribute("aria-expanded", case is_open {
+        True -> "true"
+        False -> "false"
+      }),
+    ]
+    False -> []
+  }
+  let li_attrs =
+    list.flatten([
+      [
+        a.class(node_class),
+        a.role("treeitem"),
+        a.attribute("tabindex", "0"),
+        e.on("keydown", decode_activate(item.id, has_children, on_toggle, on_select)),
+      ],
+      aria_expanded_attrs,
+    ])
+  h.li(li_attrs, [
     h.div(row_attrs, [
       expand_el,
       icon_el,
@@ -148,6 +168,29 @@ fn render_node(
 fn calc_indent(depth: Int) -> String {
   let px = depth * 16 + 8
   int.to_string(px) <> "px"
+}
+
+/// Keyboard activation for a focused treeitem: `Enter` toggles a branch or
+/// selects a leaf, mirroring the click behaviour. Other keys fall through so
+/// `Tab` still moves focus. `Enter` has no default scroll, so no
+/// `prevent_default` is needed; arrow-key roving navigation would require the
+/// consumer to track a focused id and is left as a future enhancement.
+fn decode_activate(
+  id: String,
+  has_children: Bool,
+  on_toggle: fn(String) -> msg,
+  on_select: Option(fn(String) -> msg),
+) -> decode.Decoder(msg) {
+  use key <- decode.field("key", decode.string)
+  case key, has_children {
+    "Enter", True -> decode.success(on_toggle(id))
+    "Enter", False ->
+      case on_select {
+        Some(f) -> decode.success(f(id))
+        None -> decode.failure(on_toggle(id), "no select handler")
+      }
+    _, _ -> decode.failure(on_toggle(id), "not an activation key")
+  }
 }
 
 // --- Convenience shortcuts ---

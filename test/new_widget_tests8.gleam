@@ -194,6 +194,23 @@ pub fn tree_view_open_node_has_open_class_test() {
   assert string.contains(html, "aria-expanded=\"true\"")
 }
 
+pub fn tree_view_nodes_are_keyboard_reachable_test() {
+  let items = [tree_view.TreeItem("root", "Root", None, [])]
+  let html =
+    tree_view.tree_view_simple(items, [], fn(id) { id })
+    |> element.to_string
+  assert string.contains(html, "role=\"treeitem\"")
+  assert string.contains(html, "tabindex=\"0\"")
+}
+
+pub fn tree_view_leaf_omits_aria_expanded_test() {
+  let items = [tree_view.TreeItem("leaf1", "Leaf", None, [])]
+  let html =
+    tree_view.tree_view_simple(items, [], fn(id) { id })
+    |> element.to_string
+  assert !string.contains(html, "aria-expanded")
+}
+
 // --- timeline ---
 
 pub fn timeline_simple_renders_ol_test() {

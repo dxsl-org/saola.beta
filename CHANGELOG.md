@@ -7,6 +7,7 @@ Full per-batch history lives in [`docs/project-changelog.md`](docs/project-chang
 
 ### Added
 
+- **`field.field_id` accessibility wiring** — set it to the same `id` as the wrapped input and the `<label>` targets it via `for`, while the hint/error get `<id>-hint`/`<id>-error` ids for the input's `aria-describedby`. Additive and opt-in: empty (the default) emits none of these, preserving prior output (the widget can't inject attributes into a pre-built input).
 - **Modular CSS distribution** — per-widget colocated stylesheets (`src/saola/<widget>.css`, 25 generated from Basecoat + 29 authored) and five bundles in `priv/static/`: `saola.css` (full), `saola-base.css`, `saola-components.css`, `saola-charts.css`, `saola-preflight.css` (opt-in global reset). Consumers import the full bundle, a group bundle, or a single widget file (self-sufficient via `@import "./base.css"`).
 - **CSS build pipeline** — `scripts/build-css.mjs` (selector-set slicer with fail-loud guards, `@generated`/`saola:custom` region contract) + `scripts/bundle-css.mjs` (ordered-manifest concatenation), runnable via `just build-css`; idempotent and re-runnable after Basecoat submodule syncs.
 - **Button styling guide** — the button preview page (a "Customizing Styles" section) and the `saola/button` module docs now spell out the three CSS customization layers: theme tokens (`--color-*`/`--radius-*`), per-widget override (unlayered rules beat `@layer saola.*` without `!important`), and `add_class` for one-offs. Clarifies that `@generated` only forbids editing the sliced `src/saola/*.css`, not customizing from your own stylesheet.
@@ -17,6 +18,7 @@ Full per-batch history lives in [`docs/project-changelog.md`](docs/project-chang
 
 ### Fixed
 
+- **Tree view is keyboard accessible** — `aria-expanded` now sits on each `role="treeitem"` (the `<li>`, was on an inner `<div>`), nodes carry `tabindex="0"` so they are Tab-reachable, and `Enter` activates the focused node (toggles a branch / selects a leaf). Leaves no longer emit `aria-expanded`. (Arrow-key roving navigation is intentionally deferred — it needs consumer-tracked focus state.)
 - **Icon-only buttons use the square Basecoat class** — an empty label with an icon (or loading spinner) now emits `btn-{sm,lg}-icon-{variant}` instead of the text-padded `btn-{sm,lg}-{variant}`, so `button_close` and other icon-only buttons render as proper squares rather than mis-shapen narrow buttons.
 - **Disabled/loading anchors are genuinely inert** — an anchor-rendered button omits `href` while inert (`Loading`/`Suspended`/`Disabled`), keeping `aria-disabled` + `tabindex="-1"`. Previously the link kept its `href` and stayed mouse-clickable since `aria-disabled` is advisory only.
 - **Loading & aria-disabled states are visually dimmed** — buttons/anchors using `aria-busy`/`aria-disabled` (loading buttons, disabled anchors) now get `opacity: 50%` + `pointer-events: none`, mirroring Basecoat's native `:disabled` visual that those aria-state elements never matched.

@@ -24,6 +24,12 @@ pub type FieldOrientation {
 
 /// Presentation options for a field. Public for record-update syntax. The
 /// wrapped `input` element is the required data, passed to `view`.
+///
+/// `field_id` wires accessibility: set it to the same `id` you put on the
+/// input. The `<label>` then targets the input via `for`, and the hint/error
+/// get ids `<field_id>-hint` / `<field_id>-error` so the consumer can point
+/// the input's `aria-describedby` at them. Left empty, none of these are
+/// emitted (the widget cannot inject attributes into the pre-built input).
 pub type FieldConfig {
   FieldConfig(
     label: String,
@@ -32,11 +38,12 @@ pub type FieldConfig {
     orientation: FieldOrientation,
     required: Bool,
     hint: String,
+    field_id: String,
   )
 }
 
-/// Builder entry point. Defaults: no label/description/error/hint, Vertical,
-/// not required.
+/// Builder entry point. Defaults: no label/description/error/hint/id,
+/// Vertical, not required.
 pub fn new() -> FieldConfig {
   FieldConfig(
     label: "",
@@ -45,6 +52,7 @@ pub fn new() -> FieldConfig {
     orientation: Vertical,
     required: False,
     hint: "",
+    field_id: "",
   )
 }
 
@@ -83,6 +91,13 @@ pub fn hint(config: FieldConfig, hint: String) -> FieldConfig {
   FieldConfig(..config, hint: hint)
 }
 
+/// Set the field's accessible id — must match the `id` on the wrapped input.
+/// Enables `<label for>` and `<field_id>-hint`/`<field_id>-error` description
+/// ids (see `FieldConfig` docs).
+pub fn field_id(config: FieldConfig, field_id: String) -> FieldConfig {
+  FieldConfig(..config, field_id: field_id)
+}
+
 /// Render the field wrapping the given `input` element.
 pub fn view(config: FieldConfig, input: Element(msg)) -> Element(msg) {
   let is_invalid = config.error != ""
@@ -94,13 +109,25 @@ pub fn view(config: FieldConfig, input: Element(msg)) -> Element(msg) {
     Vertical -> []
     Horizontal -> [a.attribute("data-orientation", "horizontal")]
   }
+  let label_for_attrs = case config.field_id {
+    "" -> []
+    id -> [a.for(id)]
+  }
+  let hint_id_attrs = case config.field_id {
+    "" -> []
+    id -> [a.id(id <> "-hint")]
+  }
+  let error_id_attrs = case config.field_id {
+    "" -> []
+    id -> [a.id(id <> "-error")]
+  }
   h.div(
     list.flatten([[a.class(class_field)], invalid_attrs, orientation_attrs]),
     [
       case config.label {
         "" -> element.none()
         l ->
-          h.label([a.class("label")], [
+          h.label(list.flatten([[a.class("label")], label_for_attrs]), [
             h.text(l),
             case config.required {
               True ->
@@ -115,7 +142,10 @@ pub fn view(config: FieldConfig, input: Element(msg)) -> Element(msg) {
       input,
       case config.hint {
         "" -> element.none()
-        h_ -> h.p([a.class("field-hint")], [h.text(h_)])
+        h_ ->
+          h.p(list.flatten([[a.class("field-hint")], hint_id_attrs]), [
+            h.text(h_),
+          ])
       },
       case config.description {
         "" -> element.none()
@@ -123,7 +153,8 @@ pub fn view(config: FieldConfig, input: Element(msg)) -> Element(msg) {
       },
       case config.error {
         "" -> element.none()
-        err -> h.p([a.role("alert")], [h.text(err)])
+        err ->
+          h.p(list.flatten([[a.role("alert")], error_id_attrs]), [h.text(err)])
       },
     ],
   )
