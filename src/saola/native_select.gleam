@@ -41,17 +41,26 @@ pub fn default_config() -> NativeSelectConfig {
 }
 
 /// Set the size (Default, Small).
-pub fn size(config: NativeSelectConfig, size: NativeSelectSize) -> NativeSelectConfig {
+pub fn size(
+  config: NativeSelectConfig,
+  size: NativeSelectSize,
+) -> NativeSelectConfig {
   NativeSelectConfig(..config, size: size)
 }
 
 /// Set the disabled state.
-pub fn disabled(config: NativeSelectConfig, disabled: Bool) -> NativeSelectConfig {
+pub fn disabled(
+  config: NativeSelectConfig,
+  disabled: Bool,
+) -> NativeSelectConfig {
   NativeSelectConfig(..config, disabled: disabled)
 }
 
 /// Append an extra CSS class on the wrapper. Additive only.
-pub fn add_class(config: NativeSelectConfig, class: String) -> NativeSelectConfig {
+pub fn add_class(
+  config: NativeSelectConfig,
+  class: String,
+) -> NativeSelectConfig {
   let merged = case config.class {
     "" -> class
     existing -> existing <> " " <> class
@@ -59,7 +68,10 @@ pub fn add_class(config: NativeSelectConfig, class: String) -> NativeSelectConfi
   NativeSelectConfig(..config, class: merged)
 }
 
-fn render_option(opt: NativeSelectOption, current_value: String) -> Element(msg) {
+fn render_option(
+  opt: NativeSelectOption,
+  current_value: String,
+) -> Element(msg) {
   case opt {
     NativeSelectOption(value, label) ->
       h.option([a.value(value), a.selected(value == current_value)], label)
@@ -92,23 +104,19 @@ pub fn view(
     True -> [a.disabled(True)]
     False -> []
   }
-  h.div(
-    list.flatten([[a.class("native-select-wrapper")], extra_class_attrs]),
-    [
-      h.select(
-        list.flatten([
-          [a.class(size_class), a.name(name)],
-          disabled_attrs,
-          [e.on_input(on_change)],
-        ]),
-        list.map(options, fn(o) { render_option(o, value) }),
-      ),
-      h.span(
-        [a.class("native-select-icon"), a.attribute("aria-hidden", "true")],
-        [h.text("▾")],
-      ),
-    ],
-  )
+  h.div(list.flatten([[a.class("native-select-wrapper")], extra_class_attrs]), [
+    h.select(
+      list.flatten([
+        [a.class(size_class), a.name(name)],
+        disabled_attrs,
+        [e.on_input(on_change)],
+      ]),
+      list.map(options, fn(o) { render_option(o, value) }),
+    ),
+    h.span([a.class("native-select-icon"), a.attribute("aria-hidden", "true")], [
+      h.text("▾"),
+    ]),
+  ])
 }
 
 // --- Convenience shortcuts ---

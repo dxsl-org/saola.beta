@@ -173,10 +173,14 @@ fn controls_panel(model: Model) -> Element(Message) {
   let actors = threat_intel_data.all_actors()
   h.div([a.class("threat-intel-controls")], [
     search.new()
-    |> search.size(search.Small)
-    |> search.placeholder("Search actors…")
-    |> search.add_class("threat-intel-search")
-    |> search.view(model.threat_search, ThreatSearchChanged, Some(ThreatSearchCleared)),
+      |> search.size(search.Small)
+      |> search.placeholder("Search actors…")
+      |> search.add_class("threat-intel-search")
+      |> search.view(
+        model.threat_search,
+        ThreatSearchChanged,
+        Some(ThreatSearchCleared),
+      ),
     multi_select.element([
       a.property(
         "choices",
@@ -308,7 +312,11 @@ fn table_panel(model: Model) -> Element(Message) {
     case rows {
       [] ->
         empty.new()
-        |> empty.view("No actors match", [h.text("Adjust the filters or search query.")], [])
+        |> empty.view(
+          "No actors match",
+          [h.text("Adjust the filters or search query.")],
+          [],
+        )
       _ ->
         data_table.new()
         |> data_table.show_filter(False)

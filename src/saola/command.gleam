@@ -44,7 +44,10 @@ pub fn default_config() -> CommandConfig {
 }
 
 /// Set the search input placeholder.
-pub fn placeholder(config: CommandConfig, placeholder: String) -> CommandConfig {
+pub fn placeholder(
+  config: CommandConfig,
+  placeholder: String,
+) -> CommandConfig {
   CommandConfig(..config, placeholder: placeholder)
 }
 
@@ -127,7 +130,10 @@ fn render_item(
       idx + 1,
     )
     CommandSeparator -> #(
-      h.div([a.class("command-separator"), a.attribute("role", "separator")], []),
+      h.div(
+        [a.class("command-separator"), a.attribute("role", "separator")],
+        [],
+      ),
       idx,
     )
     CommandGroup(group_label, sub_items) -> {
@@ -315,6 +321,9 @@ pub fn command_nav_up(highlighted: Int, items: List(CommandItem(msg))) -> Int {
   command_clamp_highlight(highlighted - 1, items)
 }
 
-pub fn command_nav_down(highlighted: Int, items: List(CommandItem(msg))) -> Int {
+pub fn command_nav_down(
+  highlighted: Int,
+  items: List(CommandItem(msg)),
+) -> Int {
   command_clamp_highlight(highlighted + 1, items)
 }

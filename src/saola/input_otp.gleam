@@ -92,27 +92,29 @@ pub fn view(
     slot_indices(config.length)
     |> list.map(fn(idx) {
       let slot_val = char_at(chars, idx)
-      h.input(list.flatten([
-        [
-          a.type_("text"),
-          a.class("input input-otp-slot"),
-          a.id("otp-slot-" <> int.to_string(idx)),
-          a.value(slot_val),
-          a.attribute("maxlength", "1"),
-          a.attribute("inputmode", "numeric"),
-          a.attribute("autocomplete", "one-time-code"),
-          a.attribute("aria-label", "Digit " <> int.to_string(idx + 1)),
-        ],
-        disabled_attrs,
-        [
-          e.on_input(fn(new_char) {
-            let before = list.take(chars, idx)
-            let after = list.drop(chars, idx + 1)
-            let new_chars = list.flatten([before, [new_char], after])
-            on_change(string.join(new_chars, ""))
-          }),
-        ],
-      ]))
+      h.input(
+        list.flatten([
+          [
+            a.type_("text"),
+            a.class("input input-otp-slot"),
+            a.id("otp-slot-" <> int.to_string(idx)),
+            a.value(slot_val),
+            a.attribute("maxlength", "1"),
+            a.attribute("inputmode", "numeric"),
+            a.attribute("autocomplete", "one-time-code"),
+            a.attribute("aria-label", "Digit " <> int.to_string(idx + 1)),
+          ],
+          disabled_attrs,
+          [
+            e.on_input(fn(new_char) {
+              let before = list.take(chars, idx)
+              let after = list.drop(chars, idx + 1)
+              let new_chars = list.flatten([before, [new_char], after])
+              on_change(string.join(new_chars, ""))
+            }),
+          ],
+        ]),
+      )
     })
   h.div(
     list.flatten([

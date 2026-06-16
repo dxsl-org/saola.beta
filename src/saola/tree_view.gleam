@@ -142,7 +142,10 @@ fn render_node(
         a.class(node_class),
         a.role("treeitem"),
         a.attribute("tabindex", "0"),
-        e.on("keydown", decode_activate(item.id, has_children, on_toggle, on_select)),
+        e.on(
+          "keydown",
+          decode_activate(item.id, has_children, on_toggle, on_select),
+        ),
       ],
       aria_expanded_attrs,
     ])

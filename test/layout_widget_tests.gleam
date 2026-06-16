@@ -161,10 +161,7 @@ pub fn toaster_destructive_renders_test() {
 
 pub fn table_simple_renders_headers_test() {
   let html =
-    table.table_simple(
-      headers: ["Name", "Email", "Role"],
-      rows: [],
-    )
+    table.table_simple(headers: ["Name", "Email", "Role"], rows: [])
     |> element.to_string
   assert string.contains(html, "<table")
   assert string.contains(html, "<thead")
@@ -176,15 +173,12 @@ pub fn table_simple_renders_headers_test() {
 
 pub fn table_simple_renders_rows_test() {
   let html =
-    table.table_simple(
-      headers: ["Plan", "Status"],
-      rows: [
-        table.TableRow([
-          table.TextCell("Starter"),
-          table.ElementCell(badge.badge_default("Active")),
-        ]),
-      ],
-    )
+    table.table_simple(headers: ["Plan", "Status"], rows: [
+      table.TableRow([
+        table.TextCell("Starter"),
+        table.ElementCell(badge.badge_default("Active")),
+      ]),
+    ])
     |> element.to_string
   assert string.contains(html, "<tbody")
   assert string.contains(html, "<tr")

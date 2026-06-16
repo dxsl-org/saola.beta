@@ -32,12 +32,18 @@ pub fn default_config() -> CollapsibleConfig {
 }
 
 /// Set the disabled state (the trigger becomes non-interactive).
-pub fn disabled(config: CollapsibleConfig, disabled: Bool) -> CollapsibleConfig {
+pub fn disabled(
+  config: CollapsibleConfig,
+  disabled: Bool,
+) -> CollapsibleConfig {
   CollapsibleConfig(..config, disabled: disabled)
 }
 
 /// Append an extra CSS class on the root. Additive only.
-pub fn add_class(config: CollapsibleConfig, class: String) -> CollapsibleConfig {
+pub fn add_class(
+  config: CollapsibleConfig,
+  class: String,
+) -> CollapsibleConfig {
   let merged = case config.class {
     "" -> class
     existing -> existing <> " " <> class

@@ -47,10 +47,10 @@ pub fn view() -> Element(Message) {
     ]),
     DocSection("sizes", "Sizes", [
       item.new()
-        |> item.variant(item.Outline)
-        |> item.size(item.Small)
-        |> item.actions(actions)
-        |> item.view("Small size", "Tighter padding.", ""),
+      |> item.variant(item.Outline)
+      |> item.size(item.Small)
+      |> item.actions(actions)
+      |> item.view("Small size", "Tighter padding.", ""),
     ]),
     DocSection("group", "Group with Separators", [
       item.item_group(list.intersperse(three_items, item.item_separator())),

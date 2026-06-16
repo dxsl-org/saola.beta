@@ -54,47 +54,59 @@ fn signup_form(model: Model) -> Element(Message) {
 
   h.form([a.class("grid gap-4"), e.on_submit(fn(_) { SignupSubmitted })], [
     field.new()
-    |> field.label("Full name")
-    |> field.required(True)
-    |> field.error(err("name"))
-    |> field.view(
-      input.new()
-      |> input.name("name")
-      |> input.placeholder("Nguyen Van A")
-      |> input.view(Some(input.SyncValue(model.signup_name)), Some(SignupNameChanged)),
-    ),
+      |> field.label("Full name")
+      |> field.required(True)
+      |> field.error(err("name"))
+      |> field.view(
+        input.new()
+        |> input.name("name")
+        |> input.placeholder("Nguyen Van A")
+        |> input.view(
+          Some(input.SyncValue(model.signup_name)),
+          Some(SignupNameChanged),
+        ),
+      ),
     field.new()
-    |> field.label("Email address")
-    |> field.required(True)
-    |> field.error(err("email"))
-    |> field.view(
-      input.new()
-      |> input.type_(input.Email)
-      |> input.name("email")
-      |> input.placeholder("you@example.com")
-      |> input.view(Some(input.SyncValue(model.signup_email)), Some(SignupEmailChanged)),
-    ),
+      |> field.label("Email address")
+      |> field.required(True)
+      |> field.error(err("email"))
+      |> field.view(
+        input.new()
+        |> input.type_(input.Email)
+        |> input.name("email")
+        |> input.placeholder("you@example.com")
+        |> input.view(
+          Some(input.SyncValue(model.signup_email)),
+          Some(SignupEmailChanged),
+        ),
+      ),
     field.new()
-    |> field.label("Password")
-    |> field.required(True)
-    |> field.hint("At least 8 characters.")
-    |> field.error(err("password"))
-    |> field.view(
-      input.new()
-      |> input.type_(input.Password)
-      |> input.name("password")
-      |> input.view(Some(input.SyncValue(model.signup_password)), Some(SignupPasswordChanged)),
-    ),
+      |> field.label("Password")
+      |> field.required(True)
+      |> field.hint("At least 8 characters.")
+      |> field.error(err("password"))
+      |> field.view(
+        input.new()
+        |> input.type_(input.Password)
+        |> input.name("password")
+        |> input.view(
+          Some(input.SyncValue(model.signup_password)),
+          Some(SignupPasswordChanged),
+        ),
+      ),
     field.new()
-    |> field.label("Confirm password")
-    |> field.required(True)
-    |> field.error(err("confirm"))
-    |> field.view(
-      input.new()
-      |> input.type_(input.Password)
-      |> input.name("confirm")
-      |> input.view(Some(input.SyncValue(model.signup_confirm)), Some(SignupConfirmChanged)),
-    ),
+      |> field.label("Confirm password")
+      |> field.required(True)
+      |> field.error(err("confirm"))
+      |> field.view(
+        input.new()
+        |> input.type_(input.Password)
+        |> input.name("confirm")
+        |> input.view(
+          Some(input.SyncValue(model.signup_confirm)),
+          Some(SignupConfirmChanged),
+        ),
+      ),
     h.div([a.class("flex gap-2 pt-2")], [
       button.button_submit("Create account"),
     ]),

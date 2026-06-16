@@ -100,7 +100,10 @@ pub fn kbd_builder_add_class_test() {
 
 pub fn label_builder_for_test() {
   let html =
-    label.new() |> label.for_("email") |> label.view("Email") |> element.to_string
+    label.new()
+    |> label.for_("email")
+    |> label.view("Email")
+    |> element.to_string
   assert string.contains(html, "for=\"email\"")
   assert string.contains(html, "Email")
 }

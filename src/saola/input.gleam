@@ -184,19 +184,21 @@ pub fn view(
     "" -> []
     c -> [a.class(c)]
   }
-  h.input(list.flatten([
-    [a.type_(type_string(config.type_)), a.class(class_input)],
-    value_attrs,
-    on_input_attrs,
-    id_attrs,
-    name_attrs,
-    placeholder_attrs,
-    disabled_attrs,
-    required_attrs,
-    describedby_attrs,
-    invalid_attrs,
-    extra_class_attrs,
-  ]))
+  h.input(
+    list.flatten([
+      [a.type_(type_string(config.type_)), a.class(class_input)],
+      value_attrs,
+      on_input_attrs,
+      id_attrs,
+      name_attrs,
+      placeholder_attrs,
+      disabled_attrs,
+      required_attrs,
+      describedby_attrs,
+      invalid_attrs,
+      extra_class_attrs,
+    ]),
+  )
 }
 
 // --- Convenience shortcuts ---

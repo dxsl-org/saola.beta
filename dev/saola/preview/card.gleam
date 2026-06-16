@@ -18,12 +18,17 @@ pub fn view() -> Element(Message) {
           ]),
           card.new()
             |> card.title("Card with Description")
-            |> card.description("A short description of what this card contains.")
+            |> card.description(
+              "A short description of what this card contains.",
+            )
             |> card.view([h.p([], [text("Main content area goes here.")])]),
           card.new()
             |> card.title("Card with Footer")
             |> card.description("This card has a footer with an action button.")
-            |> card.footer(button.button_primary("Save changes", OnRouteChange(Home)))
+            |> card.footer(button.button_primary(
+              "Save changes",
+              OnRouteChange(Home),
+            ))
             |> card.view([h.p([], [text("Card body content.")])]),
         ]),
       ]),

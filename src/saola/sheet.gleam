@@ -79,7 +79,9 @@ pub fn view(
           ],
           [
             h.div([a.class("sheet-header")], [
-              h.h2([a.class("sheet-title"), a.id("sheet-title")], [h.text(title)]),
+              h.h2([a.class("sheet-title"), a.id("sheet-title")], [
+                h.text(title),
+              ]),
               h.button(
                 [
                   a.type_("button"),

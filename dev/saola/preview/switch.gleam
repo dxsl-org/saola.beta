@@ -16,10 +16,10 @@ pub fn view(notifications: Bool, marketing: Bool) -> Element(Message) {
           SwitchToggled("marketing", v)
         }),
         switch.new()
-        |> switch.disabled(True)
-        |> switch.view("Disabled switch", switch.InitChecked(True), fn(v) {
-          SwitchToggled("disabled", v)
-        }),
+          |> switch.disabled(True)
+          |> switch.view("Disabled switch", switch.InitChecked(True), fn(v) {
+            SwitchToggled("disabled", v)
+          }),
       ]),
     ]),
     DocSection("usage", "Usage", [

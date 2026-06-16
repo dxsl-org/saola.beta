@@ -41,7 +41,10 @@ pub fn orientation(
 }
 
 /// Append an extra CSS class. Additive only.
-pub fn add_class(config: ButtonGroupConfig, class: String) -> ButtonGroupConfig {
+pub fn add_class(
+  config: ButtonGroupConfig,
+  class: String,
+) -> ButtonGroupConfig {
   let merged = case config.class {
     "" -> class
     existing -> existing <> " " <> class
@@ -50,7 +53,10 @@ pub fn add_class(config: ButtonGroupConfig, class: String) -> ButtonGroupConfig 
 }
 
 /// Render the group wrapping the given child elements.
-pub fn view(config: ButtonGroupConfig, children: List(Element(msg))) -> Element(msg) {
+pub fn view(
+  config: ButtonGroupConfig,
+  children: List(Element(msg)),
+) -> Element(msg) {
   let orientation_class = case config.orientation {
     Horizontal -> "button-group"
     Vertical -> "button-group button-group-vertical"

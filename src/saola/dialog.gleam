@@ -45,22 +45,34 @@ pub fn default_config() -> DialogConfig(msg) {
 }
 
 /// Set the header description (omitted when empty).
-pub fn description(config: DialogConfig(msg), description: String) -> DialogConfig(msg) {
+pub fn description(
+  config: DialogConfig(msg),
+  description: String,
+) -> DialogConfig(msg) {
   DialogConfig(..config, description: description)
 }
 
 /// Set the footer element.
-pub fn footer(config: DialogConfig(msg), footer: Element(msg)) -> DialogConfig(msg) {
+pub fn footer(
+  config: DialogConfig(msg),
+  footer: Element(msg),
+) -> DialogConfig(msg) {
   DialogConfig(..config, footer: Some(footer))
 }
 
 /// Toggle the top-right close button (default shown).
-pub fn show_close_button(config: DialogConfig(msg), show: Bool) -> DialogConfig(msg) {
+pub fn show_close_button(
+  config: DialogConfig(msg),
+  show: Bool,
+) -> DialogConfig(msg) {
   DialogConfig(..config, show_close_button: show)
 }
 
 /// Append an extra CSS class on the dialog. Additive only.
-pub fn add_class(config: DialogConfig(msg), class: String) -> DialogConfig(msg) {
+pub fn add_class(
+  config: DialogConfig(msg),
+  class: String,
+) -> DialogConfig(msg) {
   let merged = case config.class {
     "" -> class
     existing -> existing <> " " <> class

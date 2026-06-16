@@ -222,7 +222,9 @@ fn employee_table(
             h.tr([a.class(row_class), e.on_click(DashRowClicked(emp.id))], [
               h.td([a.class("px-4 py-2")], [text(emp.name)]),
               h.td([a.class("px-4 py-2")], [
-                badge.new() |> badge.variant(dept_badge_variant(emp.dept)) |> badge.view(emp.dept),
+                badge.new()
+                |> badge.variant(dept_badge_variant(emp.dept))
+                |> badge.view(emp.dept),
               ]),
               h.td([a.class("px-4 py-2 text-right font-medium")], [
                 text(int.to_string(emp.score)),
@@ -308,7 +310,9 @@ fn employee_detail(emp: Employee) -> Element(Message) {
       h.p([a.class("text-xs text-muted-foreground uppercase tracking-wide")], [
         text("Department"),
       ]),
-      badge.new() |> badge.variant(dept_badge_variant(emp.dept)) |> badge.view(emp.dept),
+      badge.new()
+        |> badge.variant(dept_badge_variant(emp.dept))
+        |> badge.view(emp.dept),
     ]),
     h.div([a.class("grid gap-2")], [
       h.p([a.class("text-xs text-muted-foreground uppercase tracking-wide")], [
@@ -318,13 +322,13 @@ fn employee_detail(emp: Employee) -> Element(Message) {
         h.span([a.class("text-3xl font-bold")], [text(int.to_string(emp.score))]),
         h.div([a.class("flex-1")], [
           progress.new()
-            |> progress.label("Performance score")
-            |> progress.variant(case emp.score {
-              s if s >= 85 -> progress.Success
-              s if s < 65 -> progress.Destructive
-              _ -> progress.Default
-            })
-            |> progress.view(emp.score),
+          |> progress.label("Performance score")
+          |> progress.variant(case emp.score {
+            s if s >= 85 -> progress.Success
+            s if s < 65 -> progress.Destructive
+            _ -> progress.Default
+          })
+          |> progress.view(emp.score),
         ]),
       ]),
     ]),

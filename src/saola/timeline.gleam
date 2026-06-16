@@ -57,7 +57,10 @@ pub fn add_class(config: TimelineConfig, class: String) -> TimelineConfig {
 }
 
 /// Render the vertical timeline of events (top-to-bottom).
-pub fn view(config: TimelineConfig, items: List(TimelineItem(msg))) -> Element(msg) {
+pub fn view(
+  config: TimelineConfig,
+  items: List(TimelineItem(msg)),
+) -> Element(msg) {
   let root_class = case config.class {
     "" -> "timeline"
     c -> "timeline " <> c

@@ -49,17 +49,26 @@ pub fn side(config: DrawerConfig(msg), side: DrawerSide) -> DrawerConfig(msg) {
 }
 
 /// Set the header description.
-pub fn description(config: DrawerConfig(msg), description: String) -> DrawerConfig(msg) {
+pub fn description(
+  config: DrawerConfig(msg),
+  description: String,
+) -> DrawerConfig(msg) {
   DrawerConfig(..config, description: Some(description))
 }
 
 /// Set the footer element.
-pub fn footer(config: DrawerConfig(msg), footer: Element(msg)) -> DrawerConfig(msg) {
+pub fn footer(
+  config: DrawerConfig(msg),
+  footer: Element(msg),
+) -> DrawerConfig(msg) {
   DrawerConfig(..config, footer: Some(footer))
 }
 
 /// Append an extra CSS class on the drawer. Additive only.
-pub fn add_class(config: DrawerConfig(msg), class: String) -> DrawerConfig(msg) {
+pub fn add_class(
+  config: DrawerConfig(msg),
+  class: String,
+) -> DrawerConfig(msg) {
   let merged = case config.class {
     "" -> class
     existing -> existing <> " " <> class
@@ -108,7 +117,9 @@ pub fn view(
               False -> h.text("")
             },
             h.div([a.class("drawer-header")], [
-              h.h2([a.class("drawer-title"), a.id("drawer-title")], [h.text(title)]),
+              h.h2([a.class("drawer-title"), a.id("drawer-title")], [
+                h.text(title),
+              ]),
               case config.description {
                 None -> h.text("")
                 Some(d) -> h.p([a.class("drawer-description")], [h.text(d)])

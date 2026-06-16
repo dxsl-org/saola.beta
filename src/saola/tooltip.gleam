@@ -79,7 +79,11 @@ pub fn add_class(config: TooltipConfig, class: String) -> TooltipConfig {
 }
 
 /// Wrap a child element in a `<span>` carrying the tooltip.
-pub fn view(config: TooltipConfig, text: String, child: Element(msg)) -> Element(msg) {
+pub fn view(
+  config: TooltipConfig,
+  text: String,
+  child: Element(msg),
+) -> Element(msg) {
   let side_attrs = case config.side {
     None -> []
     Some(s) -> [a.attribute("data-side", side_string(s))]
@@ -89,7 +93,10 @@ pub fn view(config: TooltipConfig, text: String, child: Element(msg)) -> Element
     c -> [a.class(c)]
   }
   h.span(
-    [a.attribute("data-tooltip", text), ..list.flatten([side_attrs, class_attrs])],
+    [
+      a.attribute("data-tooltip", text),
+      ..list.flatten([side_attrs, class_attrs])
+    ],
     [child],
   )
 }

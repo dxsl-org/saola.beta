@@ -137,7 +137,10 @@ pub fn rating_readonly(value: Int) -> Element(msg) {
   new() |> view(value, ReadOnly, None)
 }
 
-pub fn rating_interactive(value: Int, on_change: fn(Int) -> msg) -> Element(msg) {
+pub fn rating_interactive(
+  value: Int,
+  on_change: fn(Int) -> msg,
+) -> Element(msg) {
   new() |> view(value, Interactive, Some(on_change))
 }
 

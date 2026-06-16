@@ -48,7 +48,10 @@ pub fn group_type(
 }
 
 /// Append an extra CSS class. Additive only.
-pub fn add_class(config: ToggleGroupConfig, class: String) -> ToggleGroupConfig {
+pub fn add_class(
+  config: ToggleGroupConfig,
+  class: String,
+) -> ToggleGroupConfig {
   let merged = case config.class {
     "" -> class
     existing -> existing <> " " <> class

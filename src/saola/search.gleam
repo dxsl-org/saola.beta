@@ -145,7 +145,10 @@ pub fn view(
 
 // --- Convenience shortcuts ---
 
-pub fn search_simple(value: String, on_input: fn(String) -> msg) -> Element(msg) {
+pub fn search_simple(
+  value: String,
+  on_input: fn(String) -> msg,
+) -> Element(msg) {
   new() |> view(value, on_input, None)
 }
 

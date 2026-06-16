@@ -72,17 +72,26 @@ pub fn default_config() -> DropdownMenuConfig(a) {
 }
 
 /// Set the trigger button label.
-pub fn trigger_label(config: DropdownMenuConfig(a), label: String) -> DropdownMenuConfig(a) {
+pub fn trigger_label(
+  config: DropdownMenuConfig(a),
+  label: String,
+) -> DropdownMenuConfig(a) {
   DropdownMenuConfig(..config, trigger_label: label)
 }
 
 /// Set the trigger button icon.
-pub fn trigger_icon(config: DropdownMenuConfig(a), icon: Element(a)) -> DropdownMenuConfig(a) {
+pub fn trigger_icon(
+  config: DropdownMenuConfig(a),
+  icon: Element(a),
+) -> DropdownMenuConfig(a) {
   DropdownMenuConfig(..config, trigger_icon: Some(icon))
 }
 
 /// Set an extra class on the trigger button.
-pub fn trigger_class(config: DropdownMenuConfig(a), class: String) -> DropdownMenuConfig(a) {
+pub fn trigger_class(
+  config: DropdownMenuConfig(a),
+  class: String,
+) -> DropdownMenuConfig(a) {
   DropdownMenuConfig(..config, trigger_class: class)
 }
 
@@ -92,17 +101,26 @@ pub fn id(config: DropdownMenuConfig(a), id: String) -> DropdownMenuConfig(a) {
 }
 
 /// Set an extra class on the root container.
-pub fn main_class(config: DropdownMenuConfig(a), class: String) -> DropdownMenuConfig(a) {
+pub fn main_class(
+  config: DropdownMenuConfig(a),
+  class: String,
+) -> DropdownMenuConfig(a) {
   DropdownMenuConfig(..config, main_class: class)
 }
 
 /// Set an extra class on the popover wrapper.
-pub fn popover_class(config: DropdownMenuConfig(a), class: String) -> DropdownMenuConfig(a) {
+pub fn popover_class(
+  config: DropdownMenuConfig(a),
+  class: String,
+) -> DropdownMenuConfig(a) {
   DropdownMenuConfig(..config, popover_class: class)
 }
 
 /// Set an extra class on the menu.
-pub fn menu_class(config: DropdownMenuConfig(a), class: String) -> DropdownMenuConfig(a) {
+pub fn menu_class(
+  config: DropdownMenuConfig(a),
+  class: String,
+) -> DropdownMenuConfig(a) {
   DropdownMenuConfig(..config, menu_class: class)
 }
 
@@ -116,7 +134,8 @@ fn render_menu_item(item: DropdownMenuItem(a)) -> Element(a) {
 fn render_base_item(item: BaseDropdownMenuItem(a)) -> Element(a) {
   case item {
     Item(label) -> h.div([a.role("menuitem")], [h.text(label)])
-    ItemWithIcon(icon, label) -> h.div([a.role("menuitem")], [icon, h.text(label)])
+    ItemWithIcon(icon, label) ->
+      h.div([a.role("menuitem")], [icon, h.text(label)])
     Link(label, url) -> h.a([a.role("menuitem"), a.href(url)], [h.text(label)])
     LinkWithIcon(icon, label, url) ->
       h.a([a.role("menuitem"), a.href(url)], [icon, h.text(label)])
@@ -124,7 +143,10 @@ fn render_base_item(item: BaseDropdownMenuItem(a)) -> Element(a) {
   }
 }
 
-fn render_item_group(label: String, items: List(BaseDropdownMenuItem(a))) -> Element(a) {
+fn render_item_group(
+  label: String,
+  items: List(BaseDropdownMenuItem(a)),
+) -> Element(a) {
   let group_id =
     typeid.new(prefix: "grp")
     |> result.map(typeid.to_string)

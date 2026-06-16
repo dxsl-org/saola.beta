@@ -53,15 +53,15 @@ pub fn view(model: Model) -> Element(Message) {
             h.h2([], [text("Full command palette (keyboard navigation)")]),
             h.div([a.style("max-width", "480px")], [
               command.new()
-                |> command.view(
-                  model.command_query,
-                  items,
-                  model.command_highlighted,
-                  fn(q) { CommandQueryChanged(q) },
-                  fn() { CommandNavUp },
-                  fn() { CommandNavDown },
-                  fn(_idx) { CommandSelected("") },
-                ),
+              |> command.view(
+                model.command_query,
+                items,
+                model.command_highlighted,
+                fn(q) { CommandQueryChanged(q) },
+                fn() { CommandNavUp },
+                fn() { CommandNavDown },
+                fn(_idx) { CommandSelected("") },
+              ),
             ]),
           ]),
           h.div([a.class("grid gap-4")], [

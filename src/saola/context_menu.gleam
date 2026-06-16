@@ -41,7 +41,10 @@ pub fn default_config() -> ContextMenuConfig {
 }
 
 /// Append an extra CSS class on the trigger wrapper. Additive only.
-pub fn add_class(config: ContextMenuConfig, class: String) -> ContextMenuConfig {
+pub fn add_class(
+  config: ContextMenuConfig,
+  class: String,
+) -> ContextMenuConfig {
   let merged = case config.class {
     "" -> class
     existing -> existing <> " " <> class
@@ -142,7 +145,10 @@ pub fn view(
         False -> h.text("")
         True ->
           h.div([], [
-            h.div([a.class("context-menu-backdrop"), e.on_click(on_close())], []),
+            h.div(
+              [a.class("context-menu-backdrop"), e.on_click(on_close())],
+              [],
+            ),
             h.div(
               [
                 a.class("context-menu-popup"),

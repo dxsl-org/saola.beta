@@ -34,7 +34,10 @@ pub fn default_config() -> DatePickerConfig {
 }
 
 /// Set the trigger placeholder (shown when no date is selected).
-pub fn placeholder(config: DatePickerConfig, placeholder: String) -> DatePickerConfig {
+pub fn placeholder(
+  config: DatePickerConfig,
+  placeholder: String,
+) -> DatePickerConfig {
   DatePickerConfig(..config, placeholder: placeholder)
 }
 

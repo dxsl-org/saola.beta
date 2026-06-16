@@ -64,7 +64,10 @@ pub fn default_config() -> ItemConfig(msg) {
 }
 
 /// Set the variant (Default, Outline, Muted).
-pub fn variant(config: ItemConfig(msg), variant: ItemVariant) -> ItemConfig(msg) {
+pub fn variant(
+  config: ItemConfig(msg),
+  variant: ItemVariant,
+) -> ItemConfig(msg) {
   ItemConfig(..config, variant: variant)
 }
 
@@ -162,7 +165,8 @@ pub fn view(
   description: String,
   href: String,
 ) -> Element(msg) {
-  let base = "item " <> variant_class(config.variant) <> " " <> size_class(config.size)
+  let base =
+    "item " <> variant_class(config.variant) <> " " <> size_class(config.size)
   let cls = case config.class {
     "" -> base
     c -> base <> " " <> c

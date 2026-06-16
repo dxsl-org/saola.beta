@@ -57,7 +57,11 @@ pub fn view(config: SpinnerConfig) -> Element(msg) {
     c -> size_class <> " " <> c
   }
   h.span(
-    [a.class(full_class), a.role("status"), a.attribute("aria-label", "Loading")],
+    [
+      a.class(full_class),
+      a.role("status"),
+      a.attribute("aria-label", "Loading"),
+    ],
     [],
   )
 }

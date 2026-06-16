@@ -51,10 +51,9 @@ pub fn view(config: LabelConfig, text: String) -> Element(msg) {
     "" -> []
     c -> [a.class(c)]
   }
-  h.label(
-    list.flatten([[a.class(class_label)], for_attrs, extra_class_attrs]),
-    [h.text(text)],
-  )
+  h.label(list.flatten([[a.class(class_label)], for_attrs, extra_class_attrs]), [
+    h.text(text),
+  ])
 }
 
 // --- Convenience shortcuts ---

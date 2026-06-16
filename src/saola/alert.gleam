@@ -38,7 +38,10 @@ pub fn default_config() -> AlertConfig(msg) {
 }
 
 /// Set the variant (Default, Destructive).
-pub fn variant(config: AlertConfig(msg), variant: AlertVariant) -> AlertConfig(msg) {
+pub fn variant(
+  config: AlertConfig(msg),
+  variant: AlertVariant,
+) -> AlertConfig(msg) {
   AlertConfig(..config, variant: variant)
 }
 

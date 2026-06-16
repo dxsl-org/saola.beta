@@ -18,23 +18,29 @@ pub fn view(model: Model) -> Element(Message) {
     DocSection("outline", "Outline variant", [
       h.div([a.class("flex gap-2 mt-4")], [
         toggle.new()
-        |> toggle.variant(toggle.Outline)
-        |> toggle.view(model.toggle_bold, "Bold", ToggleBoldChanged),
+          |> toggle.variant(toggle.Outline)
+          |> toggle.view(model.toggle_bold, "Bold", ToggleBoldChanged),
         toggle.new()
-        |> toggle.variant(toggle.Outline)
-        |> toggle.view(model.toggle_italic, "Italic", ToggleItalicChanged),
+          |> toggle.variant(toggle.Outline)
+          |> toggle.view(model.toggle_italic, "Italic", ToggleItalicChanged),
       ]),
     ]),
     DocSection("sizes", "Sizes", [
       h.div([a.class("flex gap-2 items-center mt-4")], [
         toggle.new()
-        |> toggle.size(toggle.Small)
-        |> toggle.view(False, "Small", fn(_) { ToggleBoldChanged(model.toggle_bold) }),
+          |> toggle.size(toggle.Small)
+          |> toggle.view(False, "Small", fn(_) {
+            ToggleBoldChanged(model.toggle_bold)
+          }),
         toggle.new()
-        |> toggle.view(True, "Medium", fn(_) { ToggleBoldChanged(model.toggle_bold) }),
+          |> toggle.view(True, "Medium", fn(_) {
+            ToggleBoldChanged(model.toggle_bold)
+          }),
         toggle.new()
-        |> toggle.size(toggle.Large)
-        |> toggle.view(False, "Large", fn(_) { ToggleBoldChanged(model.toggle_bold) }),
+          |> toggle.size(toggle.Large)
+          |> toggle.view(False, "Large", fn(_) {
+            ToggleBoldChanged(model.toggle_bold)
+          }),
       ]),
     ]),
     DocSection("usage", "Usage", [

@@ -302,5 +302,12 @@ pub fn calendar_simple(
   on_next_month: msg,
 ) -> Element(msg) {
   new()
-  |> view(selected, view_year, view_month, on_select, on_prev_month, on_next_month)
+  |> view(
+    selected,
+    view_year,
+    view_month,
+    on_select,
+    on_prev_month,
+    on_next_month,
+  )
 }

@@ -28,15 +28,15 @@ pub fn view(model: Model) -> Element(Message) {
       DocSection("12-hour", "12-hour format", [
         h.div([a.class("grid gap-4 mt-4")], [
           time_picker.new()
-            |> time_picker.format(time_picker.TwelveHour)
-            |> time_picker.view(model.time_picker_value, TimePickerChanged),
+          |> time_picker.format(time_picker.TwelveHour)
+          |> time_picker.view(model.time_picker_value, TimePickerChanged),
         ]),
       ]),
       DocSection("with-seconds", "With seconds", [
         h.div([a.class("grid gap-4 mt-4")], [
           time_picker.new()
-            |> time_picker.show_seconds(True)
-            |> time_picker.view(model.time_picker_value, TimePickerChanged),
+          |> time_picker.show_seconds(True)
+          |> time_picker.view(model.time_picker_value, TimePickerChanged),
         ]),
       ]),
       DocSection("disabled", "Disabled", [

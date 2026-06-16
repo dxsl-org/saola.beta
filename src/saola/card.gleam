@@ -41,12 +41,18 @@ pub fn title(config: CardConfig(msg), title: String) -> CardConfig(msg) {
 }
 
 /// Set the header description (omitted when empty).
-pub fn description(config: CardConfig(msg), description: String) -> CardConfig(msg) {
+pub fn description(
+  config: CardConfig(msg),
+  description: String,
+) -> CardConfig(msg) {
   CardConfig(..config, description: description)
 }
 
 /// Set the footer element.
-pub fn footer(config: CardConfig(msg), footer: Element(msg)) -> CardConfig(msg) {
+pub fn footer(
+  config: CardConfig(msg),
+  footer: Element(msg),
+) -> CardConfig(msg) {
   CardConfig(..config, footer: Some(footer))
 }
 
@@ -61,7 +67,10 @@ pub fn add_class(config: CardConfig(msg), class: String) -> CardConfig(msg) {
 
 /// Render the card with the given body content. Uses semantic
 /// `<header>`/`<section>`/`<footer>`.
-pub fn view(config: CardConfig(msg), content: List(Element(msg))) -> Element(msg) {
+pub fn view(
+  config: CardConfig(msg),
+  content: List(Element(msg)),
+) -> Element(msg) {
   let header_el = case config.title, config.description {
     "", "" -> element.none()
     _, _ -> {
@@ -94,6 +103,9 @@ pub fn view(config: CardConfig(msg), content: List(Element(msg))) -> Element(msg
 // --- Convenience shortcuts ---
 
 /// Render a card with a title and body content only.
-pub fn card_simple(card_title: String, content: List(Element(msg))) -> Element(msg) {
+pub fn card_simple(
+  card_title: String,
+  content: List(Element(msg)),
+) -> Element(msg) {
   new() |> title(card_title) |> view(content)
 }

@@ -27,19 +27,17 @@ pub fn view(volume: Int, brightness: Int) -> Element(Message) {
               |> slider.min(10)
               |> slider.step(10)
               |> slider.aria_label("Brightness")
-              |> slider.view(
-              slider.SyncValue(brightness),
-              fn(v) { SliderChanged("brightness", v) },
-            ),
+              |> slider.view(slider.SyncValue(brightness), fn(v) {
+                SliderChanged("brightness", v)
+              }),
           ]),
           h.div([a.class("grid gap-2")], [
             h.label([a.class("label")], [text("Disabled slider")]),
             slider.new()
               |> slider.disabled(True)
-              |> slider.view(
-              slider.SyncValue(40),
-              fn(v) { SliderChanged("disabled", v) },
-            ),
+              |> slider.view(slider.SyncValue(40), fn(v) {
+                SliderChanged("disabled", v)
+              }),
           ]),
         ]),
       ]),

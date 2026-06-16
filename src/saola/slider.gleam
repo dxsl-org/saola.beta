@@ -135,21 +135,23 @@ pub fn view(
     "" -> class_input
     c -> class_input <> " " <> c
   }
-  h.input(list.flatten([
-    [
-      a.type_("range"),
-      a.class(class_str),
-      a.min(int.to_string(config.min)),
-      a.max(int.to_string(config.max)),
-      a.step(int.to_string(config.step)),
-      value_attr,
-      a.style("--slider-value", pct <> "%"),
-    ],
-    name_attrs,
-    disabled_attrs,
-    aria_label_attrs,
-    [e.on_input(on_input)],
-  ]))
+  h.input(
+    list.flatten([
+      [
+        a.type_("range"),
+        a.class(class_str),
+        a.min(int.to_string(config.min)),
+        a.max(int.to_string(config.max)),
+        a.step(int.to_string(config.step)),
+        value_attr,
+        a.style("--slider-value", pct <> "%"),
+      ],
+      name_attrs,
+      disabled_attrs,
+      aria_label_attrs,
+      [e.on_input(on_input)],
+    ]),
+  )
 }
 
 // --- Convenience shortcuts ---

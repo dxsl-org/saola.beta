@@ -77,7 +77,10 @@ pub fn error(config: FieldConfig, error: String) -> FieldConfig {
 }
 
 /// Set the orientation (Vertical — default, Horizontal).
-pub fn orientation(config: FieldConfig, orientation: FieldOrientation) -> FieldConfig {
+pub fn orientation(
+  config: FieldConfig,
+  orientation: FieldOrientation,
+) -> FieldConfig {
   FieldConfig(..config, orientation: orientation)
 }
 
@@ -132,7 +135,10 @@ pub fn view(config: FieldConfig, input: Element(msg)) -> Element(msg) {
             case config.required {
               True ->
                 h.span(
-                  [a.class("field-required"), a.attribute("aria-hidden", "true")],
+                  [
+                    a.class("field-required"),
+                    a.attribute("aria-hidden", "true"),
+                  ],
                   [h.text(" *")],
                 )
               False -> element.none()

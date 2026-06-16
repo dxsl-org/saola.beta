@@ -88,7 +88,9 @@ pub fn monaco_editor() -> Element(Message) {
 fn codemirror_card() -> Element(Message) {
   card.new()
   |> card.title("CodeMirror 6")
-  |> card.description("Lightweight editor — fast startup, tree-sitter grammar, and a small bundle footprint.")
+  |> card.description(
+    "Lightweight editor — fast startup, tree-sitter grammar, and a small bundle footprint.",
+  )
   |> card.view([
     code_editor.editor(
       attrs: code_editor.EditorAttrs(
@@ -104,7 +106,9 @@ fn codemirror_card() -> Element(Message) {
 fn monaco_card() -> Element(Message) {
   card.new()
   |> card.title("Monaco Editor")
-  |> card.description("VS Code's editor engine — IntelliSense, multi-cursor, diff view, and rich language support.")
+  |> card.description(
+    "VS Code's editor engine — IntelliSense, multi-cursor, diff view, and rich language support.",
+  )
   |> card.view([
     monaco_editor.editor(
       attrs: monaco_editor.EditorAttrs(
@@ -136,7 +140,9 @@ fn d3_card() -> Element(Message) {
 fn lustre_card() -> Element(Message) {
   card.new()
   |> card.title("Pure Lustre SVG")
-  |> card.description("Rendered as regular Lustre SVG elements with no D3 runtime.")
+  |> card.description(
+    "Rendered as regular Lustre SVG elements with no D3 runtime.",
+  )
   |> card.view([
     lustre_bar_chart.bar_chart(
       chart_data_lustre(),

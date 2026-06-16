@@ -41,7 +41,10 @@ pub fn default_config() -> PaginationConfig {
 }
 
 /// Toggle the previous/next buttons (default True).
-pub fn show_prev_next(config: PaginationConfig, show: Bool) -> PaginationConfig {
+pub fn show_prev_next(
+  config: PaginationConfig,
+  show: Bool,
+) -> PaginationConfig {
   PaginationConfig(..config, show_prev_next: show)
 }
 

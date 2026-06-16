@@ -203,7 +203,10 @@ fn render_data_row(
   )
 }
 
-fn render_toolbar(filter: String, on_filter: fn(String) -> msg) -> Element(msg) {
+fn render_toolbar(
+  filter: String,
+  on_filter: fn(String) -> msg,
+) -> Element(msg) {
   h.div([a.class("data-table-toolbar")], [
     h.input([
       a.type_("text"),
@@ -274,7 +277,13 @@ pub fn view(
         h.tbody(
           [],
           list.map(paged_rows, fn(row) {
-            render_data_row(row, row_id(row), columns, state.selected, on_select)
+            render_data_row(
+              row,
+              row_id(row),
+              columns,
+              state.selected,
+              on_select,
+            )
           }),
         ),
       ]),

@@ -96,13 +96,20 @@ pub fn view(
     False -> []
   }
   h.label([a.class(label_class <> " gap-3 cursor-pointer")], [
-    h.input(list.flatten([
-      [a.type_("checkbox"), a.role("switch"), a.class(class_input), a.id(input_id)],
-      name_attrs,
-      [status_attr],
-      disabled_attrs,
-      [e.on_check(on_change)],
-    ])),
+    h.input(
+      list.flatten([
+        [
+          a.type_("checkbox"),
+          a.role("switch"),
+          a.class(class_input),
+          a.id(input_id),
+        ],
+        name_attrs,
+        [status_attr],
+        disabled_attrs,
+        [e.on_check(on_change)],
+      ]),
+    ),
     h.text(label),
   ])
 }

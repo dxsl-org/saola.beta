@@ -80,21 +80,18 @@ fn overview_panel() -> Element(Message) {
 fn plans_panel() -> Element(Message) {
   table.new()
   |> table.caption("Plans")
-  |> table.view(
-    ["Plan", "Price", "Status"],
-    [
-      table.TableRow([
-        table.TextCell("Starter"),
-        table.TextCell("$19"),
-        table.ElementCell(badge.badge_default("Available")),
-      ]),
-      table.TableRow([
-        table.TextCell("Team"),
-        table.TextCell("$49"),
-        table.ElementCell(badge.badge_secondary("Popular")),
-      ]),
-    ],
-  )
+  |> table.view(["Plan", "Price", "Status"], [
+    table.TableRow([
+      table.TextCell("Starter"),
+      table.TextCell("$19"),
+      table.ElementCell(badge.badge_default("Available")),
+    ]),
+    table.TableRow([
+      table.TextCell("Team"),
+      table.TextCell("$49"),
+      table.ElementCell(badge.badge_secondary("Popular")),
+    ]),
+  ])
 }
 
 fn team_panel() -> Element(Message) {

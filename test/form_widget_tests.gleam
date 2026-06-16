@@ -123,9 +123,10 @@ pub fn checkbox_basic_renders_test() {
 pub fn checkbox_full_with_help_renders_test() {
   let html =
     checkbox.new()
-    |> checkbox.form_attr(
-      checkbox.FormAttr("newsletter", checkbox.InitValue("yes")),
-    )
+    |> checkbox.form_attr(checkbox.FormAttr(
+      "newsletter",
+      checkbox.InitValue("yes"),
+    ))
     |> checkbox.id("newsletter-chk")
     |> checkbox.help_text("Receive weekly updates.")
     |> checkbox.view("Subscribe", checkbox.InitChecked(True))
@@ -175,7 +176,11 @@ pub fn select_with_name_and_required_renders_test() {
     |> select.id("colour")
     |> select.name("colour")
     |> select.required(True)
-    |> select.view([select.SelectOption("red", "Red")], select.SyncValue("red"), fn(_) { Nil })
+    |> select.view(
+      [select.SelectOption("red", "Red")],
+      select.SyncValue("red"),
+      fn(_) { Nil },
+    )
     |> element.to_string
   assert string.contains(html, "id=\"colour\"")
   assert string.contains(html, "name=\"colour\"")

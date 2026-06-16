@@ -55,12 +55,7 @@ pub type SidebarConfig {
 /// Builder entry point. Defaults: Left side, Default variant, Offcanvas
 /// collapsible, no extra class.
 pub fn new() -> SidebarConfig {
-  SidebarConfig(
-    side: Left,
-    variant: Default,
-    collapsible: Offcanvas,
-    class: "",
-  )
+  SidebarConfig(side: Left, variant: Default, collapsible: Offcanvas, class: "")
 }
 
 /// Config-style entry point — alias of `new` for record-update syntax.
@@ -74,7 +69,10 @@ pub fn side(config: SidebarConfig, side: SidebarSide) -> SidebarConfig {
 }
 
 /// Set the variant (Default, Floating, Inset).
-pub fn variant(config: SidebarConfig, variant: SidebarVariant) -> SidebarConfig {
+pub fn variant(
+  config: SidebarConfig,
+  variant: SidebarVariant,
+) -> SidebarConfig {
   SidebarConfig(..config, variant: variant)
 }
 

@@ -131,7 +131,10 @@ pub fn view() -> Element(Message) {
         ]),
         h.div([a.class("button-grid")], [
           button.new()
-            |> button.accent(button.Accent("var(--chart-2)", "var(--background)"))
+            |> button.accent(button.Accent(
+              "var(--chart-2)",
+              "var(--background)",
+            ))
             |> button.view("Theme token", "", Some(OnRouteChange(Home))),
           button.new()
             |> button.accent(button.Accent("oklch(0.55 0.22 263)", "white"))
@@ -177,7 +180,9 @@ pub fn view() -> Element(Message) {
           ),
         ]),
         h.p([a.class("text-muted-foreground text-sm")], [
-          element.text("1. Theme tokens — recolor/reshape every widget at once:"),
+          element.text(
+            "1. Theme tokens — recolor/reshape every widget at once:",
+          ),
         ]),
         doc_page.snippet([
           "/* your app.css */",
@@ -195,8 +200,8 @@ pub fn view() -> Element(Message) {
         ]),
         doc_page.snippet([
           "/* your app.css — beats @layer saola.components automatically */",
-          ".btn-primary {", "  background: #ff5722;", "  text-transform: uppercase;",
-          "}",
+          ".btn-primary {", "  background: #ff5722;",
+          "  text-transform: uppercase;", "}",
         ]),
         h.p([a.class("text-muted-foreground text-sm")], [
           element.text(

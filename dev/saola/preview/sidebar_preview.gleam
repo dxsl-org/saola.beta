@@ -62,62 +62,62 @@ pub fn view(model: Model) -> Element(Message) {
             ],
             [
               sidebar.new()
-              |> sidebar.view(
-                True,
-                Some(
-                  sidebar.sidebar_header([
-                    h.div([a.class("font-semibold text-sm")], [
-                      text("Acme Inc."),
+                |> sidebar.view(
+                  True,
+                  Some(
+                    sidebar.sidebar_header([
+                      h.div([a.class("font-semibold text-sm")], [
+                        text("Acme Inc."),
+                      ]),
+                    ]),
+                  ),
+                  sidebar.sidebar_content([
+                    sidebar.sidebar_group(Some("Projects"), [
+                      sidebar.sidebar_menu_item(
+                        "Alpha",
+                        "#",
+                        None,
+                        False,
+                        sidebar.default_menu_item_attrs,
+                      ),
+                      sidebar.sidebar_menu_item(
+                        "Beta",
+                        "#",
+                        None,
+                        True,
+                        sidebar.default_menu_item_attrs,
+                      ),
+                      sidebar.sidebar_menu_item(
+                        "Gamma",
+                        "#",
+                        None,
+                        False,
+                        sidebar.default_menu_item_attrs,
+                      ),
+                    ]),
+                    sidebar.sidebar_group(Some("Team"), [
+                      sidebar.sidebar_menu_item(
+                        "Members",
+                        "#",
+                        None,
+                        False,
+                        sidebar.default_menu_item_attrs,
+                      ),
+                      sidebar.sidebar_menu_item(
+                        "Notifications",
+                        "#",
+                        None,
+                        False,
+                        sidebar.SidebarMenuItemAttrs(badge: "3", class: ""),
+                      ),
                     ]),
                   ]),
+                  Some(
+                    sidebar.sidebar_footer([
+                      h.div([a.class("text-xs text-muted")], [text("v1.0.0")]),
+                    ]),
+                  ),
                 ),
-                sidebar.sidebar_content([
-                  sidebar.sidebar_group(Some("Projects"), [
-                    sidebar.sidebar_menu_item(
-                      "Alpha",
-                      "#",
-                      None,
-                      False,
-                      sidebar.default_menu_item_attrs,
-                    ),
-                    sidebar.sidebar_menu_item(
-                      "Beta",
-                      "#",
-                      None,
-                      True,
-                      sidebar.default_menu_item_attrs,
-                    ),
-                    sidebar.sidebar_menu_item(
-                      "Gamma",
-                      "#",
-                      None,
-                      False,
-                      sidebar.default_menu_item_attrs,
-                    ),
-                  ]),
-                  sidebar.sidebar_group(Some("Team"), [
-                    sidebar.sidebar_menu_item(
-                      "Members",
-                      "#",
-                      None,
-                      False,
-                      sidebar.default_menu_item_attrs,
-                    ),
-                    sidebar.sidebar_menu_item(
-                      "Notifications",
-                      "#",
-                      None,
-                      False,
-                      sidebar.SidebarMenuItemAttrs(badge: "3", class: ""),
-                    ),
-                  ]),
-                ]),
-                Some(
-                  sidebar.sidebar_footer([
-                    h.div([a.class("text-xs text-muted")], [text("v1.0.0")]),
-                  ]),
-                ),
-              ),
               h.div([a.class("flex-1 p-4 text-sm text-muted")], [
                 text("Main content area"),
               ]),

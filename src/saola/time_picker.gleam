@@ -53,7 +53,10 @@ pub fn default_config() -> TimePickerConfig {
 }
 
 /// Set the hour format (TwelveHour, TwentyFourHour — default).
-pub fn format(config: TimePickerConfig, format: TimePickerFormat) -> TimePickerConfig {
+pub fn format(
+  config: TimePickerConfig,
+  format: TimePickerFormat,
+) -> TimePickerConfig {
   TimePickerConfig(..config, format: format)
 }
 
@@ -204,7 +207,12 @@ pub fn view(
     }
   }
 
-  h.div([a.class(root_class)], [hour_select, colon1, minute_select, ..second_section])
+  h.div([a.class(root_class)], [
+    hour_select,
+    colon1,
+    minute_select,
+    ..second_section
+  ])
 }
 
 // --- Convenience shortcuts ---

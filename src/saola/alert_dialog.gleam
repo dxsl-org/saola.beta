@@ -31,17 +31,26 @@ pub fn default_config() -> AlertDialogConfig {
 }
 
 /// Set the confirm button label (default "Confirm").
-pub fn confirm_label(config: AlertDialogConfig, label: String) -> AlertDialogConfig {
+pub fn confirm_label(
+  config: AlertDialogConfig,
+  label: String,
+) -> AlertDialogConfig {
   AlertDialogConfig(..config, confirm_label: label)
 }
 
 /// Set the cancel button label (default "Cancel").
-pub fn cancel_label(config: AlertDialogConfig, label: String) -> AlertDialogConfig {
+pub fn cancel_label(
+  config: AlertDialogConfig,
+  label: String,
+) -> AlertDialogConfig {
   AlertDialogConfig(..config, cancel_label: label)
 }
 
 /// Append an extra CSS class on the dialog. Additive only.
-pub fn add_class(config: AlertDialogConfig, class: String) -> AlertDialogConfig {
+pub fn add_class(
+  config: AlertDialogConfig,
+  class: String,
+) -> AlertDialogConfig {
   let merged = case config.class {
     "" -> class
     existing -> existing <> " " <> class

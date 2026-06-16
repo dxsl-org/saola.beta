@@ -39,7 +39,10 @@ pub fn default_config() -> EmptyConfig(msg) {
 }
 
 /// Set the leading media element (illustration/icon).
-pub fn media(config: EmptyConfig(msg), media: Element(msg)) -> EmptyConfig(msg) {
+pub fn media(
+  config: EmptyConfig(msg),
+  media: Element(msg),
+) -> EmptyConfig(msg) {
   EmptyConfig(..config, media: Some(media))
 }
 

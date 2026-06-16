@@ -27,9 +27,15 @@ fn checkbox_examples() -> List(Element(Message)) {
       |> checkbox.help_text(
         "This checkbox is initially checked using InitChecked(True).",
       )
-      |> checkbox.view("Checkbox with InitChecked(True)", checkbox.InitChecked(True)),
+      |> checkbox.view(
+        "Checkbox with InitChecked(True)",
+        checkbox.InitChecked(True),
+      ),
     checkbox.new()
-      |> checkbox.form_attr(checkbox.FormAttr("agree", checkbox.InitValue("yes")))
+      |> checkbox.form_attr(checkbox.FormAttr(
+        "agree",
+        checkbox.InitValue("yes"),
+      ))
       |> checkbox.help_text("This checkbox uses InitValue for form submission.")
       |> checkbox.view("Checkbox with InitValue", checkbox.default_check_status),
   ]
@@ -45,11 +51,11 @@ fn input_examples() -> List(Element(Message)) {
     }),
     input.input_password("Password", fn(_) { model.OnRouteChange(model.Inputs) }),
     input.new()
-    |> input.type_(input.Number)
-    |> input.id("qty")
-    |> input.name("quantity")
-    |> input.placeholder("0")
-    |> input.view(option.None, option.None),
+      |> input.type_(input.Number)
+      |> input.id("qty")
+      |> input.name("quantity")
+      |> input.placeholder("0")
+      |> input.view(option.None, option.None),
   ]
 }
 
@@ -59,10 +65,10 @@ fn textarea_examples() -> List(Element(Message)) {
       model.OnRouteChange(model.Inputs)
     }),
     textarea.new()
-    |> textarea.name("bio")
-    |> textarea.placeholder("Tell us about yourself")
-    |> textarea.rows(4)
-    |> textarea.view(option.None, option.None),
+      |> textarea.name("bio")
+      |> textarea.placeholder("Tell us about yourself")
+      |> textarea.rows(4)
+      |> textarea.view(option.None, option.None),
   ]
 }
 

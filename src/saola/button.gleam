@@ -203,13 +203,19 @@ pub fn icon_end(
 }
 
 /// Set the button state. See `ButtonState`.
-pub fn state(config: ButtonConfig(msg), state: ButtonState) -> ButtonConfig(msg) {
+pub fn state(
+  config: ButtonConfig(msg),
+  state: ButtonState,
+) -> ButtonConfig(msg) {
   ButtonConfig(..config, state: state)
 }
 
 /// Sugar over `state`: `loading(True)` == `state(Loading)`, `loading(False)`
 /// == `state(Idle)`. For the success/failed/suspended states use `state`.
-pub fn loading(config: ButtonConfig(msg), is_loading: Bool) -> ButtonConfig(msg) {
+pub fn loading(
+  config: ButtonConfig(msg),
+  is_loading: Bool,
+) -> ButtonConfig(msg) {
   state(config, case is_loading {
     True -> Loading
     False -> Idle
@@ -218,7 +224,10 @@ pub fn loading(config: ButtonConfig(msg), is_loading: Bool) -> ButtonConfig(msg)
 
 /// Sugar over `state`: `disabled(True)` == `state(Disabled)`, `disabled(False)`
 /// == `state(Idle)`.
-pub fn disabled(config: ButtonConfig(msg), is_disabled: Bool) -> ButtonConfig(msg) {
+pub fn disabled(
+  config: ButtonConfig(msg),
+  is_disabled: Bool,
+) -> ButtonConfig(msg) {
   state(config, case is_disabled {
     True -> Disabled
     False -> Idle
@@ -245,7 +254,10 @@ pub fn accent(config: ButtonConfig(msg), accent: Accent) -> ButtonConfig(msg) {
 }
 
 /// Append an extra CSS class after the Basecoat variant class. Additive only.
-pub fn add_class(config: ButtonConfig(msg), class: String) -> ButtonConfig(msg) {
+pub fn add_class(
+  config: ButtonConfig(msg),
+  class: String,
+) -> ButtonConfig(msg) {
   let merged = case config.class {
     "" -> class
     existing -> existing <> " " <> class
@@ -370,8 +382,7 @@ fn anchor_state_attrs(state: ButtonState) -> List(a.Attribute(msg)) {
       ])
     Loaded -> [a.attribute("data-state", "loaded")]
     Failed -> [a.attribute("data-state", "failed")]
-    Suspended ->
-      list.flatten([inert, [a.attribute("data-state", "suspended")]])
+    Suspended -> list.flatten([inert, [a.attribute("data-state", "suspended")]])
     Disabled -> inert
   }
 }

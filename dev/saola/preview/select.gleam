@@ -33,26 +33,28 @@ pub fn view(fruit: String, timezone: String) -> Element(Message) {
               text("Favourite fruit: " <> fruit),
             ]),
             select.new()
-            |> select.name("fruit")
-            |> select.view(fruit_options, select.SyncValue(fruit), fn(v) {
-              SelectChanged("fruit", v)
-            }),
+              |> select.name("fruit")
+              |> select.view(fruit_options, select.SyncValue(fruit), fn(v) {
+                SelectChanged("fruit", v)
+              }),
           ]),
           h.div([a.class("grid gap-2")], [
             h.label([a.class("label")], [text("Timezone")]),
             select.new()
-            |> select.name("timezone")
-            |> select.view(timezone_options, select.SyncValue(timezone), fn(v) {
-              SelectChanged("timezone", v)
-            }),
+              |> select.name("timezone")
+              |> select.view(
+                timezone_options,
+                select.SyncValue(timezone),
+                fn(v) { SelectChanged("timezone", v) },
+              ),
           ]),
           h.div([a.class("grid gap-2")], [
             h.label([a.class("label")], [text("Disabled")]),
             select.new()
-            |> select.disabled(True)
-            |> select.view(fruit_options, select.InitValue("banana"), fn(v) {
-              SelectChanged("disabled", v)
-            }),
+              |> select.disabled(True)
+              |> select.view(fruit_options, select.InitValue("banana"), fn(v) {
+                SelectChanged("disabled", v)
+              }),
           ]),
         ]),
       ]),

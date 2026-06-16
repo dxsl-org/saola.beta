@@ -67,7 +67,10 @@ pub fn name(config: TextareaConfig, name: String) -> TextareaConfig {
 }
 
 /// Set the placeholder text.
-pub fn placeholder(config: TextareaConfig, placeholder: String) -> TextareaConfig {
+pub fn placeholder(
+  config: TextareaConfig,
+  placeholder: String,
+) -> TextareaConfig {
   TextareaConfig(..config, placeholder: placeholder)
 }
 
@@ -157,6 +160,9 @@ pub fn view(
 
 // --- Convenience shortcuts ---
 
-pub fn textarea_simple(ph: String, on_input: fn(String) -> msg) -> Element(msg) {
+pub fn textarea_simple(
+  ph: String,
+  on_input: fn(String) -> msg,
+) -> Element(msg) {
   new() |> placeholder(ph) |> view(None, Some(on_input))
 }

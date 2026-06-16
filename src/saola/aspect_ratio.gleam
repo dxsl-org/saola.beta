@@ -30,7 +30,10 @@ pub fn default_config() -> AspectRatioConfig {
 }
 
 /// Append an extra CSS class on the root. Additive only.
-pub fn add_class(config: AspectRatioConfig, class: String) -> AspectRatioConfig {
+pub fn add_class(
+  config: AspectRatioConfig,
+  class: String,
+) -> AspectRatioConfig {
   let merged = case config.class {
     "" -> class
     existing -> existing <> " " <> class
@@ -40,7 +43,11 @@ pub fn add_class(config: AspectRatioConfig, class: String) -> AspectRatioConfig 
 
 /// Render content inside a box that maintains the given aspect ratio.
 /// `ratio` is width/height, e.g. `16.0 /. 9.0` for widescreen.
-pub fn view(config: AspectRatioConfig, ratio: Float, content: Element(msg)) -> Element(msg) {
+pub fn view(
+  config: AspectRatioConfig,
+  ratio: Float,
+  content: Element(msg),
+) -> Element(msg) {
   let pct = 1.0 /. ratio *. 100.0
   let pct_str = format_pct(pct)
   let extra_class_attrs = case config.class {

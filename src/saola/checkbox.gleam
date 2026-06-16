@@ -65,7 +65,10 @@ pub fn default_config() -> CheckboxConfig {
 }
 
 /// Set the form binding (name + submitted value).
-pub fn form_attr(config: CheckboxConfig, form_attr: FormAttr) -> CheckboxConfig {
+pub fn form_attr(
+  config: CheckboxConfig,
+  form_attr: FormAttr,
+) -> CheckboxConfig {
   CheckboxConfig(..config, form_attr: form_attr)
 }
 

@@ -95,7 +95,11 @@ pub fn nav_bar_simple(
 }
 
 /// A single navigation link for use inside the nav bar.
-pub fn nav_bar_link(href: String, label: String, is_active: Bool) -> Element(msg) {
+pub fn nav_bar_link(
+  href: String,
+  label: String,
+  is_active: Bool,
+) -> Element(msg) {
   let aria_current_attrs = case is_active {
     True -> [a.attribute("aria-current", "page")]
     False -> []

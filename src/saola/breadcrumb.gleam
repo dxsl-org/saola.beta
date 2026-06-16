@@ -34,7 +34,10 @@ pub fn default_config() -> BreadcrumbConfig {
 }
 
 /// Set the separator glyph between items.
-pub fn separator(config: BreadcrumbConfig, separator: String) -> BreadcrumbConfig {
+pub fn separator(
+  config: BreadcrumbConfig,
+  separator: String,
+) -> BreadcrumbConfig {
   BreadcrumbConfig(..config, separator: separator)
 }
 
@@ -69,7 +72,10 @@ pub fn view(
               h.a([a.href(href), a.class("breadcrumb-link")], [h.text(label)])
             BreadcrumbPage(label) ->
               h.span(
-                [a.class("breadcrumb-page"), a.attribute("aria-current", "page")],
+                [
+                  a.class("breadcrumb-page"),
+                  a.attribute("aria-current", "page"),
+                ],
                 [h.text(label)],
               )
             BreadcrumbCustom(el) -> el

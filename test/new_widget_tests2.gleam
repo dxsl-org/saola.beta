@@ -52,11 +52,7 @@ pub fn radio_group_horizontal_has_data_orientation_test() {
   let html =
     radio_group.new()
     |> radio_group.orientation(radio_group.Horizontal)
-    |> radio_group.view(
-      [radio_group.RadioOption("a", "A")],
-      "a",
-      fn(v) { v },
-    )
+    |> radio_group.view([radio_group.RadioOption("a", "A")], "a", fn(v) { v })
     |> element.to_string
   assert string.contains(html, "data-orientation=\"horizontal\"")
 }

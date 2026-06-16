@@ -54,7 +54,10 @@ pub fn max(config: ProgressConfig, max: Int) -> ProgressConfig {
 }
 
 /// Set the variant (Default, Success, Destructive).
-pub fn variant(config: ProgressConfig, variant: ProgressVariant) -> ProgressConfig {
+pub fn variant(
+  config: ProgressConfig,
+  variant: ProgressVariant,
+) -> ProgressConfig {
   ProgressConfig(..config, variant: variant)
 }
 

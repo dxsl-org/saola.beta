@@ -36,7 +36,9 @@ pub fn view() -> Element(Message) {
       ]),
       DocSection("bare", "Bare (no header)", [
         empty.new()
-        |> empty.view("", [], [button.button_primary("Get started", StartedTrial)]),
+        |> empty.view("", [], [
+          button.button_primary("Get started", StartedTrial),
+        ]),
       ]),
       DocSection("usage", "Usage", [
         doc_page.snippet([

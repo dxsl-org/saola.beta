@@ -79,7 +79,10 @@ pub fn view(config: AvatarConfig, source: AvatarSource) -> Element(msg) {
       ])
   }
   h.span(
-    list.flatten([[a.class("avatar " <> size_class(config.size))], extra_class_attrs]),
+    list.flatten([
+      [a.class("avatar " <> size_class(config.size))],
+      extra_class_attrs,
+    ]),
     [inner],
   )
 }
