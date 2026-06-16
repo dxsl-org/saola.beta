@@ -47,12 +47,14 @@ pub type InputConfig {
     placeholder: String,
     disabled: Bool,
     required: Bool,
+    aria_describedby: String,
+    aria_invalid: Bool,
     class: String,
   )
 }
 
 /// Builder entry point. Defaults: Text, no id/name/placeholder, enabled,
-/// optional, no extra class.
+/// optional, not described/invalid, no extra class.
 pub fn new() -> InputConfig {
   InputConfig(
     type_: Text,
@@ -61,6 +63,8 @@ pub fn new() -> InputConfig {
     placeholder: "",
     disabled: False,
     required: False,
+    aria_describedby: "",
+    aria_invalid: False,
     class: "",
   )
 }
@@ -98,6 +102,17 @@ pub fn disabled(config: InputConfig, disabled: Bool) -> InputConfig {
 /// Set the required state.
 pub fn required(config: InputConfig, required: Bool) -> InputConfig {
   InputConfig(..config, required: required)
+}
+
+/// Set `aria-describedby` — the space-separated id(s) of the element(s) that
+/// describe this input (e.g. a `field`'s `<id>-hint`/`<id>-error`).
+pub fn aria_describedby(config: InputConfig, ids: String) -> InputConfig {
+  InputConfig(..config, aria_describedby: ids)
+}
+
+/// Set `aria-invalid="true"` to mark the value as failing validation.
+pub fn aria_invalid(config: InputConfig, invalid: Bool) -> InputConfig {
+  InputConfig(..config, aria_invalid: invalid)
 }
 
 /// Append an extra CSS class after the base `input` class. Additive only.
@@ -157,6 +172,14 @@ pub fn view(
     False -> []
     True -> [a.required(True)]
   }
+  let describedby_attrs = case config.aria_describedby {
+    "" -> []
+    v -> [a.attribute("aria-describedby", v)]
+  }
+  let invalid_attrs = case config.aria_invalid {
+    False -> []
+    True -> [a.attribute("aria-invalid", "true")]
+  }
   let extra_class_attrs = case config.class {
     "" -> []
     c -> [a.class(c)]
@@ -170,6 +193,8 @@ pub fn view(
     placeholder_attrs,
     disabled_attrs,
     required_attrs,
+    describedby_attrs,
+    invalid_attrs,
     extra_class_attrs,
   ]))
 }

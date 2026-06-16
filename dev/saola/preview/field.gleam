@@ -75,6 +75,25 @@ pub fn view(name: String, email: String) -> Element(Message) {
           |> field.required(True)
           |> field.error("This value is invalid.")
           |> field.view(input.input_text("bad value", FormNameChanged)),
+          // Fully accessible: field_id wires <label for>, the hint/error ids,
+          // and the input's aria-describedby + aria-invalid all to one id.
+          field.new()
+          |> field.label("Accessible email")
+          |> field.field_id("acc-email")
+          |> field.hint("We'll send a confirmation link.")
+          |> field.error("Enter a valid email.")
+          |> field.view(
+            input.new()
+            |> input.type_(input.Email)
+            |> input.id("acc-email")
+            |> input.placeholder("you@example.com")
+            |> input.aria_describedby("acc-email-hint acc-email-error")
+            |> input.aria_invalid(True)
+            |> input.view(
+              option.Some(input.SyncValue(email)),
+              option.Some(fn(v) { FormEmailChanged(v) }),
+            ),
+          ),
         ]),
       ]),
       DocSection("usage", "Usage", [
@@ -90,6 +109,20 @@ pub fn view(name: String, email: String) -> Element(Message) {
           "|> field.label(\"Email\")",
           "|> field.description(\"We'll never share your email.\")",
           "|> field.view(input.new() |> input.type_(input.Email) |> input.view(value, on_msg))",
+          "",
+          "// Accessible — share one id so label/hint/error and the input link up",
+          "field.new()",
+          "|> field.label(\"Email\")",
+          "|> field.field_id(\"email\")            // -> <label for>, #email-hint, #email-error",
+          "|> field.hint(\"We'll send a link.\")",
+          "|> field.error(\"Enter a valid email.\")",
+          "|> field.view(",
+          "  input.new()",
+          "  |> input.id(\"email\")",
+          "  |> input.aria_describedby(\"email-hint email-error\")",
+          "  |> input.aria_invalid(True)",
+          "  |> input.view(value, on_msg),",
+          ")",
         ]),
       ]),
     ],

@@ -65,6 +65,26 @@ pub fn input_no_id_omitted_test() {
   assert !string.contains(html, "name=")
 }
 
+pub fn input_aria_describedby_and_invalid_render_test() {
+  let html =
+    input.new()
+    |> input.aria_describedby("email-hint email-error")
+    |> input.aria_invalid(True)
+    |> input.view(None, None)
+    |> element.to_string
+  assert string.contains(html, "aria-describedby=\"email-hint email-error\"")
+  assert string.contains(html, "aria-invalid=\"true\"")
+}
+
+pub fn input_aria_defaults_omitted_test() {
+  let html =
+    input.new()
+    |> input.view(None, None)
+    |> element.to_string
+  assert !string.contains(html, "aria-describedby")
+  assert !string.contains(html, "aria-invalid")
+}
+
 // --- textarea ---
 
 pub fn textarea_renders_test() {

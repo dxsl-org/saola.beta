@@ -48,7 +48,8 @@ pub fn view(model: Model) -> Element(Message) {
 
   doc_page.doc_page(
     "Tree View",
-    "A collapsible tree widget for hierarchical data. Click folders to expand/collapse.",
+    "A collapsible tree for hierarchical data. Click folders to expand/collapse; "
+      <> "nodes are also keyboard reachable (Tab) and activate on Enter.",
     [
       DocSection("file-tree", "File Tree", [
         h.div([a.class("max-w-xs border rounded-md p-2")], [
@@ -76,9 +77,15 @@ pub fn view(model: Model) -> Element(Message) {
           "",
           "tree_view.tree_view_simple(",
           "  items,",
-          "  model.tree_open_ids,",
+          "  model.tree_open_ids,        // consumer owns which ids are open",
           "  TreeNodeToggled,",
           ")",
+          "",
+          "// Accessibility: each node is role=treeitem, tabindex=0 (Tab-reachable),",
+          "// with aria-expanded on branches. Enter toggles a branch / selects a leaf.",
+          "// Pass an on_select (full view) to make leaves selectable:",
+          "tree_view.new()",
+          "|> tree_view.view(items, open_ids, TreeNodeToggled, Some(NodeSelected))",
         ]),
       ]),
     ],
