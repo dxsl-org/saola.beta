@@ -116,13 +116,9 @@ pub fn nav_bar_simple_renders_header_test() {
 
 pub fn nav_bar_sticky_has_sticky_class_test() {
   let html =
-    navigation_bar.nav_bar(
-      navigation_bar.Sticky,
-      None,
-      [],
-      [],
-      navigation_bar.default_attrs,
-    )
+    navigation_bar.new()
+    |> navigation_bar.variant(navigation_bar.Sticky)
+    |> navigation_bar.view(None, [], [])
     |> element.to_string
   assert string.contains(html, "nav-bar-sticky")
 }

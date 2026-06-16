@@ -164,7 +164,6 @@ pub fn table_simple_renders_headers_test() {
     table.table_simple(
       headers: ["Name", "Email", "Role"],
       rows: [],
-      extra_attrs: table.default_table_attrs,
     )
     |> element.to_string
   assert string.contains(html, "<table")
@@ -185,7 +184,6 @@ pub fn table_simple_renders_rows_test() {
           table.ElementCell(badge.badge_default("Active")),
         ]),
       ],
-      extra_attrs: table.default_table_attrs,
     )
     |> element.to_string
   assert string.contains(html, "<tbody")
@@ -197,11 +195,9 @@ pub fn table_simple_renders_rows_test() {
 
 pub fn table_with_caption_renders_test() {
   let html =
-    table.table_simple(
-      headers: ["X"],
-      rows: [],
-      extra_attrs: table.TableExtraAttrs("Monthly data", ""),
-    )
+    table.new()
+    |> table.caption("Monthly data")
+    |> table.view(["X"], [])
     |> element.to_string
   assert string.contains(html, "<caption")
   assert string.contains(html, "Monthly data")

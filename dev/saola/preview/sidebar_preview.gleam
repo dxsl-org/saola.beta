@@ -61,7 +61,8 @@ pub fn view(model: Model) -> Element(Message) {
               a.style("height", "320px"),
             ],
             [
-              sidebar.sidebar(
+              sidebar.new()
+              |> sidebar.view(
                 True,
                 Some(
                   sidebar.sidebar_header([
@@ -116,7 +117,6 @@ pub fn view(model: Model) -> Element(Message) {
                     h.div([a.class("text-xs text-muted")], [text("v1.0.0")]),
                   ]),
                 ),
-                sidebar.default_attrs,
               ),
               h.div([a.class("flex-1 p-4 text-sm text-muted")], [
                 text("Main content area"),

@@ -233,17 +233,10 @@ pub fn field_simple_renders_test() {
 
 pub fn field_with_error_renders_test() {
   let html =
-    field.field(
-      field.FieldAttrs(
-        label: "Email",
-        description: "",
-        error: "Invalid email address.",
-        orientation: field.Vertical,
-        required: False,
-        hint: "",
-      ),
-      input.input_email("you@example.com", fn(_) { Nil }),
-    )
+    field.new()
+    |> field.label("Email")
+    |> field.error("Invalid email address.")
+    |> field.view(input.input_email("you@example.com", fn(_) { Nil }))
     |> element.to_string
   assert string.contains(html, "data-invalid=\"true\"")
   assert string.contains(html, "Invalid email address.")
@@ -252,17 +245,10 @@ pub fn field_with_error_renders_test() {
 
 pub fn field_with_description_renders_test() {
   let html =
-    field.field(
-      field.FieldAttrs(
-        label: "Bio",
-        description: "Write a short description.",
-        error: "",
-        orientation: field.Vertical,
-        required: False,
-        hint: "",
-      ),
-      textarea.textarea_simple("About you", fn(_) { Nil }),
-    )
+    field.new()
+    |> field.label("Bio")
+    |> field.description("Write a short description.")
+    |> field.view(textarea.textarea_simple("About you", fn(_) { Nil }))
     |> element.to_string
   assert string.contains(html, "Write a short description.")
   assert !string.contains(html, "data-invalid")
@@ -270,17 +256,10 @@ pub fn field_with_description_renders_test() {
 
 pub fn field_horizontal_renders_test() {
   let html =
-    field.field(
-      field.FieldAttrs(
-        label: "Active",
-        description: "",
-        error: "",
-        orientation: field.Horizontal,
-        required: False,
-        hint: "",
-      ),
-      switch.switch_simple("Active", True, fn(_) { Nil }),
-    )
+    field.new()
+    |> field.label("Active")
+    |> field.orientation(field.Horizontal)
+    |> field.view(switch.switch_simple("Active", True, fn(_) { Nil }))
     |> element.to_string
   assert string.contains(html, "data-orientation=\"horizontal\"")
 }

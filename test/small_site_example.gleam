@@ -104,9 +104,11 @@ fn overview_panel() -> Element(Msg) {
 }
 
 fn plans_panel() -> Element(Msg) {
-  table.table_simple(
-    headers: ["Plan", "Price", "Status"],
-    rows: [
+  table.new()
+  |> table.caption("Plans")
+  |> table.view(
+    ["Plan", "Price", "Status"],
+    [
       table.TableRow([
         table.TextCell("Starter"),
         table.TextCell("$19"),
@@ -118,7 +120,6 @@ fn plans_panel() -> Element(Msg) {
         table.ElementCell(badge.badge_secondary("Popular")),
       ]),
     ],
-    extra_attrs: table.TableExtraAttrs("Plans", ""),
   )
 }
 

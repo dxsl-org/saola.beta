@@ -1,3 +1,14 @@
+//// Form field wrapper — dual-style `Config` (uniform Saola pattern):
+////
+//// ```gleam
+//// field.field_simple("Email", the_input)                            // shortcut
+//// field.new()
+//// |> field.label("Email")
+//// |> field.description("We won't spam.")
+//// |> field.required(True)
+//// |> field.view(the_input)
+//// ```
+
 import gleam/list
 import lustre/attribute as a
 import lustre/element.{type Element}
@@ -5,13 +16,16 @@ import lustre/element/html as h
 
 pub const class_field = "field"
 
+/// Label/input layout: stacked (`Vertical`) or side-by-side (`Horizontal`).
 pub type FieldOrientation {
   Vertical
   Horizontal
 }
 
-pub type FieldAttrs {
-  FieldAttrs(
+/// Presentation options for a field. Public for record-update syntax. The
+/// wrapped `input` element is the required data, passed to `view`.
+pub type FieldConfig {
+  FieldConfig(
     label: String,
     description: String,
     error: String,
@@ -21,51 +35,77 @@ pub type FieldAttrs {
   )
 }
 
-pub const default_attrs = FieldAttrs(
-  label: "",
-  description: "",
-  error: "",
-  orientation: Vertical,
-  required: False,
-  hint: "",
-)
+/// Builder entry point. Defaults: no label/description/error/hint, Vertical,
+/// not required.
+pub fn new() -> FieldConfig {
+  FieldConfig(
+    label: "",
+    description: "",
+    error: "",
+    orientation: Vertical,
+    required: False,
+    hint: "",
+  )
+}
 
-/// Wraps an input with a label, optional description, and optional error message.
-///
-/// Example:
-/// ```gleam
-/// field(
-///   FieldAttrs(label: "Email", description: "We won't spam.", error: "", orientation: Vertical),
-///   input.input_email("you@example.com", EmailChanged),
-/// )
-/// ```
-pub fn field(attrs: FieldAttrs, input: Element(msg)) -> Element(msg) {
-  let FieldAttrs(label:, description:, error:, orientation:, required:, hint:) =
-    attrs
-  let is_invalid = error != ""
+/// Config-style entry point — alias of `new` for record-update syntax.
+pub fn default_config() -> FieldConfig {
+  new()
+}
+
+/// Set the field label (omitted when empty).
+pub fn label(config: FieldConfig, label: String) -> FieldConfig {
+  FieldConfig(..config, label: label)
+}
+
+/// Set the helper description (below the input).
+pub fn description(config: FieldConfig, description: String) -> FieldConfig {
+  FieldConfig(..config, description: description)
+}
+
+/// Set the error message (presence marks the field invalid).
+pub fn error(config: FieldConfig, error: String) -> FieldConfig {
+  FieldConfig(..config, error: error)
+}
+
+/// Set the orientation (Vertical — default, Horizontal).
+pub fn orientation(config: FieldConfig, orientation: FieldOrientation) -> FieldConfig {
+  FieldConfig(..config, orientation: orientation)
+}
+
+/// Mark the field required (renders a `*` indicator).
+pub fn required(config: FieldConfig, required: Bool) -> FieldConfig {
+  FieldConfig(..config, required: required)
+}
+
+/// Set the hint text (between input and description).
+pub fn hint(config: FieldConfig, hint: String) -> FieldConfig {
+  FieldConfig(..config, hint: hint)
+}
+
+/// Render the field wrapping the given `input` element.
+pub fn view(config: FieldConfig, input: Element(msg)) -> Element(msg) {
+  let is_invalid = config.error != ""
   let invalid_attrs = case is_invalid {
     True -> [a.attribute("data-invalid", "true")]
     False -> []
   }
-  let orientation_attrs = case orientation {
+  let orientation_attrs = case config.orientation {
     Vertical -> []
     Horizontal -> [a.attribute("data-orientation", "horizontal")]
   }
   h.div(
     list.flatten([[a.class(class_field)], invalid_attrs, orientation_attrs]),
     [
-      case label {
+      case config.label {
         "" -> element.none()
         l ->
           h.label([a.class("label")], [
             h.text(l),
-            case required {
+            case config.required {
               True ->
                 h.span(
-                  [
-                    a.class("field-required"),
-                    a.attribute("aria-hidden", "true"),
-                  ],
+                  [a.class("field-required"), a.attribute("aria-hidden", "true")],
                   [h.text(" *")],
                 )
               False -> element.none()
@@ -73,15 +113,15 @@ pub fn field(attrs: FieldAttrs, input: Element(msg)) -> Element(msg) {
           ])
       },
       input,
-      case hint {
+      case config.hint {
         "" -> element.none()
         h_ -> h.p([a.class("field-hint")], [h.text(h_)])
       },
-      case description {
+      case config.description {
         "" -> element.none()
         d -> h.p([a.class("text-muted-foreground text-sm")], [h.text(d)])
       },
-      case error {
+      case config.error {
         "" -> element.none()
         err -> h.p([a.role("alert")], [h.text(err)])
       },
@@ -89,6 +129,9 @@ pub fn field(attrs: FieldAttrs, input: Element(msg)) -> Element(msg) {
   )
 }
 
+// --- Convenience shortcuts ---
+
+/// A labelled field wrapping `input`, using all other defaults.
 pub fn field_simple(label: String, input: Element(msg)) -> Element(msg) {
-  field(FieldAttrs(..default_attrs, label: label), input)
+  FieldConfig(..new(), label: label) |> view(input)
 }

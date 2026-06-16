@@ -30,8 +30,8 @@ pub fn view() -> Element(Message) {
           h.div([a.class("grid gap-4")], [
             h.h2([], [text("With actions")]),
             h.div([a.class("border rounded-lg overflow-hidden")], [
-              nav_bar.nav_bar(
-                nav_bar.Default,
+              nav_bar.new()
+              |> nav_bar.view(
                 Some(h.span([a.class("font-bold text-lg")], [text("Saola")])),
                 [
                   nav_bar.nav_bar_link("/", "Home", False),
@@ -41,15 +41,14 @@ pub fn view() -> Element(Message) {
                   button.button_outline("Sign in", StartedTrial),
                   button.button_primary("Get started", StartedTrial),
                 ],
-                nav_bar.default_attrs,
               ),
             ]),
           ]),
           h.div([a.class("grid gap-4")], [
             h.h2([], [text("No logo")]),
             h.div([a.class("border rounded-lg overflow-hidden")], [
-              nav_bar.nav_bar(
-                nav_bar.Default,
+              nav_bar.new()
+              |> nav_bar.view(
                 None,
                 [
                   nav_bar.nav_bar_link("/", "Home", False),
@@ -57,7 +56,6 @@ pub fn view() -> Element(Message) {
                   nav_bar.nav_bar_link("/contact", "Contact", True),
                 ],
                 [],
-                nav_bar.default_attrs,
               ),
             ]),
           ]),

@@ -32,25 +32,24 @@ pub fn view() -> Element(Message) {
     "Data tables with typed cells and optional captions.",
     [
       DocSection("demo", "Demo", [
-        table.table_simple(
-          headers: headers,
-          rows: rows,
-          extra_attrs: table.TableExtraAttrs("Team members", ""),
-        ),
+        table.new()
+        |> table.caption("Team members")
+        |> table.view(headers, rows),
       ]),
       DocSection("usage", "Usage", [
         doc_page.snippet([
           "import saola/table",
           "",
-          "table.table_simple(",
-          "  headers: [\"Name\", \"Status\"],",
-          "  rows: [",
+          "table.new()",
+          "|> table.caption(\"Team members\")",
+          "|> table.view(",
+          "  [\"Name\", \"Status\"],",
+          "  [",
           "    table.TableRow([",
           "      table.TextCell(\"Alice\"),",
           "      table.ElementCell(badge.badge_default(\"Active\")),",
           "    ]),",
           "  ],",
-          "  extra_attrs: table.TableExtraAttrs(\"Caption\", \"\"),",
           ")",
         ]),
       ]),

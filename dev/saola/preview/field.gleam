@@ -20,15 +20,10 @@ pub fn view(name: String, email: String) -> Element(Message) {
             "Full name",
             input.input_text("Jane Doe", FormNameChanged),
           ),
-          field.field(
-            field.FieldAttrs(
-              label: "Email address",
-              description: "We'll never share your email.",
-              error: "",
-              orientation: field.Vertical,
-              required: False,
-              hint: "",
-            ),
+          field.new()
+          |> field.label("Email address")
+          |> field.description("We'll never share your email.")
+          |> field.view(
             input.new()
             |> input.type_(input.Email)
             |> input.placeholder("you@example.com")
@@ -38,15 +33,10 @@ pub fn view(name: String, email: String) -> Element(Message) {
               option.Some(fn(v) { FormEmailChanged(v) }),
             ),
           ),
-          field.field(
-            field.FieldAttrs(
-              label: "Username",
-              description: "",
-              error: "Username is already taken.",
-              orientation: field.Vertical,
-              required: False,
-              hint: "",
-            ),
+          field.new()
+          |> field.label("Username")
+          |> field.error("Username is already taken.")
+          |> field.view(
             input.new()
             |> input.placeholder("choose a username")
             |> input.name("username")
@@ -55,15 +45,10 @@ pub fn view(name: String, email: String) -> Element(Message) {
               option.Some(FormNameChanged),
             ),
           ),
-          field.field(
-            field.FieldAttrs(
-              label: "Country",
-              description: "Used to calculate shipping.",
-              error: "",
-              orientation: field.Vertical,
-              required: False,
-              hint: "",
-            ),
+          field.new()
+          |> field.label("Country")
+          |> field.description("Used to calculate shipping.")
+          |> field.view(
             select.select_simple(
               [
                 select.SelectOption("vn", "Vietnam"),
@@ -73,37 +58,23 @@ pub fn view(name: String, email: String) -> Element(Message) {
               fn(_) { FormNameChanged("") },
             ),
           ),
-          field.field(
-            field.FieldAttrs(
-              label: "Marketing emails",
-              description: "Receive product updates and offers.",
-              error: "",
-              orientation: field.Horizontal,
-              required: False,
-              hint: "",
-            ),
+          field.new()
+          |> field.label("Marketing emails")
+          |> field.description("Receive product updates and offers.")
+          |> field.orientation(field.Horizontal)
+          |> field.view(
             switch.switch_simple("", False, fn(_) { FormNameChanged("") }),
           ),
-          field.field(
-            field.FieldAttrs(
-              label: "Required field",
-              description: "",
-              error: "",
-              orientation: field.Vertical,
-              required: True,
-              hint: "This field is mandatory.",
-            ),
-            input.input_text("", FormNameChanged),
-          ),
-          field.field(
-            field.FieldAttrs(
-              ..field.default_attrs,
-              label: "With validation error",
-              required: True,
-              error: "This value is invalid.",
-            ),
-            input.input_text("bad value", FormNameChanged),
-          ),
+          field.new()
+          |> field.label("Required field")
+          |> field.required(True)
+          |> field.hint("This field is mandatory.")
+          |> field.view(input.input_text("", FormNameChanged)),
+          field.new()
+          |> field.label("With validation error")
+          |> field.required(True)
+          |> field.error("This value is invalid.")
+          |> field.view(input.input_text("bad value", FormNameChanged)),
         ]),
       ]),
       DocSection("usage", "Usage", [
@@ -115,13 +86,10 @@ pub fn view(name: String, email: String) -> Element(Message) {
           "field.field_simple(\"Full name\", input.input_text(\"Jane Doe\", on_msg))",
           "",
           "// Full — with description, error, orientation",
-          "field.field(",
-          "  field.FieldAttrs(",
-          "    label: \"Email\", description: \"We'll never share your email.\",",
-          "    error: \"\", orientation: field.Vertical, required: False, hint: \"\",",
-          "  ),",
-          "  input.new() |> input.type_(input.Email) |> input.view(value, on_msg),",
-          ")",
+          "field.new()",
+          "|> field.label(\"Email\")",
+          "|> field.description(\"We'll never share your email.\")",
+          "|> field.view(input.new() |> input.type_(input.Email) |> input.view(value, on_msg))",
         ]),
       ]),
     ],

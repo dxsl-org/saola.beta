@@ -61,12 +61,12 @@ pub fn view(model: Model) -> Element(Message) {
       ]),
       DocSection("with-select", "With Select Callback", [
         h.div([a.class("max-w-xs border rounded-md p-2")], [
-          tree_view.tree_view(
+          tree_view.new()
+          |> tree_view.view(
             items,
             model.tree_open_ids,
             TreeNodeToggled,
             Some(fn(_id) { TreeNodeToggled("") }),
-            tree_view.default_attrs,
           ),
         ]),
       ]),

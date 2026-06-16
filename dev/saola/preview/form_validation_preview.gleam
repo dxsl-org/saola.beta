@@ -31,13 +31,11 @@ pub fn view(model: Model) -> Element(Message) {
           "import saola/field",
           "import saola/input",
           "",
-          "field.field(",
-          "  field.FieldAttrs(",
-          "    ..field.default_attrs,",
-          "    label: \"Full name\",",
-          "    required: True,",
-          "    error: err(\"name\"),",
-          "  ),",
+          "field.new()",
+          "|> field.label(\"Full name\")",
+          "|> field.required(True)",
+          "|> field.error(err(\"name\"))",
+          "|> field.view(",
           "  input.new()",
           "  |> input.name(\"name\")",
           "  |> input.placeholder(\"Nguyen Van A\")",
@@ -55,51 +53,43 @@ fn signup_form(model: Model) -> Element(Message) {
   }
 
   h.form([a.class("grid gap-4"), e.on_submit(fn(_) { SignupSubmitted })], [
-    field.field(
-      field.FieldAttrs(
-        ..field.default_attrs,
-        label: "Full name",
-        required: True,
-        error: err("name"),
-      ),
+    field.new()
+    |> field.label("Full name")
+    |> field.required(True)
+    |> field.error(err("name"))
+    |> field.view(
       input.new()
       |> input.name("name")
       |> input.placeholder("Nguyen Van A")
       |> input.view(Some(input.SyncValue(model.signup_name)), Some(SignupNameChanged)),
     ),
-    field.field(
-      field.FieldAttrs(
-        ..field.default_attrs,
-        label: "Email address",
-        required: True,
-        error: err("email"),
-      ),
+    field.new()
+    |> field.label("Email address")
+    |> field.required(True)
+    |> field.error(err("email"))
+    |> field.view(
       input.new()
       |> input.type_(input.Email)
       |> input.name("email")
       |> input.placeholder("you@example.com")
       |> input.view(Some(input.SyncValue(model.signup_email)), Some(SignupEmailChanged)),
     ),
-    field.field(
-      field.FieldAttrs(
-        ..field.default_attrs,
-        label: "Password",
-        required: True,
-        hint: "At least 8 characters.",
-        error: err("password"),
-      ),
+    field.new()
+    |> field.label("Password")
+    |> field.required(True)
+    |> field.hint("At least 8 characters.")
+    |> field.error(err("password"))
+    |> field.view(
       input.new()
       |> input.type_(input.Password)
       |> input.name("password")
       |> input.view(Some(input.SyncValue(model.signup_password)), Some(SignupPasswordChanged)),
     ),
-    field.field(
-      field.FieldAttrs(
-        ..field.default_attrs,
-        label: "Confirm password",
-        required: True,
-        error: err("confirm"),
-      ),
+    field.new()
+    |> field.label("Confirm password")
+    |> field.required(True)
+    |> field.error(err("confirm"))
+    |> field.view(
       input.new()
       |> input.type_(input.Password)
       |> input.name("confirm")

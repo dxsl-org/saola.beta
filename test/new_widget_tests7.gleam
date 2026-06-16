@@ -8,10 +8,10 @@ import saola/theme
 
 pub fn field_required_renders_label_and_asterisk_test() {
   let html =
-    field.field(
-      field.FieldAttrs(..field.default_attrs, label: "Name", required: True),
-      h.input([]),
-    )
+    field.new()
+    |> field.label("Name")
+    |> field.required(True)
+    |> field.view(h.input([]))
     |> element.to_string
   assert string.contains(html, "field-required")
   assert string.contains(html, " *")
@@ -20,10 +20,10 @@ pub fn field_required_renders_label_and_asterisk_test() {
 
 pub fn field_required_renders_asterisk_test() {
   let html =
-    field.field(
-      field.FieldAttrs(..field.default_attrs, label: "Name", required: True),
-      h.input([]),
-    )
+    field.new()
+    |> field.label("Name")
+    |> field.required(True)
+    |> field.view(h.input([]))
     |> element.to_string
   assert string.contains(html, "field-required")
   assert string.contains(html, " *")
@@ -31,24 +31,20 @@ pub fn field_required_renders_asterisk_test() {
 
 pub fn field_not_required_omits_aria_required_test() {
   let html =
-    field.field(
-      field.FieldAttrs(..field.default_attrs, label: "Name", required: False),
-      h.input([]),
-    )
+    field.new()
+    |> field.label("Name")
+    |> field.required(False)
+    |> field.view(h.input([]))
     |> element.to_string
   assert !string.contains(html, "aria-required")
 }
 
 pub fn field_hint_renders_test() {
   let html =
-    field.field(
-      field.FieldAttrs(
-        ..field.default_attrs,
-        label: "Email",
-        hint: "Enter a valid email address.",
-      ),
-      h.input([]),
-    )
+    field.new()
+    |> field.label("Email")
+    |> field.hint("Enter a valid email address.")
+    |> field.view(h.input([]))
     |> element.to_string
   assert string.contains(html, "field-hint")
   assert string.contains(html, "Enter a valid email address.")
@@ -56,25 +52,21 @@ pub fn field_hint_renders_test() {
 
 pub fn field_hint_empty_omits_test() {
   let html =
-    field.field(
-      field.FieldAttrs(..field.default_attrs, label: "Email", hint: ""),
-      h.input([]),
-    )
+    field.new()
+    |> field.label("Email")
+    |> field.hint("")
+    |> field.view(h.input([]))
     |> element.to_string
   assert !string.contains(html, "field-hint")
 }
 
 pub fn field_required_and_hint_together_test() {
   let html =
-    field.field(
-      field.FieldAttrs(
-        ..field.default_attrs,
-        label: "Phone",
-        required: True,
-        hint: "Include country code.",
-      ),
-      h.input([]),
-    )
+    field.new()
+    |> field.label("Phone")
+    |> field.required(True)
+    |> field.hint("Include country code.")
+    |> field.view(h.input([]))
     |> element.to_string
   assert string.contains(html, "field-required")
   assert string.contains(html, "field-hint")

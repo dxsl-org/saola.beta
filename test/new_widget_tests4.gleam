@@ -97,30 +97,22 @@ pub fn sidebar_trigger_renders_button_test() {
 
 pub fn sidebar_right_variant_test() {
   let html =
-    sidebar.sidebar(
-      True,
-      None,
-      sidebar.sidebar_content([]),
-      None,
-      sidebar.SidebarAttrs(
-        side: sidebar.Right,
-        variant: sidebar.Default,
-        collapsible: sidebar.SidebarNone,
-        class: "",
-      ),
-    )
+    sidebar.new()
+    |> sidebar.side(sidebar.Right)
+    |> sidebar.collapsible(sidebar.SidebarNone)
+    |> sidebar.view(True, None, sidebar.sidebar_content([]), None)
     |> element.to_string
   assert string.contains(html, "sidebar-right")
 }
 
 pub fn sidebar_full_with_header_footer_test() {
   let html =
-    sidebar.sidebar(
+    sidebar.new()
+    |> sidebar.view(
       True,
       Some(sidebar.sidebar_header([h.text("Header")])),
       sidebar.sidebar_content([]),
       Some(sidebar.sidebar_footer([h.text("Footer")])),
-      sidebar.default_attrs,
     )
     |> element.to_string
   assert string.contains(html, "sidebar-header")
